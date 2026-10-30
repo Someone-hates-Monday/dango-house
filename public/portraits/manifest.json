@@ -1,0 +1,196 @@
+{
+  "repository": "shuaizenge/ai-girls",
+  "commit": "dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76",
+  "records": [
+    {
+      "id": "deepseek",
+      "path": "deepseek.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/deepseek-adult-zipzippipe-pixiv-148186519-p00.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_declared",
+        "identifier": "CC-BY-NC-SA-4.0",
+        "evidence_url": "https://www.bilibili.com/video/BV1tE9XBbErS/",
+        "note": "上善无形原角色 → ZipZipPipe 女仆二次设计；社区补充图的具体绘制者仍未核实。"
+      },
+      "creators": [
+        "上善无形（角色原型）",
+        "ZipZipPipe（女仆二次设计）"
+      ],
+      "sha256": "abf8fff518e49f26f06166b238e4b21d3015ff57452b1d531c66dfd90d212a9a",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "claude",
+      "path": "claude.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/claude-adult-zipzippipe-pixiv-148186519-p02.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "29f51c0b98921c53c6992e1298eed2c41ff79ba5753f2c0e06ba0e43b9fbbf89",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "gpt",
+      "path": "gpt.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/gpt-adult-zipzippipe-pixiv-148186519-p03.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "2ad17c3c08c1b9eaed948c4d4ed53246a6c91e8240621c46c35f8d04e210905a",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "gemini",
+      "path": "gemini.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/gemini-adult-zipzippipe-pixiv-148186519-p04.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "f24e4ba9f37157b0ed4b1c1061c3ce893597fbb0b4a33eb90e7e341ecdad368c",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "glm",
+      "path": "glm.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/glm-adult-zipzippipe-pixiv-148186519-p06.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "109fd1517734b798a0264617632379aa1234ecf8b81cd51664135bd5a3204c95",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "kimi",
+      "path": "kimi.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/kimi-adult-zipzippipe-pixiv-148186519-p05.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "a13fda416bfd67e5fe1f1300698745f764c34952323ee0b52682287532ae3285",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    },
+    {
+      "id": "grok",
+      "path": "grok.jpg",
+      "source": "https://github.com/shuaizenge/ai-girls/blob/dcd69f5f4f2dff1a9c0031e82deb49e0fe949c76/previews/grok-adult-zipzippipe-pixiv-148186519-p07.jpg",
+      "originalSource": {
+        "title": "ZipZipPipe《AI娘化》",
+        "page_url": "https://www.pixiv.net/artworks/148186519",
+        "author": "ZipZipPipe",
+        "author_id": "18604994",
+        "author_url": "https://www.pixiv.net/users/18604994",
+        "published_at": "2026-08-09T01:18:00+09:00",
+        "accessed_on": "2026-10-01",
+        "kind": "author_original_collection",
+        "note": "通过作者作品的 pages 接口取得 original 文件，原字节保存。此为公开合集收录日期，不能据此认定为角色首次设计日期。"
+      },
+      "license": {
+        "status": "author_sharing_statement",
+        "identifier": null,
+        "evidence_url": "https://www.bilibili.com/video/BV1bARXBYEZz/",
+        "note": "作者说明作品开放分享与再创作，未核实这些角色适用统一标准许可证，不推断为 CC0 / MIT。"
+      },
+      "creators": [
+        "ZipZipPipe"
+      ],
+      "sha256": "e64a1444df10024262eab45e68686470b7370b76e4f1aa11236a74fb9f5eb6c1",
+      "note": "Upstream preview derivative retained unchanged; normal proportions do not establish character age."
+    }
+  ]
+}

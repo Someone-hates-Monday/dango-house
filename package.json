@@ -1,0 +1,65 @@
+{
+  "name": "desktop-pet-garden",
+  "productName": "团子小屋",
+  "version": "0.3.7",
+  "private": true,
+  "type": "module",
+  "description": "团子小屋 · AI 娘乐园 / A cozy desktop home for seven AI companions",
+  "author": "Someone-hates-Monday <2872397866@qq.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Someone-hates-Monday/dango-house.git"
+  },
+  "homepage": "https://github.com/Someone-hates-Monday/dango-house#readme",
+  "bugs": {
+    "url": "https://github.com/Someone-hates-Monday/dango-house/issues"
+  },
+  "license": "MIT",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/build-electron.mjs",
+    "start": "node scripts/launch.mjs",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:desktop": "node scripts/smoke.mjs",
+    "package": "npm run build && electron-builder --win portable --x64",
+    "assets": "node scripts/assets.mjs && node scripts/brand.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "1.62.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0",
+    "esbuild": "0.28.2",
+    "playwright": "1.64.1",
+    "tsx": "^4.19.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
+  },
+  "build": {
+    "appId": "garden.desktop.companions",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "compression": "normal",
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.ico",
+      "signExecutable": false
+    },
+    "artifactName": "DangoHouse-${version}-${arch}.${ext}"
+  }
+}

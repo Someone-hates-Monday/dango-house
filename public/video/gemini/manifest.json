@@ -1,0 +1,22 @@
+{
+  "productionApproved": true,
+  "status": "accepted-after-local-review",
+  "basis": "Original first frame, contact sheet over light/dark backgrounds, full forward frame preservation and boundary audit; verify in Electron before release.",
+  "evidence": [
+    "download-first-frame.png",
+    "contact-alpha.png",
+    "audit.json"
+  ],
+  "acceptedMotion": "Ear relaxation, closed-eye leaning and gentle smile, then visible return to open-eye stance.",
+  "limits": "Small generated line and clothing variations remain; no claim of identical pixels or independently authored animation. Other interactions retain existing renderer.",
+  "sourceSha256": "32aac46acae49101cbd4541e5450268183e9107a43ad381722ff62b91b0d5a63",
+  "frames": 241,
+  "duration": 10.041666666666666,
+  "date": "2026-10-30",
+  "character": "gemini",
+  "action": "pat",
+  "asset": "pat-doubao-a1.webm",
+  "fps": 24,
+  "alpha": true,
+  "assetSha256": "564014097f10006f89824b2ba6d6ca8517d687d751266e7f19b500daa4c3ea76"
+}

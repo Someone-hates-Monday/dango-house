@@ -1,0 +1,55 @@
+{
+  "repository": "https://github.com/fywdy/chatgpt-chibi-pets",
+  "tree": "d5bbb27c79e5c08e8b8ab44d4023cd35a67418e2",
+  "license": "CC-BY-NC-4.0",
+  "records": [
+    {
+      "path": "NOTICE.md",
+      "upstream": "NOTICE.md",
+      "gitBlob": "5f4b146a0c9f0bf651f85dbb19e118a01c0351f2",
+      "sha256": "18590cb91c023dfec4e8a92c927213e0caa826e1a3264c8387cb20353c8299c0"
+    },
+    {
+      "path": "LICENSE",
+      "upstream": "LICENSE",
+      "gitBlob": "cba74d8d0e2dbd51dac41d4576d9943b57e79ce4",
+      "sha256": "16e11fba88f0fa3d266e0540bc695747d7dd513ed7d065e44445e8d3ef5d0cd0"
+    },
+    {
+      "path": "claude.webp",
+      "upstream": "claude-orange-scholar-chibi-v3/spritesheet.webp",
+      "gitBlob": "b19eb0770a1f552afb1edcdabdab82a52f303afe",
+      "sha256": "6ff6ce931a8bb97bed33018ca23da959c5558695740d28bc014d316b5c1cf359"
+    },
+    {
+      "path": "deepseek.webp",
+      "upstream": "deepseek-whale-maid-chibi-v4/spritesheet.webp",
+      "gitBlob": "26559a0cf17133649820f6d2245d9b2149e52402",
+      "sha256": "df223ae1fe1700073a17619c037503b9b1ce0b8dbb7804b019e44c5e0eb2a335"
+    },
+    {
+      "path": "gpt.webp",
+      "upstream": "chatgpt-white-dragon-chibi-v5/spritesheet.webp",
+      "gitBlob": "0d81395c8a5d127ffb1ff8f21a091d9679c8c0af",
+      "sha256": "6d7cd4d4a33f2babda645dc1cb8b6b719530029b511e126ac6611fa1142a718f"
+    },
+    {
+      "path": "kimi.webp",
+      "upstream": "kimi-moon-maid-chibi-v2/spritesheet.webp",
+      "gitBlob": "498abadfd0e2ca51863c0e20c314f9823fa17d22",
+      "sha256": "5b3d882e7a1509861f1757babc7073a01e4c91b2cdae81bbca1afcc899e12b61"
+    },
+    {
+      "path": "gemini.webp",
+      "upstream": "gemini-star-cat-chibi-v1/spritesheet.webp",
+      "gitBlob": "bc8998511c151900f256b5835eeaf5bead000d48",
+      "sha256": "e9b9d65e22271228fbde34d9a42901746616066b18e90f995d1acaf4c1e095b2"
+    },
+    {
+      "path": "grok.webp",
+      "upstream": "grok-gothic-chibi-v1/spritesheet.webp",
+      "gitBlob": "a10c07dfe81a40073be10653ac4e0a31f9a7d482",
+      "sha256": "a7d283a24eb03075fe4e3292646c135c1fb59d4a934c40fa301ddd64ded7c4dc"
+    }
+  ]
+}

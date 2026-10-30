@@ -1,0 +1,122 @@
+{
+  "repository": "https://github.com/lokicorvus/crosspet",
+  "commit": "6e98970f6ff9b44e8ac85215241cabcd78f67d92",
+  "license": "CC-BY-NC-SA-4.0",
+  "files": [
+    {
+      "path": "UPSTREAM-LICENSE.md",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/LICENSE.md",
+      "sha256": "45a526f6ea84394937392df30601bb0c2565150485b3a766288fc08a4a151578"
+    },
+    {
+      "path": "deepseek/character.json",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/deepseek/character.json",
+      "sha256": "d8ab65ea9eebcb5e33453b8f7f1addf519305dda0e5dbbe27a2f612e6d23a888"
+    },
+    {
+      "path": "gemini/character.json",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gemini/character.json",
+      "sha256": "55fb1ef1712ce78cfb83e76a82a2644028c28e34fd3719834a64db95c32a5623"
+    },
+    {
+      "path": "glm/character.json",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/character.json",
+      "sha256": "bd2c344a35874d32a8a28b410ef8766efcf02a67043c6f151004a9e5fca0b7cd"
+    },
+    {
+      "path": "gpt/character.json",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gpt/character.json",
+      "sha256": "3af568cd019130eeb577f4bb28442f14988d087a84d6256fc4b2783f78ec49a7"
+    },
+    {
+      "path": "claude/character.json",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/claude/character.json",
+      "sha256": "92838b50a456b1e4780c8e78c2f863fe2d89b1b56867d46345895123ad1877a4"
+    },
+    {
+      "path": "deepseek/idle.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/deepseek/idle.webp",
+      "sha256": "4d827db8f758afd35dbbbbedba1924721bf8a29090554ede1e1607acfaa80378"
+    },
+    {
+      "path": "gemini/idle.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gemini/idle.webp",
+      "sha256": "fa0c2937114fdd283a65d113a356626c1f02d8a1ba892d8ca85f50b97d7b44f4"
+    },
+    {
+      "path": "glm/idle.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/idle.webp",
+      "sha256": "b89cb49fd81efdd687010d6db08cd09051a0bba654833e6d2c3eafb466b3015e"
+    },
+    {
+      "path": "gemini/thinking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gemini/thinking.webp",
+      "sha256": "e65d59aad594010da377f461413a6d11b0e55454c6fcb8a42d5bfc7c4cc832b0"
+    },
+    {
+      "path": "gpt/idle.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gpt/idle.webp",
+      "sha256": "329ac22977c06b481abfea8d9a857b4d758a606e88b5d98651ad867aec692587"
+    },
+    {
+      "path": "deepseek/thinking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/deepseek/thinking.webp",
+      "sha256": "7502277b98453ae1b6d1d6d47da5a77901ac452011767a4574e044444ee6ecb5"
+    },
+    {
+      "path": "gemini/proud.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gemini/proud.webp",
+      "sha256": "88b3367a1f4df49cc474d977e053633e3e7b49baebc4b933a459ad0f0a1136bf"
+    },
+    {
+      "path": "glm/thinking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/thinking.webp",
+      "sha256": "7800ea05348ce835e470a698f3ee29d01b042cdc06725fcc561a84350968d4ee"
+    },
+    {
+      "path": "glm/proud.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/proud.webp",
+      "sha256": "a32b20355307c96af1b3ed84a41606d86d8b2db52242878c56a3549c2f95f165"
+    },
+    {
+      "path": "claude/idle.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/claude/idle.webp",
+      "sha256": "cb4540df9325fd246de61c673e29027de0821ea70eeeafb3220a97546f440653"
+    },
+    {
+      "path": "gpt/thinking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gpt/thinking.webp",
+      "sha256": "01f866e66e360f01b31bddd2d5ee762796348534417a9a08c5a20ddb0978d795"
+    },
+    {
+      "path": "deepseek/proud.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/deepseek/proud.webp",
+      "sha256": "de0346c6ecc12050f73cc25fcb163f1279ef954af2fe942a1d2d58691f636c12"
+    },
+    {
+      "path": "gpt/proud.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/gpt/proud.webp",
+      "sha256": "a3b9e52b42ecbb6d36342a2ddfc5be58c50424396b9341cc3d2fc7eb09abd746"
+    },
+    {
+      "path": "claude/thinking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/claude/thinking.webp",
+      "sha256": "48cc8fb2a0b151beef025ea0a6ba530784a5b894149659578843efc1c68ba736"
+    },
+    {
+      "path": "claude/proud.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/claude/proud.webp",
+      "sha256": "adc8d1e823e4c6c92d0cc5513c34d4b90c9142b3a0ca6194d1e906a8eb54cc12"
+    },
+    {
+      "path": "glm/sulk.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/sulk.webp",
+      "sha256": "2fc5b7dd0564ec3d7cd99525dadbea898e23f45f0475a0055e61bc827fd4fbad"
+    },
+    {
+      "path": "glm/asking.webp",
+      "source": "https://raw.githubusercontent.com/lokicorvus/crosspet/6e98970f6ff9b44e8ac85215241cabcd78f67d92/characters/glm/asking.webp",
+      "sha256": "4373a34789c0691ee9c3587678c39548e389340ea3795a4f684d136afc177156"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+.rig-sprite{position:relative;display:inline-block;vertical-align:bottom;overflow:visible!important;contain:layout}
+.rig-canvas{position:absolute;display:block;left:-22.222222%;top:-20%;width:144.444444%;height:140%;pointer-events:none}
+.direct-interaction{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:visible}
+.pat-hand{position:absolute;width:54%;height:auto;left:29%;top:calc(var(--head-y) - 12%);transform-origin:45% 75%;animation:headStroke 3.6s ease-in-out both;filter:drop-shadow(0 2px 1px #7f668020)}
+.pat-touch-lines{position:absolute;left:39%;top:calc(var(--head-y) + 4%);font-size:18px;color:#d4adbc;animation:touchLines 3.6s ease both}
+.pat-heart{position:absolute;left:78%;top:var(--head-y);font-size:15px;color:var(--reaction-accent);animation:touchHeart 3.6s ease both}
+.feed-dish{position:absolute;font-size:clamp(17px,2vw,27px);left:13%;top:56%;animation:serveDish 3.8s ease both}
+.feed-utensil{position:absolute;font-size:20px;left:53%;top:44%;animation:offerBite 3.8s ease both}
+.feed-spark{position:absolute;color:#e2bc7c;left:77%;top:41%;animation:touchHeart 3.8s ease both}
+@keyframes headStroke{0%{opacity:0;translate:20% -16%;rotate:-13deg}12%{opacity:1;translate:0 0;rotate:-4deg}28%{translate:-12% 3%;rotate:3deg}44%{translate:10% 0;rotate:-5deg}60%{translate:-10% 3%;rotate:3deg}76%{translate:8% 0;rotate:-3deg}88%{opacity:1;translate:0 0}100%{opacity:0;translate:22% -20%}}
+@keyframes touchLines{0%,14%,88%,100%{opacity:0}28%,58%{opacity:.8}44%,74%{opacity:.3}}
+@keyframes touchHeart{0%,15%{opacity:0;translate:0 5px}40%,72%{opacity:.9;translate:0 -4px}100%{opacity:0;translate:0 -15px}}
+@keyframes serveDish{0%{opacity:0;translate:-15px 10px}20%,85%{opacity:1;translate:0 0}100%{opacity:0;translate:-10px 10px}}
+@keyframes offerBite{0%,15%{opacity:0;translate:-15px 8px}35%,65%{opacity:1;translate:0 -4px}85%,100%{opacity:0;translate:-15px 8px}}
+.reaction-video-sprite,.reaction-fallback{position:absolute;inset:0;display:block;pointer-events:none}
+.reaction-video-sprite .reaction-video,.reaction-video-sprite .cast-idle-video{position:absolute;left:50%;top:-26.666667%;height:133.333333%;width:auto;max-width:none;transform:translateX(-50%);opacity:0;pointer-events:none}
+.reaction-video-sprite[data-clip=pat] .reaction-video,.reaction-video-sprite[data-clip=idle] .cast-idle-video{opacity:1}
+.reaction-video-sprite[data-clip=pat] .reaction-fallback,.reaction-video-sprite[data-clip=idle] .reaction-fallback{visibility:hidden}
+.video-snapshot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .22s ease}
+.dock-cast{position:absolute;inset:0;pointer-events:none}
+.dock-pet.desktop-pet{pointer-events:none;transition:none;overflow:visible}
+.dock-pet.awake{pointer-events:auto}
+.dock-pet.awake:hover{z-index:30}
+.dock-pet .pet-body{width:100%;height:132px;margin:0;cursor:pointer;pointer-events:auto;position:absolute;bottom:0}
+.dock-pet.resting .pet-body{height:72px;overflow:visible}
+.dock-pet .pet-body>.sprite{width:100%;height:auto!important;aspect-ratio:216/240;max-height:132px;transform:translateY(8.333333%)}
+.dock-pet .pet-tools{pointer-events:none;left:50%;top:auto;bottom:132px;transform:translateX(-50%);gap:4px;padding:4px;background:#fff5fbee;border:1px solid #ead8e7;border-radius:10px;white-space:nowrap;z-index:10}
+.dock-pet .pet-tools button{width:32px;height:32px;flex-shrink:0;cursor:pointer}
+.dock-pet.awake .pet-tools{opacity:1;pointer-events:auto}
+.dock-pet .pet-bubble{bottom:143px;left:-35px;width:190px}
+.dock-name{position:absolute;bottom:1px;left:0;right:0;text-align:center;font-size:8px;color:#967d9c;opacity:0;pointer-events:none;text-shadow:0 0 3px white}
+.dock-pet:hover .dock-name{opacity:1}
+.portrait-stage{position:relative;display:block;width:100%;height:100%;overflow:hidden;border-radius:12px;isolation:isolate}
+.portrait-stage img{width:100%;height:100%;object-fit:contain;transform-origin:50% 90%;animation:portraitBreathe 6s ease-in-out infinite}
+.portrait-shy img{animation:portraitShy 5s ease-in-out infinite}
+.portrait-happy img{animation:portraitHappy 4s ease-in-out infinite}
+.portrait-caption{position:absolute;bottom:5px;left:0;right:0;text-align:center;font-size:8px;color:#b497af;background:#fff8}
+.portrait-heart{position:absolute;right:18%;top:20%;color:#d891ac;animation:touchHeart 3.8s ease both}
+.private-character>.portrait-stage{height:180px;width:140px}
+.selected-art>.portrait-stage{height:230px;width:100%;z-index:1}
+@keyframes portraitBreathe{0%,100%{transform:scale(1) rotate(-.2deg)}50%{transform:scale(1.009) rotate(.2deg)}}
+@keyframes portraitShy{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(2px) rotate(-.8deg)}}
+@keyframes portraitHappy{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.008)}}

@@ -1,0 +1,15 @@
+{
+  "character": "gpt",
+  "action": "pat",
+  "source": "PixVerse V6 P1",
+  "sourceSha256": "d526a8c4cead5ca97158fce4a832e5ba1760d545a8a671ce17992d5ed28082df",
+  "asset": "pat-pixverse-p1.webm",
+  "frames": 121,
+  "fps": 24,
+  "duration": 5.041666666666667,
+  "alpha": true,
+  "acceptance": "user-approved-full-P1-2026-10-30",
+  "reversed": false,
+  "trimmed": false,
+  "notes": "Full forward reaction. Returns to existing rig idle; no independently generated recovery clip."
+}

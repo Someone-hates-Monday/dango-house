@@ -1,0 +1,1 @@
+import fs from 'node:fs';const file='src/Room.tsx';fs.writeFileSync(file,fs.readFileSync(file,'utf8').replace('top:140,bottom:size.height-18','top:Math.max(140,size.height*.6),bottom:size.height-18'));

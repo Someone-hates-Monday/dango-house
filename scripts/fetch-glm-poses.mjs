@@ -1,0 +1,5 @@
+import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
+const file='public/community/manifest.json';const manifest=JSON.parse(await fs.readFile(file,'utf8'));
+for(const pose of ['sulk','asking']){const path=`glm/${pose}.webp`;const response=await fetch(`https://api.github.com/repos/lokicorvus/crosspet/contents/characters/${path}?ref=${manifest.commit}`);if(!response.ok)throw new Error(`HTTP ${response.status}`);const item=await response.json();const bytes=Buffer.from(item.content,'base64');if(crypto.createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex')!==item.sha)throw new Error('Hash mismatch');await fs.writeFile(`public/community/${path}`,bytes);manifest.files=manifest.files.filter(f=>f.path!==path);manifest.files.push({path,source:`https://raw.githubusercontent.com/lokicorvus/crosspet/${manifest.commit}/characters/${path}`,sha256:crypto.createHash('sha256').update(bytes).digest('hex')});console.log(`Imported ${path}`);}
+await fs.writeFile(file,JSON.stringify(manifest,null,2));

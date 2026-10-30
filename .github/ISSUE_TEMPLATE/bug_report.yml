@@ -1,0 +1,30 @@
+name: Bug 反馈 / Bug report
+description: 帮我们修好小屋 / Help us fix the house
+body:
+  - type: markdown
+    attributes:
+      value: "请先移除 Key、私人聊天与个人信息。安全漏洞请按 SECURITY.md 私下报告。 / Redact keys and private data. Report vulnerabilities privately via SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: 版本与系统 / Version & OS
+      placeholder: v0.3.7, Windows 11 x64, 125% DPI
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 包括角色、模式与动作；不填 API Key / Include character, mode and action, never your key.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 实际与预期表现 / Actual & expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 脱敏截图或日志 / Redacted screenshots or logs

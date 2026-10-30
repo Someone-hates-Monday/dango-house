@@ -1,0 +1,1 @@
+import fs from 'node:fs';const file='tests/animation.test.ts';let s=fs.readFileSync(file,'utf8');s=s.replace('assert.equal(x%192,0);assert.equal(y%208,0);assert.equal(w,192);assert.equal(h,208);','assert.equal(x%(f.cellWidth??192),0);assert.equal(y%(f.cellHeight??208),0);assert.equal(w,f.cellWidth??192);assert.equal(h,f.cellHeight??208);');fs.writeFileSync(file,s);

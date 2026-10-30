@@ -1,0 +1,2064 @@
+[
+  {
+    "repo": "fywdy/chatgpt-chibi-pets",
+    "branch": "main",
+    "tree": "d5bbb27c79e5c08e8b8ab44d4023cd35a67418e2",
+    "pushedAt": "2026-10-02T03:31:27Z",
+    "license": "NOASSERTION",
+    "assets": [
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/failed.gif",
+        "sha": "a26466100808bdea9fab46c0b2f3ba789772ac38",
+        "size": 106266
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/failed.webp",
+        "sha": "f4f95681ed809fb79c80e44f7e7b01bf147223c6",
+        "size": 304008
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/idle.gif",
+        "sha": "ea7386337afb2aeaafe0de2b07017ed882c0ddda",
+        "size": 83206
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/idle.webp",
+        "sha": "2f81f5115304e3d2e3da2b511762258ee75a4087",
+        "size": 254818
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/jumping.gif",
+        "sha": "136b7b066278b0bf02169675759c89154207c1ee",
+        "size": 74751
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/jumping.webp",
+        "sha": "63108e6915a621cee879079fa100f8a2d8c1cb2e",
+        "size": 221646
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/review.gif",
+        "sha": "baa0d65dbd9f55a0783387927d7217fe1bb4ea2c",
+        "size": 89389
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/review.webp",
+        "sha": "4067a648ad3adad5c336beced003980f422af91e",
+        "size": 278892
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running-left.gif",
+        "sha": "fdfbe6ede23f346c79a76262b73e9c583810f932",
+        "size": 98166
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running-left.webp",
+        "sha": "61f5b29d4793b7a30fedfaa37938375f1385e484",
+        "size": 287656
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running-right.gif",
+        "sha": "83a428f6f17ed931a88c2c58734d3df876ac5e71",
+        "size": 97666
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running-right.webp",
+        "sha": "b75b151b9065635bfcdc799f5d2ea31238bb140b",
+        "size": 286822
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running.gif",
+        "sha": "2da9fd47a107bdb4b340a32c84767ead6a44ea5b",
+        "size": 86146
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/running.webp",
+        "sha": "6ca00ea20ee68f4e3206233dc597bf760368a1fa",
+        "size": 277548
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/waiting.gif",
+        "sha": "9096f8ebb04b83eb576a7c86e020549bb1654ac4",
+        "size": 86254
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/waiting.webp",
+        "sha": "4943907bc7bcc90d70b0f9b54fd7fd98e9f0d1a8",
+        "size": 268234
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/waving.gif",
+        "sha": "e10992fae4fadb94ae78cb25b29dc5ddb6fbdb18",
+        "size": 57870
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/qa/previews/waving.webp",
+        "sha": "e8fefb6e8801118d655313f1a258a2fab89aa099",
+        "size": 176026
+      },
+      {
+        "path": "chatgpt-white-dragon-chibi-v5/spritesheet.webp",
+        "sha": "0d81395c8a5d127ffb1ff8f21a091d9679c8c0af",
+        "size": 3020366
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/failed.gif",
+        "sha": "5a127e210fb10642e3a7ce22e334a70524cdc61b",
+        "size": 45414
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/failed.webp",
+        "sha": "d61f1896b938c15a113ab9fec6f1232d21e6af3a",
+        "size": 105128
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/idle.gif",
+        "sha": "79be94b4c564b3c0539f20da529b8fa1b6c47f8d",
+        "size": 61765
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/idle.webp",
+        "sha": "30ff448ff608d8aac4ee5baae413292c3f53d7bc",
+        "size": 155306
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/jumping.gif",
+        "sha": "52222fcc97ca30699836146a5b6b80c2fcdf94bc",
+        "size": 54894
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/jumping.webp",
+        "sha": "71d9a2e9ef8a0258cccf56db6fda3275c75211ec",
+        "size": 139412
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/review.gif",
+        "sha": "2ce1605903a81654eef838834653205508b4c252",
+        "size": 79238
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/review.webp",
+        "sha": "55f687098a3af39d0bbcac73bcb979053be28ae2",
+        "size": 212672
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running-left.gif",
+        "sha": "e001bc80ba06b5e5703fe72fae4a36460ca24c3a",
+        "size": 103635
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running-left.webp",
+        "sha": "3185cc42c04d9ed6aca4c19b45f947a4f4914208",
+        "size": 268002
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running-right.gif",
+        "sha": "26ec6dcb0ea1d00bcde1ae2e8ddd1c22f96691db",
+        "size": 118685
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running-right.webp",
+        "sha": "b7c51c71898ebfdcc05103f7e742aa9f4573a8e1",
+        "size": 313656
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running.gif",
+        "sha": "cfc0fefa476737babcdfcdcfcf92ff0abdf01a75",
+        "size": 65896
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/running.webp",
+        "sha": "6fa14cea26c6daf0f85a567b0f0e9f6404cfc2bd",
+        "size": 156740
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/waiting.gif",
+        "sha": "8d0584317329faa3cfbfd93a5ae3f5a2d078456e",
+        "size": 59242
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/waiting.webp",
+        "sha": "4bb9af7afa25152c5d7a9b0c0da4c198a149efb2",
+        "size": 139332
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/waving.gif",
+        "sha": "08c472b84988ac312fae30456a9ece79aac02ece",
+        "size": 64859
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/qa/previews/waving.webp",
+        "sha": "824962486dcb606eed620fdb1d6b446ba01537d2",
+        "size": 168948
+      },
+      {
+        "path": "claude-orange-scholar-chibi-v3/spritesheet.webp",
+        "sha": "b19eb0770a1f552afb1edcdabdab82a52f303afe",
+        "size": 2006908
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/failed.gif",
+        "sha": "8b2366589e6045a7ce8cd55269c0376004a9424e",
+        "size": 128052
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/failed.webp",
+        "sha": "4957f75b2031f0916910c555de75545d134bc56c",
+        "size": 341864
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/idle.gif",
+        "sha": "df43cab8e4fb22e31090c1470b9f5c58c525afa7",
+        "size": 93257
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/idle.webp",
+        "sha": "a1df9da93a6fd238c6bc07a755a105ce6d5af22a",
+        "size": 254256
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/jumping.gif",
+        "sha": "f0448d4d217e781c59e296212f48d12ef4b27c85",
+        "size": 82044
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/jumping.webp",
+        "sha": "256b4c113f347a30ff6a6d55a8e5f149cf6b1061",
+        "size": 216916
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/review.gif",
+        "sha": "02c9d81aa81d27284208933b8e467d5da055b945",
+        "size": 86667
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/review.webp",
+        "sha": "d3116a772af931a4555bace6b309a9ae0a33ebb5",
+        "size": 232444
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running-left.gif",
+        "sha": "e26cfaaa6d25a0bbfb2492220f7e82d1c97e18c1",
+        "size": 118365
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running-left.webp",
+        "sha": "51beea1a4310f9533bbd5f645369f72bd77a30ce",
+        "size": 313994
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running-right.gif",
+        "sha": "fe4ddd3f7af748842f36ffdc4e6deb0d2ee551fa",
+        "size": 117882
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running-right.webp",
+        "sha": "f4017b3e3aa8acc0fd3450d4592d67d7496d4bb4",
+        "size": 313112
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running.gif",
+        "sha": "013bd459340f0e5dc80706445e6de3b6eff63a2a",
+        "size": 89186
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/running.webp",
+        "sha": "8cbfda8b796c006be41727988c1447cde58c8964",
+        "size": 241038
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/waiting.gif",
+        "sha": "758ca28f6a82b5fc5aeda8ed83163d802935365d",
+        "size": 84492
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/waiting.webp",
+        "sha": "d66f11b87a8f4aaf62da5125b22c9375dac1a0b4",
+        "size": 228534
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/waving.gif",
+        "sha": "817dbd0fa4d0c15243b75dbc2140b74078cd2b53",
+        "size": 63547
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/qa/previews/waving.webp",
+        "sha": "025279c7aafc01deb2188c9893cb1722e6f29ffb",
+        "size": 167720
+      },
+      {
+        "path": "deepseek-whale-maid-chibi-v4/spritesheet.webp",
+        "sha": "26559a0cf17133649820f6d2245d9b2149e52402",
+        "size": 3013338
+      },
+      {
+        "path": "dist/codex-native/chatgpt-white-dragon-chibi-v5/spritesheet.webp",
+        "sha": "0d81395c8a5d127ffb1ff8f21a091d9679c8c0af",
+        "size": 3020366
+      },
+      {
+        "path": "dist/codex-native/claude-orange-scholar-chibi-v3/spritesheet.webp",
+        "sha": "b19eb0770a1f552afb1edcdabdab82a52f303afe",
+        "size": 2006908
+      },
+      {
+        "path": "dist/codex-native/deepseek-whale-maid-chibi-v4/spritesheet.webp",
+        "sha": "26559a0cf17133649820f6d2245d9b2149e52402",
+        "size": 3013338
+      },
+      {
+        "path": "dist/codex-native/gemini-star-cat-chibi-v1/spritesheet.webp",
+        "sha": "bc8998511c151900f256b5835eeaf5bead000d48",
+        "size": 2983780
+      },
+      {
+        "path": "dist/codex-native/grok-gothic-chibi-v1/spritesheet.webp",
+        "sha": "a10c07dfe81a40073be10653ac4e0a31f9a7d482",
+        "size": 3085784
+      },
+      {
+        "path": "dist/codex-native/kimi-moon-maid-chibi-v2/spritesheet.webp",
+        "sha": "498abadfd0e2ca51863c0e20c314f9823fa17d22",
+        "size": 2295040
+      },
+      {
+        "path": "dist/codex-native/qwen-chibi-scholar-v3/spritesheet.webp",
+        "sha": "e4709efb3771d7972c68a85b5dd252a81c132589",
+        "size": 3158838
+      },
+      {
+        "path": "dist/codex-native/zhipu-chibi-tech-v2/spritesheet.webp",
+        "sha": "5f2bb14522adb35bffa7986ac74a615bc454581f",
+        "size": 2739028
+      },
+      {
+        "path": "dist/codex-standard-9row/chatgpt-white-dragon-chibi-v5/spritesheet.webp",
+        "sha": "bcac8e2a8c8179f626b40c99167a8a19b103a2a2",
+        "size": 2388296
+      },
+      {
+        "path": "dist/codex-standard-9row/claude-orange-scholar-chibi-v3/spritesheet.webp",
+        "sha": "6caf306a5a0de731d0751f37bbef89194d33881e",
+        "size": 1763168
+      },
+      {
+        "path": "dist/codex-standard-9row/deepseek-whale-maid-chibi-v4/spritesheet.webp",
+        "sha": "b0aea38ee3157e61a6401ebf89b4c9e09c81abf5",
+        "size": 2442432
+      },
+      {
+        "path": "dist/codex-standard-9row/gemini-star-cat-chibi-v1/spritesheet.webp",
+        "sha": "5aa1d5aa6e493f243730bbd0df929c193d7e6e1f",
+        "size": 2363370
+      },
+      {
+        "path": "dist/codex-standard-9row/grok-gothic-chibi-v1/spritesheet.webp",
+        "sha": "6b6d8ddae2735cf7b8dc16e9d78756cfcf079483",
+        "size": 2512514
+      },
+      {
+        "path": "dist/codex-standard-9row/kimi-moon-maid-chibi-v2/spritesheet.webp",
+        "sha": "336585ba1ac3b12bc154034017efc3021aed6030",
+        "size": 1811926
+      },
+      {
+        "path": "dist/codex-standard-9row/qwen-chibi-scholar-v3/spritesheet.webp",
+        "sha": "1acd44c6808429f4972b7625d5f9f1894d45a1fd",
+        "size": 2493296
+      },
+      {
+        "path": "dist/codex-standard-9row/zhipu-chibi-tech-v2/spritesheet.webp",
+        "sha": "35ced71cf7a2fb40f55e4f89fe8961549b577a98",
+        "size": 2154578
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/failed.gif",
+        "sha": "a26466100808bdea9fab46c0b2f3ba789772ac38",
+        "size": 106266
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/failed.webp",
+        "sha": "f4f95681ed809fb79c80e44f7e7b01bf147223c6",
+        "size": 304008
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/idle.gif",
+        "sha": "ea7386337afb2aeaafe0de2b07017ed882c0ddda",
+        "size": 83206
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/idle.webp",
+        "sha": "2f81f5115304e3d2e3da2b511762258ee75a4087",
+        "size": 254818
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/jumping.gif",
+        "sha": "136b7b066278b0bf02169675759c89154207c1ee",
+        "size": 74751
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/jumping.webp",
+        "sha": "63108e6915a621cee879079fa100f8a2d8c1cb2e",
+        "size": 221646
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/review.gif",
+        "sha": "baa0d65dbd9f55a0783387927d7217fe1bb4ea2c",
+        "size": 89389
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/review.webp",
+        "sha": "4067a648ad3adad5c336beced003980f422af91e",
+        "size": 278892
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running-left.gif",
+        "sha": "fdfbe6ede23f346c79a76262b73e9c583810f932",
+        "size": 98166
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running-left.webp",
+        "sha": "61f5b29d4793b7a30fedfaa37938375f1385e484",
+        "size": 287656
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running-right.gif",
+        "sha": "83a428f6f17ed931a88c2c58734d3df876ac5e71",
+        "size": 97666
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running-right.webp",
+        "sha": "b75b151b9065635bfcdc799f5d2ea31238bb140b",
+        "size": 286822
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running.gif",
+        "sha": "2da9fd47a107bdb4b340a32c84767ead6a44ea5b",
+        "size": 86146
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/running.webp",
+        "sha": "6ca00ea20ee68f4e3206233dc597bf760368a1fa",
+        "size": 277548
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/waiting.gif",
+        "sha": "9096f8ebb04b83eb576a7c86e020549bb1654ac4",
+        "size": 86254
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/waiting.webp",
+        "sha": "4943907bc7bcc90d70b0f9b54fd7fd98e9f0d1a8",
+        "size": 268234
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/waving.gif",
+        "sha": "e10992fae4fadb94ae78cb25b29dc5ddb6fbdb18",
+        "size": 57870
+      },
+      {
+        "path": "dist/generic-assets/chatgpt-white-dragon-chibi-v5/previews/waving.webp",
+        "sha": "e8fefb6e8801118d655313f1a258a2fab89aa099",
+        "size": 176026
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/failed.gif",
+        "sha": "5a127e210fb10642e3a7ce22e334a70524cdc61b",
+        "size": 45414
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/failed.webp",
+        "sha": "d61f1896b938c15a113ab9fec6f1232d21e6af3a",
+        "size": 105128
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/idle.gif",
+        "sha": "79be94b4c564b3c0539f20da529b8fa1b6c47f8d",
+        "size": 61765
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/idle.webp",
+        "sha": "30ff448ff608d8aac4ee5baae413292c3f53d7bc",
+        "size": 155306
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/jumping.gif",
+        "sha": "52222fcc97ca30699836146a5b6b80c2fcdf94bc",
+        "size": 54894
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/jumping.webp",
+        "sha": "71d9a2e9ef8a0258cccf56db6fda3275c75211ec",
+        "size": 139412
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/review.gif",
+        "sha": "2ce1605903a81654eef838834653205508b4c252",
+        "size": 79238
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/review.webp",
+        "sha": "55f687098a3af39d0bbcac73bcb979053be28ae2",
+        "size": 212672
+      },
+      {
+        "path": "dist/generic-assets/claude-orange-scholar-chibi-v3/previews/running-left.gif",
+        "sha": "e001bc80ba06b5e5703fe72fae4a36460ca24c3a",
+        "size": 103635
+      }
+    ],
+    "notices": [
+      "LICENSE",
+      "LICENSE-MIT",
+      "NOTICE.md",
+      "README.en.md",
+      "README.md",
+      "chatgpt-white-dragon-chibi-v5/README.md",
+      "claude-orange-scholar-chibi-v3/README.md",
+      "deepseek-whale-maid-chibi-v4/README.md",
+      "dist/generic-assets/chatgpt-white-dragon-chibi-v5/README.md",
+      "dist/generic-assets/claude-orange-scholar-chibi-v3/README.md",
+      "dist/generic-assets/deepseek-whale-maid-chibi-v4/README.md",
+      "dist/generic-assets/gemini-star-cat-chibi-v1/README.md",
+      "dist/generic-assets/grok-gothic-chibi-v1/README.md",
+      "dist/generic-assets/kimi-moon-maid-chibi-v2/README.md",
+      "dist/generic-assets/qwen-chibi-scholar-v3/README.md"
+    ]
+  },
+  {
+    "repo": "lokicorvus/crosspet",
+    "branch": "main",
+    "tree": "6e98970f6ff9b44e8ac85215241cabcd78f67d92",
+    "pushedAt": "2026-10-27T13:54:13Z",
+    "license": "NOASSERTION",
+    "assets": [
+      {
+        "path": "app/icon/icon-source.webp",
+        "sha": "576fa92db2951e98d26a05fea2bd2300e337bbd7",
+        "size": 272924
+      },
+      {
+        "path": "characters/claude/annoyed.webp",
+        "sha": "3b912b8850f59111db1d1ae85dd652e013cafe9e",
+        "size": 102394
+      },
+      {
+        "path": "characters/claude/asking.webp",
+        "sha": "dc422559c72f942bcff1d25f02ba8a5a2f76aa64",
+        "size": 89446
+      },
+      {
+        "path": "characters/claude/busy_left.webp",
+        "sha": "6c3655088081a03136ebe18ddce8b00dd1800225",
+        "size": 120624
+      },
+      {
+        "path": "characters/claude/busy_right.webp",
+        "sha": "9900bbe2d9f366a2132661b8cf8730c47839178d",
+        "size": 115738
+      },
+      {
+        "path": "characters/claude/bye.webp",
+        "sha": "f190db16a44728feb5f757e2bebdabf2c2ea7c81",
+        "size": 97560
+      },
+      {
+        "path": "characters/claude/clawd.webp",
+        "sha": "bdaab6ddc03e761345b34e306c0215c8e2b1b82d",
+        "size": 100354
+      },
+      {
+        "path": "characters/claude/coaxed.webp",
+        "sha": "897d389390be8396832adc60d40364d555e37478",
+        "size": 104392
+      },
+      {
+        "path": "characters/claude/compact.webp",
+        "sha": "4123322dc3946c0214173270ffef6f17b0f82be6",
+        "size": 108322
+      },
+      {
+        "path": "characters/claude/delegating.webp",
+        "sha": "d74cbd665cc8bba8105bfb8f6757b108eb173926",
+        "size": 110202
+      },
+      {
+        "path": "characters/claude/dizzy.webp",
+        "sha": "077d102c333f477095464263bf0af8ab70bb84f2",
+        "size": 108586
+      },
+      {
+        "path": "characters/claude/edge_left.webp",
+        "sha": "3846be7f0c485f64e38e4e10532f5d8d75baea8d",
+        "size": 64560
+      },
+      {
+        "path": "characters/claude/edge_left_peek.webp",
+        "sha": "681c630c0a8d034fdbbdb04d6ece78c6befa1132",
+        "size": 89866
+      },
+      {
+        "path": "characters/claude/edge_right.webp",
+        "sha": "9b8a10736ca2c1390af3e2c53144b0b1ae8be593",
+        "size": 64528
+      },
+      {
+        "path": "characters/claude/edge_right_peek.webp",
+        "sha": "5ef220ce932777f4387eb45e80e7be65cb5a6f90",
+        "size": 76356
+      },
+      {
+        "path": "characters/claude/fest_christmas.webp",
+        "sha": "a0acb1ba4c6f2e4ce954f3e94f3f9bcaf485378e",
+        "size": 100768
+      },
+      {
+        "path": "characters/claude/fest_dragonboat.webp",
+        "sha": "5144a9b210ee5934c735b737bcc8f6aff5a3a38d",
+        "size": 103836
+      },
+      {
+        "path": "characters/claude/fest_halloween.webp",
+        "sha": "b47a915480924153d1aeef91f5ca4cb5aa79de90",
+        "size": 105328
+      },
+      {
+        "path": "characters/claude/fest_lantern.webp",
+        "sha": "ef4de2c06b58efb14fff7cd34b71b60a0006a2d3",
+        "size": 104006
+      },
+      {
+        "path": "characters/claude/fest_midautumn.webp",
+        "sha": "eae1b968897088915d26a15218b2a8cd374a72d2",
+        "size": 106414
+      },
+      {
+        "path": "characters/claude/fest_national.webp",
+        "sha": "aad826a7398fddef0f6b937a55f8e6ee62c01453",
+        "size": 112770
+      },
+      {
+        "path": "characters/claude/fest_newyear.webp",
+        "sha": "4dbfb89b2bee796f01daf88de530d269af860820",
+        "size": 102832
+      },
+      {
+        "path": "characters/claude/fest_spring.webp",
+        "sha": "19021fd97444fb186f7061664c96ffa379f800e8",
+        "size": 104802
+      },
+      {
+        "path": "characters/claude/forgiven.webp",
+        "sha": "2363a19781b8037128018f40fa0b98b321720cc8",
+        "size": 102186
+      },
+      {
+        "path": "characters/claude/greet_afternoon.webp",
+        "sha": "3f1de0e54b55981fd0789ea53e23f1f1fb09a832",
+        "size": 101376
+      },
+      {
+        "path": "characters/claude/greet_dawn.webp",
+        "sha": "46e06c01b7b22917cdfbcb144f0777721e7cf7dd",
+        "size": 95636
+      },
+      {
+        "path": "characters/claude/greet_evening.webp",
+        "sha": "cd8d98baecb6d177f3cb17515bd87a2782f67fd0",
+        "size": 106542
+      },
+      {
+        "path": "characters/claude/greet_morning.webp",
+        "sha": "d7a56f16490b88f1d46c50e61854d3363ee3d5a2",
+        "size": 104658
+      },
+      {
+        "path": "characters/claude/greet_night.webp",
+        "sha": "c73e59894ed6bcc26670dd2e66d1ddd5cb5f947f",
+        "size": 105976
+      },
+      {
+        "path": "characters/claude/greet_noon.webp",
+        "sha": "324761ec057b945ed216cbdf478896ace5695338",
+        "size": 101772
+      },
+      {
+        "path": "characters/claude/happy-2.webp",
+        "sha": "b55cb8a1d07752f3994830cce1d8a238b99b3350",
+        "size": 103290
+      },
+      {
+        "path": "characters/claude/hum.webp",
+        "sha": "4ed12fb869f7e36fcf88ec026961676be33f9567",
+        "size": 99154
+      },
+      {
+        "path": "characters/claude/idle-2.webp",
+        "sha": "7e7889fffa081771b0cdc43818c7bfec1cd208df",
+        "size": 101338
+      },
+      {
+        "path": "characters/claude/idle-3.webp",
+        "sha": "ced81c8dfabedbdfdbd25837af933f441ba79cb7",
+        "size": 101062
+      },
+      {
+        "path": "characters/claude/idle-blink.webp",
+        "sha": "9d3e948281833b6daa369786169b7961c2844d00",
+        "size": 95676
+      },
+      {
+        "path": "characters/claude/idle.webp",
+        "sha": "923813c01cc6f64245cdc855ed7739e60eeb463b",
+        "size": 96880
+      },
+      {
+        "path": "characters/claude/listening.webp",
+        "sha": "860a0cba791467b6d65a0d7a9593ba48bbfdde95",
+        "size": 107058
+      },
+      {
+        "path": "characters/claude/oops.webp",
+        "sha": "b61268ca1e8f79b2163e2d75621fa05e4ebeabae",
+        "size": 103494
+      },
+      {
+        "path": "characters/claude/pat-2.webp",
+        "sha": "28261e7e98402fd3a26737db9736a8a911d1f08c",
+        "size": 99104
+      },
+      {
+        "path": "characters/claude/proud.webp",
+        "sha": "d4e46ed38c58798682c077b62bbe6422c92e79ec",
+        "size": 94962
+      },
+      {
+        "path": "characters/claude/puffed.webp",
+        "sha": "dd92c5873ab10fadac708fe01f963a8a5cfd69c0",
+        "size": 104798
+      },
+      {
+        "path": "characters/claude/reading-2.webp",
+        "sha": "c5b1e9a97063adf60ad0122e9135989517214846",
+        "size": 102842
+      },
+      {
+        "path": "characters/claude/redhot.webp",
+        "sha": "3c5c70296a99cb19a0cfd0d3a2288fb7a68cbaf5",
+        "size": 109904
+      },
+      {
+        "path": "characters/claude/running.webp",
+        "sha": "320cf1e3c27e96504548a324eaffaa3bac0cd3a0",
+        "size": 103714
+      },
+      {
+        "path": "characters/claude/searching.webp",
+        "sha": "60a38b3fde335794feac04dafb6056df7d927125",
+        "size": 104610
+      },
+      {
+        "path": "characters/claude/sleeping-2.webp",
+        "sha": "81c4189e25dc37f091f0f1d3a8e445f5010242f3",
+        "size": 99768
+      },
+      {
+        "path": "characters/claude/sorry.webp",
+        "sha": "b02f94c76676cb2e3da3fb0b0900fbfd5ccae74c",
+        "size": 89086
+      },
+      {
+        "path": "characters/claude/stretch.webp",
+        "sha": "64a3c0b5ee29b28324d8fb4dcfd8e962bcf01e92",
+        "size": 98920
+      },
+      {
+        "path": "characters/claude/sulk.webp",
+        "sha": "3e3f269c5daada0a332e0495e076059a43f8e663",
+        "size": 100828
+      },
+      {
+        "path": "characters/claude/surprised.webp",
+        "sha": "da0ad0d54cb22bf9d1758ef224c3a969fafdc1f0",
+        "size": 98456
+      },
+      {
+        "path": "characters/claude/swamped_left.webp",
+        "sha": "28070fc8876704b89b13f67ea450590a925e7093",
+        "size": 100870
+      },
+      {
+        "path": "characters/claude/swamped_right.webp",
+        "sha": "a5839c0b1f8807bdac79c8b45f1bd3db1bc870db",
+        "size": 104326
+      },
+      {
+        "path": "characters/claude/thinking-2.webp",
+        "sha": "a75a5c4102c20f8aa33e3bb4b2a8b0c4167f1387",
+        "size": 101662
+      },
+      {
+        "path": "characters/claude/thinking.webp",
+        "sha": "1df515f42dfb1b26575df556998f46dc92586655",
+        "size": 97840
+      },
+      {
+        "path": "characters/claude/tired.webp",
+        "sha": "0aea3f56e7d840ee3464592c685697a71a58ac7b",
+        "size": 99054
+      },
+      {
+        "path": "characters/claude/update.webp",
+        "sha": "4af4abe3c001adfdd68a167fe7616853dd14089a",
+        "size": 92050
+      },
+      {
+        "path": "characters/claude/writing.webp",
+        "sha": "f76a0c6e26154c00a1f186dc4e7228eafc089327",
+        "size": 102400
+      },
+      {
+        "path": "characters/claude/yawn.webp",
+        "sha": "427c1a2eda8eb31637158492c96fd58487534b9b",
+        "size": 100518
+      },
+      {
+        "path": "characters/deepseek-hoodie/annoyed.webp",
+        "sha": "f5e3b20fe8631b53c89c44b09ac5bc654afda648",
+        "size": 78486
+      },
+      {
+        "path": "characters/deepseek-hoodie/asking.webp",
+        "sha": "73de8c95677effeba7b90b852d8f622f82f991df",
+        "size": 79830
+      },
+      {
+        "path": "characters/deepseek-hoodie/busy_left.webp",
+        "sha": "50d135cf861be2c84e2d283f94a05f982a66f7d6",
+        "size": 79666
+      },
+      {
+        "path": "characters/deepseek-hoodie/busy_right.webp",
+        "sha": "acca19be03833155a41600e6502f4ad1410d5254",
+        "size": 80104
+      },
+      {
+        "path": "characters/deepseek-hoodie/bye.webp",
+        "sha": "79ded9bbe54fa0783404e2adaebd1e00930a00e1",
+        "size": 76532
+      },
+      {
+        "path": "characters/deepseek-hoodie/coaxed.webp",
+        "sha": "a1543800ba895fe1e1c0bd80a25b648607df6575",
+        "size": 76554
+      },
+      {
+        "path": "characters/deepseek-hoodie/compact.webp",
+        "sha": "ae4719691cb78e5fb84076229b687bc363ae0141",
+        "size": 75584
+      },
+      {
+        "path": "characters/deepseek-hoodie/deepthink.webp",
+        "sha": "90f69052a249dc4de60b334904da4b98c4db2401",
+        "size": 72958
+      },
+      {
+        "path": "characters/deepseek-hoodie/delegating.webp",
+        "sha": "0bba4cb09df92a8c0647833d22e6f4d4104cc387",
+        "size": 92296
+      },
+      {
+        "path": "characters/deepseek-hoodie/dizzy.webp",
+        "sha": "69c6be37c42e0f962b54ed8b9d61c7c8a5e9799e",
+        "size": 82382
+      },
+      {
+        "path": "characters/deepseek-hoodie/drawing.webp",
+        "sha": "72675ec9736823ed2966478ba78b01d31126f5d2",
+        "size": 79586
+      },
+      {
+        "path": "characters/deepseek-hoodie/eat.webp",
+        "sha": "8eb79a19a69af1abf5fd1684be1f57766ba0ccbd",
+        "size": 79606
+      },
+      {
+        "path": "characters/deepseek-hoodie/edge_left.webp",
+        "sha": "75878450a1626cfb0334f932eca926bf51b2fd87",
+        "size": 46102
+      },
+      {
+        "path": "characters/deepseek-hoodie/edge_left_peek.webp",
+        "sha": "51ac4f0f94ff4bbb7b37cff37a6389efadf9ca5a",
+        "size": 60098
+      },
+      {
+        "path": "characters/deepseek-hoodie/edge_right.webp",
+        "sha": "830155e82ff12c49e28ed220cca2ead19e3fe910",
+        "size": 47698
+      },
+      {
+        "path": "characters/deepseek-hoodie/edge_right_peek.webp",
+        "sha": "46b1271405e664da50b0f17c38e060368b73a981",
+        "size": 55490
+      },
+      {
+        "path": "characters/deepseek-hoodie/feast.webp",
+        "sha": "34c067f0529789704ae0c6cd38db0ec25dfcdf81",
+        "size": 85250
+      },
+      {
+        "path": "characters/deepseek-hoodie/forgiven.webp",
+        "sha": "6758ab8bcf036dc1e5f355bc3355bc897beabfb0",
+        "size": 78710
+      },
+      {
+        "path": "characters/deepseek-hoodie/happy.webp",
+        "sha": "2f1779c40046bb972b14499679681475e82394cf",
+        "size": 77116
+      },
+      {
+        "path": "characters/deepseek-hoodie/hum.webp",
+        "sha": "dc2be1d988ca2b0da915644bbefb44104a63867f",
+        "size": 78082
+      },
+      {
+        "path": "characters/deepseek-hoodie/idle-blink.webp",
+        "sha": "ebed0b27a2fa4f07b317fcab84620d2d15630543",
+        "size": 79106
+      },
+      {
+        "path": "characters/deepseek-hoodie/idle.webp",
+        "sha": "c4dd3835f882d5bfcb62af42cfb3e56b557d31b0",
+        "size": 78776
+      },
+      {
+        "path": "characters/deepseek-hoodie/listening.webp",
+        "sha": "b8a61f9602aaa0bbac68c2ea9aca2660131212ab",
+        "size": 79228
+      },
+      {
+        "path": "characters/deepseek-hoodie/oops.webp",
+        "sha": "ac482cd08b73f36ce300ead0dc0e95e79513c309",
+        "size": 78476
+      },
+      {
+        "path": "characters/deepseek-hoodie/pat-2.webp",
+        "sha": "ee2704323c7e92cd19fd20f7a5b4e824c7e274d5",
+        "size": 78596
+      },
+      {
+        "path": "characters/deepseek-hoodie/pat.webp",
+        "sha": "38bbd6ac157d4723cdc5d841878f07a5711bf402",
+        "size": 74574
+      },
+      {
+        "path": "characters/deepseek-hoodie/pout.webp",
+        "sha": "2c5013ef7cd97811728aab4fe80313e02df7b2b8",
+        "size": 75492
+      },
+      {
+        "path": "characters/deepseek-hoodie/proud.webp",
+        "sha": "ceb0fbd28998ce637ae0d32b269d9fc8240f6e58",
+        "size": 81918
+      },
+      {
+        "path": "characters/deepseek-hoodie/puffed.webp",
+        "sha": "1feb32ad3f7d63ba7232bc77b7564048ac588681",
+        "size": 75982
+      },
+      {
+        "path": "characters/deepseek-hoodie/reading.webp",
+        "sha": "55d8607a0df5ec4841236464b76a18f171c3ab71",
+        "size": 78858
+      },
+      {
+        "path": "characters/deepseek-hoodie/redhot.webp",
+        "sha": "0e3cf63a4e607ce2e90fc6c1f5c119c25834b626",
+        "size": 75380
+      },
+      {
+        "path": "characters/deepseek-hoodie/running.webp",
+        "sha": "6e32109cd77efcac0358809b7f72b79abfb7a47c",
+        "size": 78002
+      },
+      {
+        "path": "characters/deepseek-hoodie/searching.webp",
+        "sha": "32fe5ca71a45801491dc6046663cfa23d979af25",
+        "size": 78172
+      },
+      {
+        "path": "characters/deepseek-hoodie/slack.webp",
+        "sha": "1f4c332b1f342d861e1ce79769b6b183cd52456c",
+        "size": 80240
+      },
+      {
+        "path": "characters/deepseek-hoodie/sleeping.webp",
+        "sha": "ae61007c46e087d1102260022b7039f5a926ab78",
+        "size": 78694
+      },
+      {
+        "path": "characters/deepseek-hoodie/stretch.webp",
+        "sha": "79477d8b6124e5b62252583f9a54be27ca269f4e",
+        "size": 77906
+      },
+      {
+        "path": "characters/deepseek-hoodie/sulk.webp",
+        "sha": "bdb6ef82ad6ac91e6453ec22ecb40285c0f543af",
+        "size": 65894
+      },
+      {
+        "path": "characters/deepseek-hoodie/surprised.webp",
+        "sha": "f1fc3a3c42c5b83416c2228da0960469a29dc674",
+        "size": 72522
+      },
+      {
+        "path": "characters/deepseek-hoodie/swamped_left.webp",
+        "sha": "2fcb7190ffbaf7dbb1a7ed1abc301031e40123f1",
+        "size": 80744
+      },
+      {
+        "path": "characters/deepseek-hoodie/swamped_right.webp",
+        "sha": "0d8ae44c9b6055bdf9873173f8cd485ebb0f3a85",
+        "size": 82328
+      },
+      {
+        "path": "characters/deepseek-hoodie/swim.webp",
+        "sha": "c9fe383b7476bf9603be105345f8661ee941785e",
+        "size": 86834
+      },
+      {
+        "path": "characters/deepseek-hoodie/thinking.webp",
+        "sha": "07ac60499ca6fda9c09131b4ca341ee699a2c804",
+        "size": 76602
+      }
+    ],
+    "notices": [
+      "LICENSE",
+      "README.md",
+      "characters/LICENSE.md",
+      "docs/prompts/多会话/README.md",
+      "docs/prompts/展示立绘/README.md",
+      "docs/prompts/时段与节日/README.md",
+      "docs/prompts/皮肤-冬装DeepSeek/README.md",
+      "docs/prompts/皮肤-卫衣DeepSeek/README.md",
+      "docs/prompts/皮肤-睡衣DeepSeek/README.md",
+      "docs/prompts/红温/README.md",
+      "docs/prompts/角色-千问/README.md",
+      "docs/prompts/贴边/README.md",
+      "docs/prompts/重置提醒/README.md",
+      "tools/readme_images.py"
+    ]
+  },
+  {
+    "repo": "G-Terry/DeepSeek-DesktopPet",
+    "branch": "main",
+    "tree": "7139bac2dd3881a45bedc0da8c0288c862e557df",
+    "pushedAt": "2026-09-10T12:59:24Z",
+    "license": "MIT",
+    "assets": [],
+    "notices": [
+      "LICENSE",
+      "README.md"
+    ]
+  },
+  {
+    "repo": "pc2005-cloud/dsh-pet",
+    "branch": "main",
+    "tree": "86181ce1660a57ab27336630bab5b344de71b28c",
+    "pushedAt": "2026-10-28T05:37:18Z",
+    "license": "MIT",
+    "assets": [
+      {
+        "path": "dsh-pet/assets/preview/beiluoye-yanmo.gif",
+        "sha": "1928057248d8867822c319c682be6b25f0205613",
+        "size": 629167
+      },
+      {
+        "path": "dsh-pet/assets/preview/beishubiao-tuozhuai-xuankong-fankui.gif",
+        "sha": "5ee7e437d4e475e8cd09049eed09c54bf76e8ac5",
+        "size": 654762
+      },
+      {
+        "path": "dsh-pet/assets/preview/beixiayitiao-zhamao.gif",
+        "sha": "42476913b85c13eb1898cdce1f865a6f8db883e3",
+        "size": 623877
+      },
+      {
+        "path": "dsh-pet/assets/preview/bian-gezi.gif",
+        "sha": "4b4547822afaf08473f558f0e5384fd1fbd6487a",
+        "size": 651972
+      },
+      {
+        "path": "dsh-pet/assets/preview/cha-zhuyu-shangju.gif",
+        "sha": "2a6f786b18ac27f5c317374bb7e55527d9a76891",
+        "size": 615404
+      },
+      {
+        "path": "dsh-pet/assets/preview/chai-liwu.gif",
+        "sha": "de7d76b64a1e120f06816cfba55f46d7d12fbeee",
+        "size": 622000
+      },
+      {
+        "path": "dsh-pet/assets/preview/chaoda-shenlanyao.gif",
+        "sha": "b47ebcb730e1ce906787c558823890d45bbdbf10",
+        "size": 617589
+      },
+      {
+        "path": "dsh-pet/assets/preview/chenjian-shuaya.gif",
+        "sha": "319cf45d0fdfe051374bca52a1431740fc144c94",
+        "size": 644856
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-baifan.gif",
+        "sha": "ad2bde6883e6667db72c803e9271bc9dca45abfb",
+        "size": 622739
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-bingqilin-ronghua.gif",
+        "sha": "12035fbb533612da7305585b6eaea6b5233dfa9b",
+        "size": 620796
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-changshoumian.gif",
+        "sha": "03b83daca2442e7155718897cb21dc2bf57a6bc5",
+        "size": 630211
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-chongyanggao.gif",
+        "sha": "218df8b72cec91ddad18e2d9b8dda34282f00aab",
+        "size": 609458
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-dazhaxie.gif",
+        "sha": "db14d3975c0cac414b979f7421c48b884ef52da7",
+        "size": 633443
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-labazhou.gif",
+        "sha": "5e547091a96687376d1deefe10fb3325c46e4c4b",
+        "size": 611830
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-niangao.gif",
+        "sha": "6dc0ab0d6fe3a3b55368a0d363090c8ec29b0101",
+        "size": 624791
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-qingtuan.gif",
+        "sha": "e20d8403d5adccb4639700e4a23c5e5471ce0559",
+        "size": 624603
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-tanghulu.gif",
+        "sha": "7576ade5e1c040f813aa41e2d668ae6d3661103d",
+        "size": 621400
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-token.gif",
+        "sha": "2e0c05713e5ee1562699f93bed2badf9e9a6a8cc",
+        "size": 670566
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-wancan.gif",
+        "sha": "66a0a520fe9e17fee0572a8febe7696e5a6155a6",
+        "size": 742502
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-wucan.gif",
+        "sha": "b6bbf3111e86e9a76b8d9af720a103aa4cf935f6",
+        "size": 620733
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-xigua.gif",
+        "sha": "bb5eacee835959f980666e923f178499484de3d5",
+        "size": 614342
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-zaocan.gif",
+        "sha": "a6f6a92f132b8418717a2cb5251c73d5776527a4",
+        "size": 622734
+      },
+      {
+        "path": "dsh-pet/assets/preview/chi-zongzi.gif",
+        "sha": "0dc10ded49a1c05f2bbb816c652493411fe6306d",
+        "size": 630082
+      },
+      {
+        "path": "dsh-pet/assets/preview/chijiaozi.gif",
+        "sha": "91846b420f21e223ce9b0f2180310c094a5727c7",
+        "size": 668889
+      },
+      {
+        "path": "dsh-pet/assets/preview/chitangyuan.gif",
+        "sha": "08d8c000e9ca9643954df0f1b9d5011241b90be2",
+        "size": 624086
+      },
+      {
+        "path": "dsh-pet/assets/preview/chou-tuoluo.gif",
+        "sha": "1ca7394968873f7919997c6ed6e0254ce4f26d82",
+        "size": 608654
+      },
+      {
+        "path": "dsh-pet/assets/preview/chuanzhenqiqiao.gif",
+        "sha": "ed7c4de77c9872bdf34c48d4a5b3d1122e062c9a",
+        "size": 646989
+      },
+      {
+        "path": "dsh-pet/assets/preview/chui-dizi.gif",
+        "sha": "11f53ced7ef7dbb59ede474eb75070ddc6cfdb61",
+        "size": 677790
+      },
+      {
+        "path": "dsh-pet/assets/preview/chui-qiqiu.gif",
+        "sha": "3392c9784a165affd7d3a25769b61507f7123c05",
+        "size": 641205
+      },
+      {
+        "path": "dsh-pet/assets/preview/da-keshui-bei-jingxing.gif",
+        "sha": "97264491fde2dd1993cf242f9f8da6ec351616c1",
+        "size": 617811
+      },
+      {
+        "path": "dsh-pet/assets/preview/dai-kong-ru-xi.gif",
+        "sha": "6091a0064d971348ad1014e2f4be6ec16fff62fe",
+        "size": 644316
+      },
+      {
+        "path": "dsh-pet/assets/preview/daiji-huxi-xiuxian.gif",
+        "sha": "f6fb7cca1bd6e32f80174ce7679fc5ae5554bc2f",
+        "size": 630669
+      },
+      {
+        "path": "dsh-pet/assets/preview/dakou-chi-lingshi.gif",
+        "sha": "0a431bee8ce903c6fa1c7e168e58f77bc05940ed",
+        "size": 643312
+      },
+      {
+        "path": "dsh-pet/assets/preview/dangqiuqian.gif",
+        "sha": "b4e856ece2a5655f3cfc6b3beaac3aa6f8a3ac26",
+        "size": 671628
+      },
+      {
+        "path": "dsh-pet/assets/preview/dianji-huiying-aojiao-shengqi-ceshen-zhanshi.gif",
+        "sha": "be0d6b07fb337c27222d85d2f4eb8b750d40052a",
+        "size": 562573
+      },
+      {
+        "path": "dsh-pet/assets/preview/dianji-huiying-haixiu-jingya.gif",
+        "sha": "79041862a134c542d750509bfcdcb86fd0b1b625",
+        "size": 637081
+      },
+      {
+        "path": "dsh-pet/assets/preview/dianji-huiying-kaixin-yuedong.gif",
+        "sha": "e9aa82c702ce97e572d38cc57e884cce5827bb08",
+        "size": 625946
+      },
+      {
+        "path": "dsh-pet/assets/preview/dianji-huiying-naoyang-gegexiao.gif",
+        "sha": "fbffcb6b6ce4191557eb792fae5c2b765e5ef4d9",
+        "size": 631461
+      },
+      {
+        "path": "dsh-pet/assets/preview/dianji-huiying-yuanqi-huishou.gif",
+        "sha": "7834dabf82cd33b0fd857efec4d8f1921bc908de",
+        "size": 627065
+      },
+      {
+        "path": "dsh-pet/assets/preview/dongwu-huanrao.gif",
+        "sha": "d5c7a39dc0fc0b1e776a4477e41b45b315cb0fcf",
+        "size": 789492
+      },
+      {
+        "path": "dsh-pet/assets/preview/dongzhangxiwang.gif",
+        "sha": "8dad2f125e515a9a745167287dddaddb584ad554",
+        "size": 622863
+      },
+      {
+        "path": "dsh-pet/assets/preview/duixueren.gif",
+        "sha": "6c9b36956e00f540fecf2757f75b967ff16fb1b1",
+        "size": 634657
+      },
+      {
+        "path": "dsh-pet/assets/preview/fang-fengzheng.gif",
+        "sha": "375425febc798ec8aaf841cf141ffaf68894ce5f",
+        "size": 676169
+      },
+      {
+        "path": "dsh-pet/assets/preview/fang-kongmingdeng.gif",
+        "sha": "e4162d1167c70388c219d5e471c1f3cd147db048",
+        "size": 615147
+      },
+      {
+        "path": "dsh-pet/assets/preview/fang-yanhua.gif",
+        "sha": "b389afc584c403d12a9b021a19f2b6da3b12a627",
+        "size": 740012
+      },
+      {
+        "path": "dsh-pet/assets/preview/fanghedeng.gif",
+        "sha": "90206540737ebf84fc23bf58badbb8a747b0bce7",
+        "size": 608723
+      },
+      {
+        "path": "dsh-pet/assets/preview/fen-wen-bu-sheng.gif",
+        "sha": "9a27dd2304a890d469d9c5259afa15ff55d7278e",
+        "size": 660687
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-chuitou-tanqi-maohan.gif",
+        "sha": "d1e725542f4d0b09bfafc16642290c6b48842970",
+        "size": 312719
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-manglu-dianan.gif",
+        "sha": "16e18cd4d6458b3923b3abbbe4a13798512a09a2",
+        "size": 627629
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-qingdian-guidang.gif",
+        "sha": "3945e1e5673b1d75a3ab35617e498b0d0a19ab41",
+        "size": 609676
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-queyue-qingzhu.gif",
+        "sha": "3b4f41e0e92971dc3b21e6ab35853c72b8b47fa8",
+        "size": 633926
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-sikao-maopao.gif",
+        "sha": "19ed3513cee9f9ff5e008dc00a0bf5fc4f2cbdb2",
+        "size": 636712
+      },
+      {
+        "path": "dsh-pet/assets/preview/gongzuozhuangtai-yuandi-duobu-zhangwang.gif",
+        "sha": "15c8d5342c8da4a32f0f3914720b34c1fe361be3",
+        "size": 631287
+      },
+      {
+        "path": "dsh-pet/assets/preview/haqian-liantian.gif",
+        "sha": "eed5f69f89eadb6a1d3003fe8031658d86a5c691",
+        "size": 632678
+      },
+      {
+        "path": "dsh-pet/assets/preview/hudie-mifeng-huanrao-touding-kaihua.gif",
+        "sha": "b465a1830a63fd5473c78652f730b28d4efd7e2e",
+        "size": 715918
+      },
+      {
+        "path": "dsh-pet/assets/preview/jin-dai-ding-dang.gif",
+        "sha": "ee0c6c35209493b82fb5346d13c13ef38e337b94",
+        "size": 638229
+      },
+      {
+        "path": "dsh-pet/assets/preview/jingyu-tu-paopao-texiao.gif",
+        "sha": "0c9ad80dfa6ce536689010f50a047f2ea582156d",
+        "size": 647658
+      },
+      {
+        "path": "dsh-pet/assets/preview/keai-zhaiwu.gif",
+        "sha": "2bd7a42a7f168cc7300e8ef098c1b177a42b52ed",
+        "size": 617842
+      },
+      {
+        "path": "dsh-pet/assets/preview/lanjing-xianshi.gif",
+        "sha": "bf6e789610b63e51e740c73b12295b0bf14b155d",
+        "size": 654904
+      },
+      {
+        "path": "dsh-pet/assets/preview/lu-mao.gif",
+        "sha": "903641e4e1f2c34cd01bd737ca9627c58bbf3e96",
+        "size": 634039
+      },
+      {
+        "path": "dsh-pet/assets/preview/menghua-xiaoyouling.gif",
+        "sha": "cce36b4b4cc1c8cfbf21edfff0d1f298f84473f4",
+        "size": 630687
+      },
+      {
+        "path": "dsh-pet/assets/preview/nvpu-quxi-liyi.gif",
+        "sha": "170843899c3c35123fe18b6d62cc7ed74a29ca6c",
+        "size": 593893
+      },
+      {
+        "path": "dsh-pet/assets/preview/pangxie-zoulu.gif",
+        "sha": "86a8b6d0882e89cb516435e78b401374cc0714c2",
+        "size": 627328
+      },
+      {
+        "path": "dsh-pet/assets/preview/pingkong-shenghua.gif",
+        "sha": "7c8b1caf067a22cf8350ea0d4467631e64d4a85d",
+        "size": 604041
+      },
+      {
+        "path": "dsh-pet/assets/preview/puke-moshu.gif",
+        "sha": "82d6fa242045ba8d5e6f39480c5d15c3282ab1a1",
+        "size": 633858
+      },
+      {
+        "path": "dsh-pet/assets/preview/qi-muma.gif",
+        "sha": "518416887f41c5cc84533dbef7c3ac016fc4d760",
+        "size": 806703
+      },
+      {
+        "path": "dsh-pet/assets/preview/qian-dai-man-yi.gif",
+        "sha": "265310f4d01941406381364ec610a814a0edb99d",
+        "size": 620453
+      },
+      {
+        "path": "dsh-pet/assets/preview/qian-dai-ru-chang.gif",
+        "sha": "63c685bd1f3f9800785ba5ba4c0cc643339447a5",
+        "size": 656802
+      },
+      {
+        "path": "dsh-pet/assets/preview/qingkuai-jilu.gif",
+        "sha": "60e049c165a5b0144036a76925d6d9db1175d73b",
+        "size": 633555
+      },
+      {
+        "path": "dsh-pet/assets/preview/qingkuai-yaobaiwu.gif",
+        "sha": "a26da12212eb22f1da2ef89759e56125b4510319",
+        "size": 624222
+      },
+      {
+        "path": "dsh-pet/assets/preview/sanqiu-paojie.gif",
+        "sha": "17dcb3d13c85184c61f4dbeb0f5772dfadb69956",
+        "size": 632764
+      },
+      {
+        "path": "dsh-pet/assets/preview/shendu-sikao-suisuinian.gif",
+        "sha": "8350ee21d391fd728ca96f08b50a8aad2d8000d6",
+        "size": 725097
+      },
+      {
+        "path": "dsh-pet/assets/preview/shia-chishenme.gif",
+        "sha": "a834913afab0e9897c0b16d17e43fe476e8c6156",
+        "size": 855953
+      },
+      {
+        "path": "dsh-pet/assets/preview/shou-hongbao.gif",
+        "sha": "b151a43b3137bbda5246d947b2a075cf53b40378",
+        "size": 617710
+      },
+      {
+        "path": "dsh-pet/assets/preview/shu-jin-zhou-mei.gif",
+        "sha": "2e33a00efef80d3187403bb158767b26a83c3f56",
+        "size": 635602
+      },
+      {
+        "path": "dsh-pet/assets/preview/shuan-huoguo.gif",
+        "sha": "f0d33f3aa8e4ae6b2735daa0213c0ea595adcc2b",
+        "size": 652279
+      },
+      {
+        "path": "dsh-pet/assets/preview/suisuinian-cazhuo-suisuinian.gif",
+        "sha": "17545394fdee143bf26826ba4c1d6fc34f0f612f",
+        "size": 612374
+      },
+      {
+        "path": "dsh-pet/assets/preview/suisuinian-duiping-suisuinian.gif",
+        "sha": "c3d255ec6bb8bbb1a54bf3c3e5b4dd53877e06e3",
+        "size": 616674
+      },
+      {
+        "path": "dsh-pet/assets/preview/suisuinian-fadai-suisuinian.gif",
+        "sha": "82acdb18f999d4748c4a89691da0625d2fe6a588",
+        "size": 616214
+      },
+      {
+        "path": "dsh-pet/assets/preview/taotang-nanguadeng.gif",
+        "sha": "0b2c7aab35910583f0f69b7a4cfeabf1bae2c2f3",
+        "size": 625363
+      },
+      {
+        "path": "dsh-pet/assets/preview/ti-jianzi.gif",
+        "sha": "7c2fd787c47ac532b22c418a173551a6ff94a896",
+        "size": 630934
+      },
+      {
+        "path": "dsh-pet/assets/preview/touchi-lingshi-bei-zhuazhu.gif",
+        "sha": "f807dc47ab546c8528ccf305e05e8e2707f447a1",
+        "size": 638708
+      },
+      {
+        "path": "dsh-pet/assets/preview/wan-shuiqiang.gif",
+        "sha": "5ff73ee4ae035c31b8900dae7c436c48ab6b946f",
+        "size": 634678
+      },
+      {
+        "path": "dsh-pet/assets/preview/wan-youxi-qijibaituai.gif",
+        "sha": "a24239cc4e37662d54a148920d6b88d3b26bfad1",
+        "size": 676604
+      },
+      {
+        "path": "dsh-pet/assets/preview/wu-shitou.gif",
+        "sha": "e922d30c65309268305849cdbb901b091353626a",
+        "size": 640129
+      },
+      {
+        "path": "dsh-pet/assets/preview/xiaofudu-yuandi-360du-xuanzhuan-zhanshi.gif",
+        "sha": "1953ddc6be3d4c1a66a6129a49358e44724733a6",
+        "size": 606303
+      },
+      {
+        "path": "dsh-pet/assets/preview/xiaotiqin-yanzou.gif",
+        "sha": "743cd821bf9ff2d2d1cafd8f93b65ff0474c4a53",
+        "size": 629961
+      },
+      {
+        "path": "dsh-pet/assets/preview/xiawuziqi.gif",
+        "sha": "3225be44ba0dd1336373833ab65463d6dfe4bb02",
+        "size": 614374
+      },
+      {
+        "path": "dsh-pet/assets/preview/xie-daima.gif",
+        "sha": "1ed0d8d9affdf44f67c2b205d264ec0c17a59b9b",
+        "size": 627078
+      },
+      {
+        "path": "dsh-pet/assets/preview/xie-fuzi.gif",
+        "sha": "11bec1d5e023ce905d1dcbac30d1abf33da38657",
+        "size": 631185
+      },
+      {
+        "path": "dsh-pet/assets/preview/yaoshan-naliang.gif",
+        "sha": "5d698b43516b9fbe46f415438598c921bab2f08b",
+        "size": 674462
+      },
+      {
+        "path": "dsh-pet/assets/preview/yong-jingyu-weiba-paidadi.gif",
+        "sha": "1f6b4172cfaa67ede270070491b8b276436938e8",
+        "size": 643856
+      },
+      {
+        "path": "dsh-pet/assets/preview/youxian-hengga.gif",
+        "sha": "8d218a18962a36bde4e774212085051472d27142",
+        "size": 628797
+      },
+      {
+        "path": "dsh-pet/assets/preview/youya-nvpuwu.gif",
+        "sha": "d3502f2d4069c460e2810f1d63b9731659d53dca",
+        "size": 610270
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-dunxia-wan-wanju-qiche.gif",
+        "sha": "0ce137e4e5d0c8421ac769045753b925834008dd",
+        "size": 554474
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-piaofu-tabu.gif",
+        "sha": "1ff1a09ef333f951132f18b92c4c2619582146b7",
+        "size": 619678
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-qiaoji-zhuomian-hudong.gif",
+        "sha": "2705649630c3578fe7c5a9e52f4b803b3b750a8b",
+        "size": 598376
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-tiaoyue-zhuasui-touding-wupin.gif",
+        "sha": "85109278c416f8b66404ca1ea90b0101bac3fdb0",
+        "size": 573264
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-xiaoqi-chenmian.gif",
+        "sha": "07a66d90998ea5ae79f90b5e5f809adaad65e1e7",
+        "size": 626237
+      },
+      {
+        "path": "dsh-pet/assets/preview/yuandi-zhongli-xiadun-yasuo.gif",
+        "sha": "e733b1b23aa7298c2ce83b9e9217d9c39f3a20f1",
+        "size": 487025
+      }
+    ],
+    "notices": [
+      "LICENSE",
+      "README.md",
+      "dsh-pet/LICENSE",
+      "dsh-pet/README.md",
+      "dsh-pet/scripts/tests/README.md",
+      "dsh-pet/src/shared/balance/notice.ts",
+      "tools/cordis-probe/README.md"
+    ]
+  },
+  {
+    "repo": "xkk6663/dsh-live2d-mao",
+    "branch": "main",
+    "tree": "52ef4746fa690c46e2596ea84b872b7af8a5e10c",
+    "pushedAt": "2026-10-26T08:35:58Z",
+    "license": "MIT",
+    "assets": [
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/Haru.moc3",
+        "sha": "e5fc43a78cb8b2c6cd4d5601ef56019bd628d6c3",
+        "size": 384704
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/Haru.model3.json",
+        "sha": "3e20b916e24a832a7c530614f6ab42c1f3a9e2f2",
+        "size": 2083
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_idle.motion3.json",
+        "sha": "f28938b1d0a1c4c8ac8a4539893df9c7ad835ff1",
+        "size": 21183
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m01.motion3.json",
+        "sha": "115419eb6a663b484438f8ba1302693e59af5867",
+        "size": 11944
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m02.motion3.json",
+        "sha": "d0dd0f2b905cf1515998d1038d5e6c2943184631",
+        "size": 12055
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m03.motion3.json",
+        "sha": "5c5775a0fe083968084997a3ba9abc125a8369be",
+        "size": 16981
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m04.motion3.json",
+        "sha": "b5556013e54e71268f10dbcf4dbbe6b7457f51c7",
+        "size": 23449
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m05.motion3.json",
+        "sha": "fffb9fc1eca46b1755330ebcde96fb706d448ab8",
+        "size": 14198
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m06.motion3.json",
+        "sha": "b03be909a778b2fc8f976ab0f197b9cad6eff078",
+        "size": 15118
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m07.motion3.json",
+        "sha": "a7d6d86944825e308ff636a0c6c01b1021e72346",
+        "size": 14821
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m08.motion3.json",
+        "sha": "d24f5ee19d36e5b4ce43571772a113728608f9d2",
+        "size": 15439
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m09.motion3.json",
+        "sha": "55583e37b4f9c309b9a0868cb1f5dffa7ed67426",
+        "size": 25066
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m10.motion3.json",
+        "sha": "e8d4acf4abee0335a7a681c5658d595b6c8bd996",
+        "size": 34954
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m11.motion3.json",
+        "sha": "e18f08ad4aa116174510db75e088dfd35a11f955",
+        "size": 14475
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m12.motion3.json",
+        "sha": "7df27408572d0546b6ad0d4523dbba1e5e42758f",
+        "size": 22441
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m13.motion3.json",
+        "sha": "045dfe2a08b275f168e9f3dc7378c29721205655",
+        "size": 11601
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m14.motion3.json",
+        "sha": "a0c55c04d2fb207e06cb05aeb640b54db3bd9582",
+        "size": 20625
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m15.motion3.json",
+        "sha": "c774ddf9c650022c5abf899b3ddec2daba4ab968",
+        "size": 13540
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m16.motion3.json",
+        "sha": "aa0e8348105fe2697bee22ea724c27e3062a7415",
+        "size": 18639
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m17.motion3.json",
+        "sha": "3057b7a725eea82954dfbc77a977e6ce3d69c332",
+        "size": 16109
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m18.motion3.json",
+        "sha": "192a3a1285fdfc2694a7102ef4c624336e6d0fa0",
+        "size": 13424
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m19.motion3.json",
+        "sha": "674bc3f4499a0a2c8958af3aa08d9fff8d962183",
+        "size": 11302
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m20.motion3.json",
+        "sha": "6820adcf148ceda2ca79653f05934a93396dcb27",
+        "size": 23651
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m21.motion3.json",
+        "sha": "3d43542ad4a1c0f535c66cf3fbfb3aca0797c5cf",
+        "size": 23906
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m22.motion3.json",
+        "sha": "196ad33ed0426f607e94218de6eaf1646e66e5e8",
+        "size": 27408
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m23.motion3.json",
+        "sha": "a2e5001e5dd21d61c1d3c629a8c9d08112b59dae",
+        "size": 16695
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m24.motion3.json",
+        "sha": "0be005d8cb8b70008c855f5fa19d72fcb03b1fd4",
+        "size": 18090
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m25.motion3.json",
+        "sha": "5745701e09457d9f938f2cd04fd0d7249e09ead3",
+        "size": 17528
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Haru/motions/haru_g_m26.motion3.json",
+        "sha": "0b1b05d86a82975b6dcd2bad343a724d7350131f",
+        "size": 23275
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/Hiyori.moc3",
+        "sha": "7231288fc2ce85ae000c376a11b3f41bcb9cae03",
+        "size": 443648
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/Hiyori.model3.json",
+        "sha": "b93e4506b1d6e3728599e06eaef3f0171fafba86",
+        "size": 1736
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m01.motion3.json",
+        "sha": "5adb2295cfbb60bc94e4b2049b8381ae1a649ea6",
+        "size": 10622
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m02.motion3.json",
+        "sha": "bb652b1c1ef0c0fc06d5e0a1c09ed948ad918373",
+        "size": 14248
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m03.motion3.json",
+        "sha": "83c5c397143916860e2b9c7fedbd9fc384762c0e",
+        "size": 12732
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m04.motion3.json",
+        "sha": "aa8aa811b4534f7570b6429ee3f101eba07af38a",
+        "size": 8772
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m05.motion3.json",
+        "sha": "509924b71a6fddb142fe578a7adc5933e62e7f0e",
+        "size": 16061
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m06.motion3.json",
+        "sha": "0bfe6003b85de8d4d0fa6e5ad198aa61f84b8134",
+        "size": 19492
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m07.motion3.json",
+        "sha": "b19014889c164696db554af7ae19fef97cffcb22",
+        "size": 9636
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m08.motion3.json",
+        "sha": "94b9c88400b352331cc3b1fa52f149d69de29cba",
+        "size": 10551
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m09.motion3.json",
+        "sha": "47f74bfc9c459530297ea252311bfe6e080734e8",
+        "size": 11479
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Hiyori/motions/Hiyori_m10.motion3.json",
+        "sha": "341f9ec87d040b4f1a36f59dc86ffb6240e6b4b5",
+        "size": 9604
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/Mao.moc3",
+        "sha": "fc4cf72230f9046f8a9df3337f1ab4fb43ba1b58",
+        "size": 879680
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/Mao.model3.json",
+        "sha": "69c2be0ee9241e30daa029e5b8974df233ae870c",
+        "size": 1699
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/mtn_01.motion3.json",
+        "sha": "854b3c25d52ee2fb6a90bee11d660031274067d5",
+        "size": 27661
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/mtn_02.motion3.json",
+        "sha": "40ae6e646235c915d60a3114e1fd34b536e0da1d",
+        "size": 24274
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/mtn_03.motion3.json",
+        "sha": "c15f90cf5951c40f33bb43b3e34f4fe1c19ca807",
+        "size": 22934
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/mtn_04.motion3.json",
+        "sha": "09eea78ce5ff4357e9faab57c40d27c1e6629229",
+        "size": 27346
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/sample_01.motion3.json",
+        "sha": "b24f6f93cf5edbdf478633f813076ad3cd964268",
+        "size": 28330
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/special_01.motion3.json",
+        "sha": "4b6cc16712923165b36578377d89d656d958a182",
+        "size": 34229
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/special_02.motion3.json",
+        "sha": "c0c7ac1b824b2e2b76eb7e86c99bf87ec26ec58a",
+        "size": 41809
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mao/motions/special_03.motion3.json",
+        "sha": "018154512e6b875d4dd6378e45d4834651d75806",
+        "size": 48041
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/Mark.moc3",
+        "sha": "e1da2692742067668559fa5e6a0f480b840e092b",
+        "size": 124736
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/Mark.model3.json",
+        "sha": "55e6a3735275145c1757ec501ff30020c4b9c28f",
+        "size": 1119
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m01.motion3.json",
+        "sha": "f21ad29d94a1ae52d22c87ae4529338c2a3c9317",
+        "size": 28711
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m02.motion3.json",
+        "sha": "839ee18fced914d9e00aefb2959bf39f505c83d4",
+        "size": 18717
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m03.motion3.json",
+        "sha": "1ad2f759eaf71ccca9a750ff23e9eb8803c3aeb2",
+        "size": 9201
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m04.motion3.json",
+        "sha": "32d318e23692827ad0f20e617c6dedb19e1c4c4c",
+        "size": 15897
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m05.motion3.json",
+        "sha": "426eb573b178b0db9c7a1b918d4e321fa1ae1e94",
+        "size": 13054
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Mark/motions/mark_m06.motion3.json",
+        "sha": "947e343ee38f62a96fb6e9ba54000fe122e0f0f2",
+        "size": 8451
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/Rice.moc3",
+        "sha": "a872a6f019f99ef3c7b16d3e5a2aef9c356ae6cc",
+        "size": 479104
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/Rice.model3.json",
+        "sha": "dd86afabd5eec7a2ca21d98c0a9614b0ebbd25a6",
+        "size": 767
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/motions/idle.motion3.json",
+        "sha": "7b1f405a397eda999a6c7971114eadb2fb2fbc91",
+        "size": 10165
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/motions/mtn_01.motion3.json",
+        "sha": "9ce514b34f539044600d2984a1c0369ba0531555",
+        "size": 22819
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/motions/mtn_02.motion3.json",
+        "sha": "d37cf0b57a7589545905312736ad806e9cf275c3",
+        "size": 13541
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Rice/motions/mtn_03.motion3.json",
+        "sha": "96726837745843184a70c504e6ef979058c905cf",
+        "size": 21062
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/Wanko.moc3",
+        "sha": "b68661061e986f5080133a7e313d7883c4850e36",
+        "size": 107456
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/Wanko.model3.json",
+        "sha": "95ffeebb65c242e3b35580fb2ab9cae8dd2ba63e",
+        "size": 835
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/idle_01.motion3.json",
+        "sha": "86982bf1d38988370166c52f4541a270be174449",
+        "size": 6897
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/idle_02.motion3.json",
+        "sha": "3493c37180d4478c2683bb619941a3453af0ecad",
+        "size": 7781
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/idle_03.motion3.json",
+        "sha": "db190987dc35dac2ecf675969e64934986b22587",
+        "size": 7475
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/idle_04.motion3.json",
+        "sha": "b54e5a5aaf223e4a35cea88878995822a61517e8",
+        "size": 6406
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/shake_01.motion3.json",
+        "sha": "a2055bb1146c827e067329caeac6b642357c8101",
+        "size": 7296
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/shake_02.motion3.json",
+        "sha": "a850a8885cb754ccb7b61e98d68964b063314216",
+        "size": 8335
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_01.motion3.json",
+        "sha": "5f0ab46e08efb74a840d792e5ee35cb76f30a642",
+        "size": 5819
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_02.motion3.json",
+        "sha": "06b11f9a4c20269e5a8f2ee6514339a6b2c546c6",
+        "size": 6712
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_03.motion3.json",
+        "sha": "cdfb4c50ce2f2758f3bfa6b94dda578abae2a07e",
+        "size": 6228
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_04.motion3.json",
+        "sha": "e2b7725fc17b2758039b482cd12d695894155acf",
+        "size": 5986
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_05.motion3.json",
+        "sha": "6e714e0b3157d642a54ebb2f2ec302f59cc99278",
+        "size": 5031
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/Wanko/motions/touch_06.motion3.json",
+        "sha": "3d890c2ee50e4b8f92e8622087e6d01df04c7fa8",
+        "size": 7070
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/da-feiyu/大肥鱼.moc3",
+        "sha": "16f4b5406455e5602cff5a1b0ce886aecdd69637",
+        "size": 1239040
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/da-feiyu/大肥鱼.model3.json",
+        "sha": "c56dc0410d3fb05f27d90540dd19bdeafe002dad",
+        "size": 1799
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/c_0120.moc3",
+        "sha": "f7723451826a56f5f19a482a9c6d6c48c27b1f95",
+        "size": 2119552
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/c_0120.model3.json",
+        "sha": "b43f8f1f762af52c610cd93e0d4f9c2703e56166",
+        "size": 6115
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/_aidale.motion3.json",
+        "sha": "95b45e6f8a3b074c609409f7f50fe1e62d5008bb",
+        "size": 10871
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/chuipaopao.motion3.json",
+        "sha": "7101f67484a9a20e6742db558049a899f35131c2",
+        "size": 3470
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/idle.motion3.json",
+        "sha": "03bab02effbf4daec29792c4d138fe74752387bc",
+        "size": 45228
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/喷水.motion3.json",
+        "sha": "6d0e9e5378255b55283dc28291e181fe85549de2",
+        "size": 404
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/开盖.motion3.json",
+        "sha": "65eab3b4d84b825a3198b3377bdf4816066e1b3d",
+        "size": 1181
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/番茄酱.motion3.json",
+        "sha": "196ee215a93a5e16667187f30c1fb9ec18736f79",
+        "size": 7282
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/自拍.motion3.json",
+        "sha": "1bba5c531dcfe9340f7dc1265173b137bf3c86f0",
+        "size": 6580
+      },
+      {
+        "path": "澪Agent应用/dist/live2d-pet/models/whale-deepseek/motions/自拍简单.motion3.json",
+        "sha": "476181b632a69e6b4105a291458b00793e800e9a",
+        "size": 550
+      }
+    ],
+    "notices": [
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_NOTICES.md",
+      "packages/dsh-live2d-mao/README.md",
+      "澪Agent应用/LICENSE",
+      "澪Agent应用/dist/live2d-pet/THIRD_PARTY_NOTICES.html",
+      "澪Agent应用/dist/live2d-pet/licenses/CubismWebSamples-License.md",
+      "澪Agent应用/dist/live2d-pet/licenses/CubismWebSamples-Notice.md",
+      "澪Agent应用/dist/live2d-pet/licenses/Live2DPet-MIT.txt",
+      "澪Agent应用/dist/live2d-pet/licenses/PixiJS-MIT.txt",
+      "澪Agent应用/dist/live2d-pet/licenses/pixi-live2d-display-MIT.txt",
+      "澪Agent应用/src/components/UpdateNotice.vue",
+      "澪Agent应用/tests/market/README.md",
+      "私人AI日记系统/LICENSE",
+      "私人AI日记系统/backend/tools/diag/README.md"
+    ]
+  }
+]

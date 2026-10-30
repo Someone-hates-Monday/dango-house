@@ -1,0 +1,21 @@
+name: 小屋愿望 / Feature request
+description: 想一起玩什么新花样？ / What should we play next?
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 使用场景 / Use case
+      description: 现在遇到什么问题，或者想体验什么？ / What problem or experience do you have in mind?
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 希望的行为 / Desired behavior
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: 参考与授权线索 / References & permission
+      description: 美术/动画参考请附原作者、出处和授权信息。 / Include creators, original links and terms for art/animation references.

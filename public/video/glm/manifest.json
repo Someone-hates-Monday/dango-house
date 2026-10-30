@@ -1,0 +1,22 @@
+{
+  "productionApproved": true,
+  "status": "accepted-after-local-review",
+  "basis": "Original first frame, contact sheet over light/dark backgrounds, full forward frame preservation and boundary audit; verify in Electron before release.",
+  "evidence": [
+    "download-first-frame.png",
+    "contact-alpha.png",
+    "audit.json"
+  ],
+  "acceptedMotion": "Fox ears rise then relax; closed-eye smile/bow and visible return to open-eye stance.",
+  "limits": "Small generated line and clothing variations remain; no claim of identical pixels or independently authored animation. Other interactions retain existing renderer.",
+  "sourceSha256": "7d2a8ffd17ed9c3979cb50cb7ec71d753110c50bc7295dd8dddb1043b97d09c0",
+  "frames": 241,
+  "duration": 10.041666666666666,
+  "date": "2026-10-30",
+  "character": "glm",
+  "action": "pat",
+  "asset": "pat-doubao-a1.webm",
+  "fps": 24,
+  "alpha": true,
+  "assetSha256": "5896b857976bdbfe81d5bf77ff4cf7da119eb9833ec5d4b82c8a2d27d711ee81"
+}

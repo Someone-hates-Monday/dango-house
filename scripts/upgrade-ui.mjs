@@ -1,0 +1,21 @@
+import fs from 'node:fs';
+const file='src/main.tsx';let s=fs.readFileSync(file,'utf8');
+const start=s.indexOf('function Sprite('),end=s.indexOf('function Avatar(',start);if(start>=0&&end>start)s=s.slice(0,start)+s.slice(end);
+if(!s.includes("from './Room'"))s=s.replace("import './style.css';",`import { Sprite, EmotionFx } from './Sprite';\nimport { Room, useNow } from './Room';\nimport { Connections } from './Connections';\nimport { PrivateChat } from './PrivateChat';\nimport './style.css';`);
+s=s.replace("import './community.css';","import './community.css';\nimport './room.css';");
+s=s.replace("const [page, setPage] = useState('chat');","const [page, setPage] = useState('room');");
+s=s.replace('<nav>','<nav><button className={page === \'room\' ? \'active\' : \'\'} onClick={() => setPage(\'room\')}><Heart size={19} />互动小屋<span className="nav-count">NEW</span></button>');
+s=s.replace("{({ chat: '公馆群聊'","{({ room: '互动小屋', chat: '公馆群聊'");
+s=s.replace("{page === 'chat' && <Chat state={state} />}","{page === 'room' && <Room state={state} />}\n      {page === 'chat' && <Chat state={state} />}");
+s=s.replace("{page === 'settings' && <Settings state={state} />}","{page === 'settings' && <Connections state={state} />}");
+s=s.replace('className="nav-count">3<','className="nav-count">{characters.length}<');
+s=s.replace('className="version">v0.1.1<','className="version">v0.2.0<');
+s=s.replace('<Sprite character={selected} mood={state.mood[selected.id]} skin={state.skins[selected.id]} />','<Sprite character={selected} mood={state.mood[selected.id]} skin={state.skins[selected.id]} pose={state.bodies[selected.id].pose} />');
+s=s.replace('<Sprite character={c} mood={state.mood[c.id]} skin={state.skins[c.id]} />','<Sprite character={c} mood={state.mood[c.id]} skin={state.skins[c.id]} pose={state.bodies[c.id].pose} />');
+s=s.replaceAll('栖庭','团子小屋').replaceAll('QITING GARDEN','DANGO HOUSE');
+s=s.replace('鲸鱼、白龙与抱书的少女，今天都到齐了。','熟悉的 AI 娘，都住进了这间小屋。');
+s=s.replace('href','href');
+// The private view uses the same isolated subscription hook as the main app.
+s=s.replace("const view = new URLSearchParams(location.search).get('view');",`function PrivateWindow(){const {state,error}=useGarden();const id=new URLSearchParams(location.search).get('character') as CharacterId;return state&&byId[id]?<PrivateChat state={state} id={id}/>:<div className="loading">{error||'专属聊天准备中…'}</div>;}\nconst view = new URLSearchParams(location.search).get('view');`);
+s=s.replace("{view === 'pets' ? <Pets/> : <App/>}","{view === 'pets' ? <Pets/> : view === 'private' ? <PrivateWindow/> : <App/>}");
+fs.writeFileSync(file,s);

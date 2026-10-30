@@ -1,0 +1,16 @@
+{
+  "productionApproved": true,
+  "status": "accepted-and-integrated-idle",
+  "character": "kimi",
+  "action": "idle",
+  "sourceSha256": "5c3958be9a66848ddfffa6aaabce6199010b60b7c3100b1ac18e1a1a46b09c3c",
+  "frames": 241,
+  "duration": 10.041666666666666,
+  "alpha": true,
+  "idlePingPong": true,
+  "scope": "Idle only; no narrative gesture is reversed.",
+  "basis": "Existing light/dark contact sheets, source boundary audit and in-app loop/decode verification.",
+  "limits": "AI-generated idle has minor line/expression variations; not a full locomotion or interaction pack.",
+  "date": "2026-10-30",
+  "asset": "idle-jimeng-v1.webm"
+}

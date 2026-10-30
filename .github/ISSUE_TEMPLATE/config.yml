@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 私密安全报告 / Private security report
+    url: https://github.com/Someone-hates-Monday/dango-house/blob/main/SECURITY.md
+    about: 不要在公开 Issue 提交密钥或敏感漏洞 / Never post keys or sensitive exploits publicly

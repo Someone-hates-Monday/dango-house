@@ -1,0 +1,20 @@
+/* A fixed SVG source rectangle replaces percentage background offsets. Each SVG paints one
+   source cell at its original aspect ratio, regardless of parent sizing or Windows DPI. */
+.sprite.atlas,.stage-pet .sprite.atlas{overflow:hidden;padding:0;border:0;background:none!important;contain:paint}
+.sprite.atlas image{pointer-events:none}
+.sprite.atlas{aspect-ratio:216/240}
+.sprite{animation:none!important}
+.selected-art{height:230px;overflow:visible}
+.character-art{height:235px;display:flex;align-items:center;justify-content:center}
+.room-character .character-motion{animation:none!important}
+.emotion-fx i,.emotion-sad i{animation-iteration-count:1;animation-duration:2.8s}
+.private-character{height:168px}
+.private-hero{height:190px}
+.desktop-pet{width:160px;height:210px}
+.pet-body{width:144px;height:168px;overflow:visible}
+.pet-body>.sprite{width:140px}
+.sprite.video-sprite{position:relative;display:inline-block;overflow:hidden;vertical-align:bottom}
+.video-sprite video,.video-sprite .video-snapshot{position:absolute;inset:auto;top:0;left:50%;width:auto;height:100%;max-width:none;aspect-ratio:16/9;object-fit:fill;translate:-50% 0}
+.video-sprite[data-clip=walk] video{height:83%;top:8.5%}
+.sprite.atlas.rig-sprite,.sprite.atlas.video-sprite{overflow:visible!important;contain:layout}
+.claude-video-sprite video,.claude-video-sprite .video-snapshot{top:6.666667%}

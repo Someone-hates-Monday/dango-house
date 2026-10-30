@@ -1,0 +1,29 @@
+node_modules/
+dist/
+dist-electron/
+release/
+test-results/
+.env*
+*.log
+
+.animation-lab/
+
+# User data and credentials / 用户数据与凭证
+credentials.json
+Local State
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.pem
+*.key
+*.p12
+*.pfx
+*.mp4
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+coverage/
+__pycache__/
+*.pyc

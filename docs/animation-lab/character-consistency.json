@@ -1,0 +1,24 @@
+{
+  "purpose":"Visual acceptance rules; these are checks, not claims that generation obeyed them.",
+  "gpt":{
+    "reference":"public/community/gpt/idle.webp",
+    "compatibleSecondary":"public/community/gpt/thinking.webp",
+    "excludeFromNeutralReferences":"public/community/gpt/proud.webp adds a crown",
+    "tail":"Root direction is upper right next to the body, partly occluded by hair and clothing. From that thick root the tail curves down along the right side, then left along the bottom. The lower inward-pointing tapered end is the true terminal tip. NEVER reverse root and tip or treat the upper body-side section as the tip. Preserve original edge scales; do not append any separate tip, leaf, fin, plume, tuft, arrow or ornament.",
+    "tailBodyLanguage":{
+      "required":true,
+      "idle":"Occasional small relaxed sway with a soft pause; do not freeze or wag continuously at a constant speed.",
+      "happy":"One or two gentle side-to-side sways timed to the smile, driven from the body-side root with delayed motion toward the tip. Keep the character's restrained temperament.",
+      "shy":"Gradually curl the same tail inward toward the near leg and body, lightly wrapping the lower leg if the geometry remains clear; hold briefly, then visibly uncoil and recover. No sudden pose replacement.",
+      "recovery":"Reduce amplitude gradually and return continuously to the neutral tail curve. Preserve tail length, thickness order, root attachment and the unique tapered tip in every frame.",
+      "reject":["static pasted tail during expressive action","constant mechanical wagging","motion only at an added tip","teleporting coil","tail passing through legs or dress","disconnected root","new spikes or tip ornaments"]
+    },
+    "otherChecks":["same horns and wings","same head ornament and clothes","two arms only","full body and tail in frame","neutral start and complete recovery","no generated human hand","emotion-linked continuous tail motion"]
+  },
+  "otherCharacters":{
+    "gemini":"Preserve existing cat ears, eyes, star ornament and tail; do not invent extra stars, a second tail or extra ear pairs.",
+    "glm":"Preserve exact existing black-fox reference; do not add or remove accessories based on a conflicting verbal persona description.",
+    "kimi":"Preserve the current version of asymmetric clothing and head ornament; do not invent a book or change to another community design.",
+    "grok":"Preserve the current blonde/dark-gold gothic chibi version; do not substitute a different fan design."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "wan": {
+    "code": "https://github.com/Wan-Video/Wan2.2",
+    "commit": "1ea34ff48f87168174e12956e200b1d908b1c5ff",
+    "model": "https://modelscope.cn/models/Wan-AI/Wan2.2-TI2V-5B",
+    "license": "Apache-2.0",
+    "adaptations": [
+      "TI2V-only import to avoid unused audio/decord dependencies",
+      "PyTorch SDPA on Windows",
+      "T5 meta initialization with verified checkpoint assignment"
+    ]
+  },
+  "rife": {
+    "source": "https://github.com/nihui/rife-ncnn-vulkan",
+    "release": "20221029",
+    "model": "rife-v4.6",
+    "releaseAssetId": 82696426,
+    "license": "MIT"
+  },
+  "characterArt": {
+    "sources": [
+      "fywdy/chatgpt-chibi-pets",
+      "lokicorvus/crosspet"
+    ],
+    "restrictions": "Original character/art attribution and noncommercial restrictions retained; generated frames do not remove them."
+  }
+}

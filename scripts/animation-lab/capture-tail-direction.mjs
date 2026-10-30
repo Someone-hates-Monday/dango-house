@@ -1,0 +1,5 @@
+import {_electron as electron} from 'playwright';import fs from 'node:fs';import path from 'node:path';
+const root=path.resolve('test-results/animation-lab/cast-v1/gpt/reference-audit'),entry=path.join(root,'direction-qa.cjs');
+fs.writeFileSync(entry,`const {app,BrowserWindow}=require('electron');app.setPath('userData',${JSON.stringify(path.join(root,'direction-profile'))});app.whenReady().then(()=>{new BrowserWindow({width:1000,height:760,useContentSize:true,show:false}).loadURL('http://127.0.0.1:4319/test-results/animation-lab/cast-v1/gpt/reference-audit/tail-direction.html')});`);
+const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;const app=await electron.launch({args:[entry],env});
+try{const page=await app.firstWindow();await page.waitForSelector('svg image');await page.waitForFunction(()=>document.fonts.status==='loaded');await page.screenshot({path:path.join(root,'tail-direction.png'),fullPage:true});console.log('Saved original-image direction overlay, no character repaint.');}finally{await app.close()}

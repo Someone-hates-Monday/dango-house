@@ -1,0 +1,16 @@
+{
+  "productionApproved": true,
+  "status": "accepted-and-integrated-idle",
+  "character": "grok",
+  "action": "idle",
+  "sourceSha256": "123de2d304ed3783b5495b4386b4783dea2819290bacbda800892799e7f1011d",
+  "frames": 229,
+  "duration": 9.541666666666666,
+  "alpha": true,
+  "idlePingPong": true,
+  "scope": "Idle only; no narrative gesture is reversed.",
+  "basis": "Existing light/dark contact sheets, source boundary audit and in-app loop/decode verification.",
+  "limits": "AI-generated idle has minor line/expression variations; not a full locomotion or interaction pack.",
+  "date": "2026-10-30",
+  "asset": "idle-jimeng-v1.webm"
+}

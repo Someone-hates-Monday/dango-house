@@ -1,0 +1,9 @@
+import fs from 'node:fs';
+const edit=(file,fn)=>fs.writeFileSync(file,fn(fs.readFileSync(file,'utf8')));
+edit('electron/engine.ts',s=>s.replace('Date.now()+7000','Date.now()+60000').replace('Date.now()+35000','Date.now()+180000').replace('steps.length*4200+4000','steps.length*4200+60000').replace('steps.length*4200+30000','steps.length*4200+180000').replace('this.nextRoomLife=now+26000','this.nextRoomLife=now+60000').replace('this.nextRoomLife=now+9000','this.nextRoomLife=now+60000').replace("const action=this.lifeIndex%3===0?'read':this.lifeIndex%3===1?'walk':'wave'","const action=id==='rin'||id==='kimi'?'read':id==='glm'?'water':this.lifeIndex%4===0?'walk':'sit'"));
+for(const file of ['src/Room.tsx','src/DesktopPet.tsx','src/PrivateChat.tsx'])edit(file,s=>s.replace('pose={body.pose}/>', 'pose={body.pose} cue={body.until}/>').replace('pose={pose}/>', 'pose={pose} cue={body.until}/>'));
+edit('src/main.tsx',s=>s.replace('pose={state.bodies[selected.id].pose} />','pose={state.bodies[selected.id].pose} cue={state.bodies[selected.id].until} />'));
+edit('src/DesktopPet.tsx',s=>s.replaceAll('size.w-140','size.w-160').replaceAll('size.h-190','size.h-210'));
+for(const file of ['package.json','package-lock.json'])edit(file,s=>{const p=JSON.parse(s);p.version='0.2.2';if(p.packages)p.packages[''].version='0.2.2';return JSON.stringify(p,null,2)+'\n';});
+for(const file of ['src/main.tsx','README.md','scripts/smoke-packaged.mjs'])edit(file,s=>s.replaceAll('v0.2.1','v0.2.2').replaceAll('DangoHouse-0.2.1','DangoHouse-0.2.2'));
+edit('scripts/smoke.mjs',s=>s.replace("  const firstFrame = await atlas.getAttribute('data-frame');","  await page.evaluate(()=>window.garden.dispatch({type:'perform',id:'xia',intent:{action:'wave'}}));\n  const firstFrame = await atlas.getAttribute('data-frame');"));

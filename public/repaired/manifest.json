@@ -1,0 +1,20 @@
+{
+  "mode": "built-in imagegen edit / completion",
+  "createdAt": "2026-10-28",
+  "license": "CC-BY-NC-SA-4.0; retain original character and source asset notices",
+  "references": [
+    "https://github.com/fywdy/chatgpt-chibi-pets",
+    "https://github.com/lokicorvus/crosspet"
+  ],
+  "promptRecord": "docs/动画资源与补全-v0.2.2.md",
+  "files": [
+    {
+      "path": "claude-wait-v1.png",
+      "sha256": "eedd5b106c5529310d9d9ed8d24eaf64b909c8acda07817d27fadfbe34a36597",
+      "width": 1536,
+      "height": 1024,
+      "columns": 3,
+      "rows": 2
+    }
+  ]
+}

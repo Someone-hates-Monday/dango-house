@@ -1,0 +1,13 @@
+* text=auto
+*.md text eol=lf
+*.md whitespace=-blank-at-eol
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.png binary
+*.webp binary
+*.jpg binary
+*.webm binary
+*.ico binary

@@ -1,0 +1,57 @@
+{
+  "mode": "built-in image_gen",
+  "records": [
+    {
+      "id": "claude",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-3f975880-d251-4c38-b117-c63fa3a9d6cf.png",
+      "target": "public/portraits/claude-alpha-v1.png",
+      "sha256": "dbded5b7d08a56ea833b94c41cd04cefd8927220eb3e7e54fcd325ce2fbce641"
+    },
+    {
+      "id": "gpt",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-aecb4d89-88ca-44af-9d86-020a8fbff13b.png",
+      "target": "public/portraits/gpt-alpha-v1.png",
+      "sha256": "51d521ed63673c8544bd6de9e793fde1312620bd8e29ba399b3a67e54104f5eb"
+    },
+    {
+      "id": "deepseek",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-7bae2eb9-ce9a-487b-bf96-58387200e4f3.png",
+      "target": "public/portraits/deepseek-alpha-v1.png",
+      "sha256": "b5e535c3f9e27d73242cebdd48f4eac05d86ae92fcb9b0197e3d3c19a7c56add"
+    },
+    {
+      "id": "gemini",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-67e4a1c3-cbef-4645-aa1d-2503134c5632.png",
+      "target": "public/portraits/gemini-alpha-v1.png",
+      "sha256": "651a5e123663581f12969a1f52c94c48b7ab09c2e098cfde37124a1ba3030f91"
+    },
+    {
+      "id": "glm",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-4658fbb5-258b-432b-90b9-c4b04ef315bb.png",
+      "target": "public/portraits/glm-alpha-v1.png",
+      "sha256": "399ce1bc543629dc5b2e25c65d6f67573cdaed7bd336d2d81c30701724cf805b"
+    },
+    {
+      "id": "kimi",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-cdf1cb34-637b-427d-9629-f04a581053bc.png",
+      "target": "public/portraits/kimi-alpha-v1.png",
+      "sha256": "884d4445d90a26ddda91720f837635e9ceccea1ad1bae6f317bef88abe4f2fda"
+    },
+    {
+      "id": "grok",
+      "source": "C:\\Users\\Someone\\.codex\\generated_images\\01a17df2-7b75-7692-845a-0160d2880da3\\exec-681a2ed5-51e5-4a2b-8118-8560324fdbfa.png",
+      "target": "public/portraits/grok-alpha-v1.png",
+      "sha256": "b66f084ee141880bca251b8f6612c442bf7867fd538f753c3333c4b04558dba9"
+    },
+    {
+      "id": "claude-rig",
+      "source": "C:/Users/Someone/.codex/generated_images/01a17df2-7b75-7692-845a-0160d2880da3/exec-6b2e1663-f1b2-459a-86bd-1f04953c2575.png",
+      "target": "public/rigged/claude/parts-v1.png",
+      "sha256": "e5e6ed0a0f421c7546d2a0aa4c39aba77b7c811ade56836eabe69d3af9c13a25"
+    }
+  ],
+  "prompts": {
+    "portrait": "Edit the attached illustration ONLY to remove its solid white background and exterior floor shadow. Preserve the existing character drawing, pose, proportions, face, eye color, clothing, hair ornaments, tail, weapon, floating accessories and colors exactly; do not redesign or repaint. Keep all white or pale clothes, pale hair, pale skin, eyes and white fur fully opaque. Make the outside background and the gaps between separate hair strands, arms, skirt, tail and weapon genuinely transparent with clean anti-aliased edges. No white rectangle, no checkerboard, no glow, no new background. Keep entire original silhouette and every accessory inside the canvas without cropping, with the same portrait aspect ratio and composition. Output a transparent PNG suitable for compositing over both a dark background and a pale pink background.",
+    "rig": "Create ONE production-ready 2D cutout rig texture atlas based faithfully on the attached existing orange-haired chibi character. This is a rigging PARTS SHEET, not an animation frame sheet. Preserve her orange long curled hair, sunflower and black ribbon ornament, amber eyes, cream white + orange gold scholarly dress, black shoes, little brown gold-decorated book, and the reference's detailed cute anime art style. Genuinely TRANSPARENT PNG background. Square canvas, EXACT 4 columns by 4 rows of equally sized cells, 16 cells total. No lines, grid, labels, letters or backgrounds. Each separate part centered inside its own cell with wide transparent padding and no touching neighbouring cells. Parts must be designed to assemble into ONE coherent character with no duplicated hair or limbs. Front view.\nCell specification, left-to-right:\nROW 1: (1) whole HEAD FRONT including skin, ears, bangs and sunflower/ribbons, but BLANK eyes and mouth (no eyes or eyebrows or mouth, leave smooth skin for overlays; NO long side hair), (2) a matching PAIR of open amber EYES and eyebrows ONLY, floating on transparency, no face or hair, (3) matching PAIR of fully CLOSED smiling EYELIDS and eyebrows ONLY, (4) a tiny happy SMILE MOUTH ONLY on transparency.\nROW 2: (1) BACK OF HEAD orange hair cap ONLY, no face, no long hair, (2) complete TORSO AND DRESS from neck collar to dress hem, including bow and ornaments, NO head, NO arms, NO hands, NO legs, NO hair, (3) LEFT ARM complete from puff sleeve through elbow to little hand, relaxed downward, NO body, NO book, (4) RIGHT ARM complete from puff sleeve through elbow to little hand, relaxed downward, NO body.\nROW 3: (1) LEFT LEG full slim leg from upper thigh to black shoe, pale stockings, straight neutral pose, (2) matching RIGHT LEG with shoe, same length and scale, (3) LEFT LONG ORANGE HAIR LOCK, a single thick curled cascade from beside head down to skirt, (4) matching RIGHT LONG ORANGE HAIR LOCK. Hair locks have no face, hand, or body.\nROW 4: (1) her BROWN BOOK with gold trim and sunflower, NO hand, (2) same PAIR OF EYES as row1 cell2 but pupils glance LEFT, (3) same PAIR OF EYES but pupils glance RIGHT, (4) tiny NEUTRAL CLOSED MOUTH ONLY.\nStrict: only the specified part in every cell. Eyes/mouth overlays must have transparent surroundings, not a skin rectangle. All white cloth and stockings stay opaque. Do not include assembled figures, full character duplicates, shadows or sparkles. This sheet will be sliced and animated with bones, so consistency between every part is essential."
+  }
+}

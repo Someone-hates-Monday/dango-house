@@ -1,0 +1,23 @@
+[
+  {
+    "file": "public/repaired/dock-claude-v1.png",
+    "source": "C:/Users/Someone/.codex/generated_images/01a17df2-7b75-7692-845a-0160d2880da3/exec-2cdb6821-3436-447c-9ddc-9588f3c424ec.png",
+    "sha256": "92cacec248b3a00150281c465cfa7e4192c7c12ea5634c8de9735de396e20977",
+    "mode": "built-in image_gen generation with design reference",
+    "notice": "Community character derivative; upstream attribution and noncommercial restrictions retained. Not an upstream official asset."
+  },
+  {
+    "file": "public/repaired/dock-glm-v1.png",
+    "source": "C:/Users/Someone/.codex/generated_images/01a17df2-7b75-7692-845a-0160d2880da3/exec-0267be68-f732-4ef9-b797-d04277efbcbd.png",
+    "sha256": "cab5e13b91624f5decfec8f4129d503c7a216f9082c88f14c5598cbc0b107152",
+    "mode": "built-in image_gen generation with design reference",
+    "notice": "Community character derivative; upstream attribution and noncommercial restrictions retained. Not an upstream official asset."
+  },
+  {
+    "file": "public/repaired/dock-grok-v1.png",
+    "source": "C:/Users/Someone/.codex/generated_images/01a17df2-7b75-7692-845a-0160d2880da3/exec-0fc2fa8e-17e5-470c-8e32-f0778ab2aeae.png",
+    "sha256": "3f66e5d211ea5044a232eec045e1fefc07563b4f5d12dde7d0ab44ab87ec3d0f",
+    "mode": "built-in image_gen generation with design reference",
+    "notice": "Community character derivative; upstream attribution and noncommercial restrictions retained. Not an upstream official asset."
+  }
+]

@@ -1,0 +1,5 @@
+import fs from 'node:fs';const edit=(f,fn)=>fs.writeFileSync(f,fn(fs.readFileSync(f,'utf8')));
+edit('electron/engine.ts',s=>s.replace('this.state.bodies[id]=restingBody();}this.publish(); }','this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish(); }').replace("      case 'pat':",`      case 'trip': {if(!ids.includes(action.id))return;this.perform(action.id,{action:'sad',emotion:'sad',bubble:'哎呀……让我趴一会儿，再慢慢站起来。',duration:9},'local',Date.now(),{kind:'trip',startedAt:Date.now()});return;}
+      case 'pat':`.replaceAll('\n+','\n')));
+for(const file of ['src/Room.tsx','src/DesktopPet.tsx','src/PrivateChat.tsx'])edit(file,s=>s.replace('activity={body.bubble}/>', 'activity={body.bubble} interaction={body.interaction} stoppedAt={body.stoppedAt}/>'));
+edit('src/main.tsx',s=>s.replace('activity={state.bodies[selected.id].bubble} />','activity={state.bodies[selected.id].bubble} interaction={state.bodies[selected.id].interaction} stoppedAt={state.bodies[selected.id].stoppedAt} />'));

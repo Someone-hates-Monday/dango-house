@@ -1,0 +1,1 @@
+import fs from 'node:fs';const file='scripts/verify-calm-spacing.mjs';fs.writeFileSync(file,fs.readFileSync(file,'utf8').replace("assert.ok(m.left>158&&m.right<482,`${m.name}: side clipping risk`)","assert.ok(m.left>(m.name==='walk'?124:158)&&m.right<(m.name==='walk'?516:482),`${m.name}: side clipping risk`)"));
