@@ -14,8 +14,8 @@ Use Windows x64 / Node.js 22.15+. Run `npm.cmd ci` and `npm.cmd run dev`; run un
 桌面测试使用独立存档，不能拿日常存档做破坏性迁移测试。普通协议测试用模拟响应；真实 API 检查必须主动选择执行并说明额度消耗。  
 Use isolated desktop profiles, never your daily data for destructive migrations. Mock protocol responses; live API checks require explicit opt-in with quota costs explained.
 
-自动检查配置目前以 [CI 模板](docs/ci/README.md) 提供，尚未启用，提交者仍需自行运行检查。  
-Automated checks are provided as a CI template and are not yet enabled; contributors must run checks locally.
+[自动检查](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml) 会在推送 main 和提交 PR 时运行发布文件检查、单元测试与构建。提交者仍应先在本地验证；说明见 [CI 文档](docs/ci/README.md)。  
+Automated checks run publication audits, unit tests, and builds on main pushes and PRs. Contributors should still verify locally first; see the CI guide.
 
 ## 代码约定 / Code conventions
 

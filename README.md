@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/icon.png" width="100" alt="Dango House mascot / 团子小屋团子猫" />
+<img src="docs/screenshots/dock.png" width="960" alt="七位 AI 娘排排趴，等你回家 / Seven AI companions resting in a row, waiting for you" />
 
 # 团子小屋 · Dango House
 
@@ -9,8 +9,14 @@
 **七只团子，一张桌面，今天也想被你多偏爱一点。**  
 **Seven little companions. One cozy desktop. A little more of your attention, please?**
 
+趴在 Dock 上陪你，鼠标靠近就站起来：要摸摸，还是悄悄话？  
+Resting by your Dock, waking when you hover: a headpat, or a little secret?
+
+<sub>真实应用 Dock 模式截图 · Actual in-app Dock mode</sub>
+
 [![Windows](https://img.shields.io/badge/Windows-x64-f4a7bc)](https://github.com/Someone-hates-Monday/dango-house/releases)
 [![Version](https://img.shields.io/badge/alpha-0.3.7-bca7e8)](CHANGELOG.md)
+[![Checks](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml/badge.svg)](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml)
 [![Code license](https://img.shields.io/badge/code-MIT-a4cdb8)](LICENSE)
 [![Asset terms](https://img.shields.io/badge/art-noncommercial-f0cf8d)](THIRD_PARTY_NOTICES.md)
 
@@ -44,12 +50,6 @@ Claude saves a seat for DeepSeek; our dragon girl insists hers wasn't reserved o
 Your chosen companion greets you happily, while the others pout, pretend not to care, or reserve your next visit.
 
 ![Private attention and playful jealousy / 私聊与小小争宠](docs/screenshots/rivalry.png)
-
-**排排趴，陪你上班 / A tiny row of desk buddies**  
-不想铺满桌面时，让她们趴在 Dock / Windows 任务栏上沿。悬停站起来，摸摸、投喂、私聊照样玩。下面是透明桌宠窗口底部的原生截图裁切，未合成系统任务栏。  
-Let them rest along the Dock / Windows taskbar edge. Hover to wake them; headpats, feeding, and private chats remain available. Below is a cropped capture of the transparent pet window, without a composited taskbar.
-
-![Seven companions resting in Dock mode / 七位伙伴的 Dock 趴伏模式](docs/screenshots/dock.png)
 
 <details>
 <summary>再看一眼群聊和悄悄话 / Group chat & a private moment</summary>

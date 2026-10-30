@@ -8,7 +8,7 @@ Captured on Windows with v0.3.7 on 2026-10-30 using `scripts/capture-showcase.mj
 - `rivalry.png`：选择 Claude 私聊后其他伙伴的回应 / reactions to choosing Claude for a private chat.
 - `private.png`：Claude 的独立私聊窗口 / Claude's private window.
 - `chat.png`：公馆群聊及本地剧情消息 / group chat and local scene messages.
-- `dock.png`：透明桌宠窗口底部 250 CSS 像素裁切，七位趴伏；不包含真实 Windows 任务栏 / bottom 250 CSS pixels of the transparent overlay, with seven resting companions; no Windows taskbar capture.
+- `dock.png`：透明桌宠窗口底部 112 CSS 像素，横向裁切到七位伙伴的范围；不包含真实 Windows 任务栏。用于 README 顶部展示，减少留白，未合成或重绘人物 / bottom 112 CSS pixels of the transparent overlay, cropped horizontally around the seven residents; no Windows taskbar capture. Used at the top of the README with less empty space; no composited or redrawn characters.
 
 截图中的角色和美术继续适用 [素材许可](../../THIRD_PARTY_NOTICES.md)。  
 Characters and artwork in screenshots retain the asset terms.

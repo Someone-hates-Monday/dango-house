@@ -60,8 +60,11 @@ try {
   await overlay.waitForFunction(()=>document.querySelectorAll('.dock-pet.resting').length===7);
   await overlay.waitForTimeout(2500);
   const viewport = await overlay.evaluate(()=>({width:innerWidth,height:innerHeight}));
-  const height=Math.min(250,viewport.height);
-  await overlay.screenshot({path:path.join(out,'dock.png'),omitBackground:true,scale:'css',clip:{x:0,y:viewport.height-height,width:viewport.width,height}});
+  const height=Math.min(112,viewport.height);
+  const slots=await overlay.locator('.dock-pet').evaluateAll(elements=>elements.map(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right};}));
+  const left=Math.max(0,Math.floor(Math.min(...slots.map(r=>r.left))-30));
+  const right=Math.min(viewport.width,Math.ceil(Math.max(...slots.map(r=>r.right))+30));
+  await overlay.screenshot({path:path.join(out,'dock.png'),omitBackground:true,scale:'css',clip:{x:left,y:viewport.height-height,width:right-left,height}});
   await main.getByRole('button',{name:'公馆群聊',exact:false}).click();
   await main.screenshot({path:path.join(out,'chat.png'),scale:'css'});
   console.log('Captured six real application screenshots with an offline, empty profile.');
