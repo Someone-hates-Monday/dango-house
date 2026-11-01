@@ -8,6 +8,8 @@
 - [隐私 / Privacy](PRIVACY.md) · [安全 / Security](../SECURITY.md)
 - [素材署名 / Asset attribution](../THIRD_PARTY_NOTICES.md)
 - [路线图 / Roadmap](ROADMAP.md) · [更新 / Changelog](../CHANGELOG.md)
+- [Agent、浏览与共同观影规划 / Agent & watch-party plan](AGENT-WATCH-PARTY-PLAN.md)
+- [29 个参考项目与选型 / 29 reference projects](AGENT-REFERENCES.md)
 - [运行截图 / Runtime screenshots](screenshots/README.md)
 
 ## 历史研究与实验 / Research & experiment archive

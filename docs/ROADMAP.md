@@ -20,5 +20,8 @@ These are directions, not delivery commitments. Discuss concrete needs and accep
 
 ## 探索 / Exploration
 
+Agent、自主浏览、视频理解、共同讨论与推荐已完成首轮功能规划和源码核查，尚未实现。先做单片观影闭环，再做找片、自主外出与实时陪看。详见 [功能方案](AGENT-WATCH-PARTY-PLAN.md) 与 [29 个参考项目](AGENT-REFERENCES.md)。  
+Agent/browsing/watch-party capabilities have a researched proposal, not an implementation. Start with a supplied-video discussion, then discovery, outings, and live viewing; see the plan and reference catalog.
+
 分层 / Live2D、像素外观、语音、外部 Agent 联动、原创角色包。尚未实现，不属于当前下载版承诺能力。  
 Layered/Live2D animation, pixel skins, voice, external agents, original character packs. Not implemented or promised capabilities of the current build.

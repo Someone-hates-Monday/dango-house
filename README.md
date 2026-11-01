@@ -104,6 +104,9 @@ Coverage varies: DeepSeek has the broadest video set; Claude has idle plus five 
 尚未实现完整 Live2D、可选像素外观、语音对话、成熟寻路、长期自动记忆和外部 Agent 联动。目前仅验证 Windows。见 [路线图 / Roadmap](docs/ROADMAP.md)。  
 Full Live2D, selectable pixel skins, voice, mature pathfinding, automatic long-term memory, and external agent integration are not implemented. Windows is the verified platform. See the roadmap.
 
+下一步玩法研究：让伙伴们浏览找片、一起看视频、讨论并推荐。当前为 [双语功能提案](docs/AGENT-WATCH-PARTY-PLAN.md)，附 [29 个参考项目](docs/AGENT-REFERENCES.md)，欢迎通过 Issue 参与方案讨论；并非当前下载版功能。  
+Next-step research covers browsing, watch parties, character discussion, and recommendations. Explore the bilingual proposal and 29-project reference catalog; these are not current release features.
+
 ## 一起装修 / Develop & contribute
 
 Windows x64，Node.js **22.15+**，npm。Electron 45 / React 19 / TypeScript 7 / Vite 8；SQLite 使用 Electron 内置模块。  

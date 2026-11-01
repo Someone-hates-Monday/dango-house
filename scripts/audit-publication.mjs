@@ -23,7 +23,7 @@ for(const file of files){
   for(const [name,rule] of secretRules){rule.lastIndex=0;if(rule.test(text))errors.push(`${file}: ${name}`);}
 }
 // Validate links in maintained docs; historical experiment notes intentionally reference local-only trials.
-const maintained=['README.md','CONTRIBUTING.md','CODE_OF_CONDUCT.md','SECURITY.md','THIRD_PARTY_NOTICES.md','CHANGELOG.md','docs/README.md','docs/PRIVACY.md','docs/ROADMAP.md','docs/PROJECT_NAME.md','docs/screenshots/README.md'];
+const maintained=['README.md','CONTRIBUTING.md','CODE_OF_CONDUCT.md','SECURITY.md','THIRD_PARTY_NOTICES.md','CHANGELOG.md','docs/README.md','docs/PRIVACY.md','docs/ROADMAP.md','docs/PROJECT_NAME.md','docs/screenshots/README.md','docs/AGENT-WATCH-PARTY-PLAN.md','docs/AGENT-REFERENCES.md'];
 for(const file of maintained){
   const text=fs.readFileSync(file,'utf8');
   for(const match of text.matchAll(/\]\(([^\s)]+)\)/g)){
