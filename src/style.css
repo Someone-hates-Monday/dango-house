@@ -6,3 +6,77 @@
 .pet-document,.pet-document body,.pet-document #root{background:transparent!important;width:100%;height:100%;overflow:hidden}.pet-overlay{width:100vw;height:100vh;position:relative;overflow:hidden;pointer-events:none}.desktop-pet{position:absolute;width:140px;height:180px;pointer-events:auto;user-select:none;touch-action:none}.pet-body{width:124px;height:155px;margin:6px auto 0;cursor:grab;touch-action:none;display:flex;align-items:flex-end;justify-content:center}.pet-body:active{cursor:grabbing}.pet-body>.sprite{height:150px;width:120px;pointer-events:none}.pet-body.wandering{animation:wander 22s ease-in-out infinite}.pet-name{font-size:10px;text-align:center;color:#635e53;background:#fff9eae8;border:1px solid #ded6c0;border-radius:7px;padding:3px 8px;width:max-content;margin:0 auto;display:flex;align-items:center;gap:5px}.pet-tools{display:flex;position:absolute;top:0;left:43px;gap:5px;z-index:2;opacity:0;transition:opacity .2s}.desktop-pet:hover .pet-tools{opacity:1}.pet-tools button{width:25px;height:25px;background:#fffaef;border:1px solid #dbd4be;border-radius:6px;color:#a27d62;display:grid;place-items:center}.pet-bubble{position:absolute;bottom:184px;left:-38px;width:216px;border:1px solid #ded5bf;border-radius:12px 12px 12px 3px;background:#fffbedf5;color:#756c58;padding:12px;font-size:11px;line-height:1.8;pointer-events:none;overflow-wrap:anywhere}.dragging .pet-tools{display:none}
 @media(max-width:1150px){.sidebar{width:190px}.character-panel{width:216px;padding-left:16px;padding-right:16px}.stage-copy h2{font-size:17px}.stage-copy p{max-width:150px;line-height:1.8}.stage-pet{width:64px}.stage-pet .sprite{width:64px;height:80px}.stage-pets{right:7px}.chat-heading h1>span{display:none}.character-grid{gap:10px}.character-card{padding:18px 15px}.character-card .tags{gap:3px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Watch party / agent task tray */
+.task-tray{margin:10px 18px 0;padding:12px 14px;border:1px solid #e5d7c8;border-radius:14px;background:#fff8f2;box-shadow:0 8px 24px #c9a78d14}
+.task-tray header{display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#7a5a4a}
+.task-tray header small{margin-left:auto;font-size:11px;color:#a08878}
+.task-tray ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.task-tray li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:#fff}
+.task-tray li[data-status=running]{border-left:3px solid #d98da6}
+.task-tray li[data-status=paused]{border-left:3px solid #c4a574}
+.task-tray li[data-status=completed]{border-left:3px solid #8fb89a}
+.task-tray li[data-status=cancelled],.task-tray li[data-status=failed]{border-left:3px solid #c48b8b}
+.task-tray li b{display:block;font-size:13px;color:#6b4d3f}
+.task-tray li span{font-size:11px;color:#9a7f70}
+.task-tray li p{margin:4px 0 0;font-size:12px;color:#7d6558;line-height:1.5}
+.task-tray-actions{display:flex;gap:4px}
+.task-tray-actions button{width:28px;height:28px;border-radius:8px;border:1px solid #e6d5c6;background:#fffaf6;color:#8a6554;display:grid;place-items:center}
+.watch-party-page{padding-bottom:40px}
+.watch-panel{display:grid;gap:14px;margin:8px 0 22px}
+.watch-import{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#fff7f0,#f7f1ff);border:1px solid #ead9cb}
+.watch-import p{margin:4px 0 0;font-size:12px;color:#8a7468;line-height:1.6}
+.watch-import .primary-button{margin-left:auto;display:inline-flex;align-items:center;gap:8px}
+.watch-speakers{padding:14px 16px;border:1px solid #eadfce;border-radius:14px;background:#fffcf8}
+.watch-speakers header{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:#7a5a4a}
+.watch-speaker-grid{display:flex;flex-wrap:wrap;gap:8px}
+.watch-speaker-grid button{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid #e6d7c6;background:#fff;font-size:12px;color:#6f5648}
+.watch-speaker-grid button.selected{border-color:#d59ab0;background:#fff0f5;color:#8a4d63}
+.watch-speaker-grid button span{width:28px;height:28px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.watch-speaker-grid .sprite{transform:scale(.35);transform-origin:center}
+.watch-result{display:grid;gap:16px;padding:18px;border-radius:16px;border:1px solid #e6d7c6;background:#fff}
+.watch-result>header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.watch-result h2{margin:0;font-size:20px;color:#6a4a3c}
+.watch-result header p{margin:6px 0 0;font-size:12px;color:#9a7f70}
+.watch-limitations{margin:0;padding-left:18px;color:#8a6554;font-size:12px;line-height:1.7}
+.watch-opinions{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.watch-opinions article{padding:12px;border-radius:12px;background:#fff8f2;border:1px solid #f0e0d2}
+.watch-opinions strong{display:block;color:#7a4f5f}
+.watch-opinions em{display:block;margin:4px 0;font-size:12px;color:#b07a8c}
+.watch-opinions p{margin:0;font-size:12px;line-height:1.65;color:#6f584c}
+.watch-opinions small{display:block;margin-top:6px;color:#a08878}
+.watch-turns,.watch-recs{display:grid;gap:8px}
+.watch-turns h3,.watch-recs h3{margin:0;font-size:14px;color:#7a5a4a}
+.watch-turn{padding:10px 12px;border-radius:10px;background:#faf7f2;border:1px solid #eee2d6}
+.watch-turn b{font-size:12px;color:#8a4d63}
+.watch-turn p{margin:4px 0 0;font-size:13px;line-height:1.65;color:#675548}
+.room-watch-hint{font-size:12px;color:#9a7f70;align-self:center;margin-left:4px}
+
+.language-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.language-options button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 14px 12px;border:1px solid #e6d7c6;border-radius:14px;background:#fffaf6;text-align:left;position:relative;color:#6f5648}
+.language-options button.selected{border-color:#d59ab0;background:#fff0f5}
+.language-options button strong{font-size:15px}
+.language-options button small{font-size:11px;color:#9a7f70}
+.language-options button svg{position:absolute;right:12px;top:12px;color:#b07088}
+
+.favor-strip{display:flex;flex-wrap:wrap;gap:12px 20px;padding:10px 16px;margin:0 0 8px;border-radius:12px;background:#fff6f9;border:1px solid #f0d8e2;font-size:12px;color:#7a5564}
+.favor-strip>div{display:flex;align-items:center;gap:8px}
+.favor-strip span{opacity:.75}
+.favor-strip strong{font-weight:600;color:#8a4d63}
+.watch-browse-form{display:flex;flex-direction:column;gap:8px;min-width:200px}
+.watch-browse-form input{padding:8px 10px;border-radius:10px;border:1px solid #e6d7c6;font-size:13px}
+.watch-recs a{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:10px;background:#fff8f2;border:1px solid #f0e0d2;text-decoration:none;color:#6f584c}
+.watch-recs a small{color:#b07a8c}
+
+.bridge-snippet{margin-top:12px;padding:12px 14px;background:#f3f1ea;border:1px solid var(--line);border-radius:8px;font-size:11px;line-height:1.45;overflow:auto;max-height:220px;white-space:pre-wrap;word-break:break-all}
+.mono-path{font-family:ui-monospace,Consolas,monospace;font-size:11px;word-break:break-all}
+/* Shared interaction picker: same actions in room, private chat, free pets and Dock. */
+.companion-interactions{position:relative;margin:8px 0}.companion-interactions>summary{cursor:pointer;list-style:none;padding:8px 12px;border-radius:10px;background:#f6edf6;color:#786582;font-size:12px}.companion-panel{padding:10px;background:#fff9ff;color:#5d5269;border:1px solid #ddcedf;border-radius:12px;z-index:10000;max-height:310px;overflow:auto;width:min(100%,292px);box-sizing:border-box;pointer-events:auto}.companion-panel button{min-height:32px;border:1px solid #e6d8e8;background:#faf3fb;border-radius:7px;color:#685875;padding:6px;cursor:pointer;font-size:11px}.companion-common,.clip-groups{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}.clip-groups button[aria-pressed=true]{background:#ead6e8}.clip-library{display:grid;grid-template-columns:1fr 1fr;gap:5px}.clip-library button{display:flex;justify-content:space-between;gap:5px;align-items:center;text-align:left}.clip-library small{font-size:9px;opacity:.65}.companion-interactions.compact{margin:0}.companion-interactions.compact>summary{width:32px;height:32px;box-sizing:border-box;text-align:center;padding:3px;font-size:22px;border:1px solid #dacbdf}.companion-interactions.compact .companion-panel{width:292px}.pet-tools:has(details[open]),.desktop-pet:has(details[open]) .pet-tools{opacity:1;z-index:10000}.desktop-pet:has(details[open]){z-index:10000!important}.pet-tools .companion-panel button{width:auto;height:auto;display:block}.pet-tools .clip-library button{display:flex}.interaction-close{float:right}.pet-tools{left:0!important;gap:4px!important}.pet-tools>button{min-width:32px;min-height:32px}
+/* A transformed toolbar would make fixed menus scroll outside the overlay. */
+.dock-pet .pet-tools{transform:none!important}.companion-panel{white-space:normal}
+.desktop-pet .pet-tools .companion-panel button{width:auto!important;height:auto!important;max-width:100%;white-space:normal;min-height:32px}.desktop-pet .pet-tools .clip-library button{min-width:0;overflow-wrap:anywhere}
+
+.via-badge{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;background:#efe8dc;color:#6a5a4a;font-size:11px}
+.override-grid{display:grid;gap:8px;margin-top:10px}
+.override-row{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center;font-size:13px}
+.override-row select{width:100%}

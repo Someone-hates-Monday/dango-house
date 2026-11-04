@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, globalShortcut, safeStorage } from 'electron';
+import { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, globalShortcut, safeStorage, dialog } from 'electron';
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,6 +9,17 @@ import { providers } from '../src/shared/characters';
 import { ids } from '../src/shared/director';
 import type { CharacterId } from '../src/shared/types';
 import type { Action, AppState } from '../src/shared/types';
+import { GardenBridgeServer } from './bridge/http';
+import { applyBridgePatch, bridgeFilePath, readBridgeFile } from './bridge/persist';
+import {
+  claudeDesktopMcpConfig,
+  codexMcpToml,
+  cursorMcpConfig,
+  deepseekHarnessHint,
+  type BridgeStatus,
+} from '../src/shared/bridge';
+import { providerLabel } from '../src/shared/cast';
+import { translate } from '../src/shared/i18n';
 
 if (!app.isPackaged && process.env.GARDEN_TEST_DATA) app.setPath('userData', process.env.GARDEN_TEST_DATA);
 app.setName('Qiting');
@@ -24,6 +35,7 @@ const overlays = new Map<number, BrowserWindow>();
 const privateWindows = new Map<CharacterId,BrowserWindow>();
 let keys: Record<string, string> = {};
 let lastRevision = -1;
+let bridgeServer: GardenBridgeServer | null = null;
 
 const root = app.getAppPath();
 const renderer = path.join(root, 'dist/index.html');
@@ -39,7 +51,8 @@ function secure(win: BrowserWindow) {
 }
 function persist() {
   if (!engine || !database) return;
-  const snapshot = { ...engine.state, busy: false };
+  // Agent UI is process-local; do not resurrect running jobs from disk.
+  const snapshot = { ...engine.state, busy: false, agent: { tasks: [], activeTaskId: null, watchParty: null, events: [] } };
   database.prepare('INSERT INTO state (id, data) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(JSON.stringify(snapshot));
 }
 function broadcast(state: AppState) {
@@ -67,7 +80,55 @@ async function getKey(provider: string) {
 }
 function known(sender: Electron.WebContents) { return BrowserWindow.getAllWindows().some(win => win.webContents === sender); }
 
-if (single) app.whenReady().then(() => {
+function mcpEntryPath() {
+  // External Node clients cannot load a script inside Electron's app.asar.
+  return app.isPackaged
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron', 'bridge-mcp.cjs')
+    : path.join(__dirname, 'bridge-mcp.cjs');
+}
+
+function currentBridgeStatus(): BridgeStatus {
+  const userData = app.getPath('userData');
+  const cfg = readBridgeFile(userData);
+  return {
+    enabled: cfg.enabled,
+    running: !!bridgeServer?.running,
+    host: cfg.host,
+    port: cfg.port,
+    token: cfg.token,
+    baseUrl: `http://${cfg.host}:${cfg.port}`,
+    bridgeFile: bridgeFilePath(userData),
+    mcpEntry: mcpEntryPath(),
+    error: bridgeServer?.error || undefined,
+  };
+}
+
+async function syncBridgeFromDisk() {
+  const userData = app.getPath('userData');
+  const cfg = readBridgeFile(userData);
+  if (!bridgeServer) {
+    bridgeServer = new GardenBridgeServer(
+      {
+        getState: () => engine.state,
+        dispatch: action => engine.dispatch(action),
+      },
+      () => readBridgeFile(userData),
+    );
+  }
+  try {
+    if (cfg.enabled) await bridgeServer.start();
+    else await bridgeServer.stop();
+  } catch (error) {
+    applyBridgePatch(userData, { enabled: false });
+    throw error;
+  }
+  if (engine.state.settings.agentBridge !== cfg.enabled) {
+    engine.state.settings.agentBridge = cfg.enabled;
+    engine.publish();
+  }
+}
+
+if (single) app.whenReady().then(async () => {
   fs.mkdirSync(app.getPath('userData'), { recursive: true });
   database = new DatabaseSync(path.join(app.getPath('userData'), 'garden.sqlite'));
   database.exec('PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS state (id INTEGER PRIMARY KEY, data TEXT NOT NULL)');
@@ -75,7 +136,23 @@ if (single) app.whenReady().then(() => {
   let restored: AppState | undefined;
   try { restored = restoreState(saved?.data ? JSON.parse(saved.data) : null); } catch { restored = restoreState(null); }
   try { keys = JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'credentials.json'), 'utf8')); } catch { keys = {}; }
-  engine = new GardenEngine(restored, broadcast, async (state, id, text, signal, update, act) => generateReply(state, id, text, await getKey(state.settings.provider), signal, update, act));
+  engine = new GardenEngine(restored, broadcast, async (state, id, text, signal, update, act) =>
+    generateReply(state, id, text, getKey, signal, update, act, (wanted, used) => {
+      engine.add(
+        'system',
+        translate(engine.state.settings.locale, 'sys.providerFallback', {
+          wanted: providerLabel(wanted),
+          used: providerLabel(used),
+        }),
+        'notice',
+      );
+    }),
+  );
+  const mediaCache = path.join(app.getPath('userData'), 'media-cache');
+  fs.mkdirSync(mediaCache, { recursive: true });
+  engine.enableAgent(mediaCache);
+  applyBridgePatch(app.getPath('userData'), { enabled: !!engine.state.settings.agentBridge });
+  try { await syncBridgeFromDisk(); } catch (error) { console.warn('Agent Bridge failed to start:', error); }
   for(const [index,id]of ids.entries()){const p=engine.state.pets[id];if(!p||!screen.getAllDisplays().some(d=>d.id===p.displayId))engine.state.pets[id]={x:.08+index*.13,y:.96,displayId:screen.getPrimaryDisplay().id};}
   mainWindow = new BrowserWindow({ width: 1280, height: 860, minWidth: 1000, minHeight: 700, frame: false, backgroundColor: '#f7f5f0', title: '团子小屋 · 桌面伙伴', show: false, webPreferences: { preload, contextIsolation: true, nodeIntegration: false, sandbox: true } });
   secure(mainWindow); load(mainWindow, 'chat');
@@ -127,10 +204,60 @@ if (single) app.whenReady().then(() => {
     try { const result = await requestText(provider, model, await getKey(provider), '请仅回复：连接成功', [{ role: 'user', content: '你好' }], new AbortController().signal, () => {},{endpoint:typeof endpoint==='string'?endpoint:undefined}); if (!result.trim()) throw new Error('没有返回文字'); return '连接成功，模型已返回文字。'; }
     catch (error) { throw new Error(error instanceof Error ? error.message : '连接失败'); }
   });
+  ipcMain.handle('garden:pick-video', async event => {
+    if (event.sender !== mainWindow.webContents) throw new Error('无效窗口');
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: '选择一起看的短视频',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Videos', extensions: ['mp4', 'webm', 'mkv', 'mov', 'm4v'] },
+        { name: 'All', extensions: ['*'] },
+      ],
+    });
+    if (result.canceled || !result.filePaths[0]) return null;
+    const videoPath = result.filePaths[0];
+    const base = videoPath.replace(/\.[^.]+$/, '');
+    const caption = ['.vtt', '.srt', '.zh.vtt', '.zh.srt'].map(ext => `${base}${ext}`).find(p => fs.existsSync(p));
+    return { path: videoPath, displayName: path.basename(videoPath), captionPath: caption };
+  });
+  ipcMain.handle('garden:bridge-status', event => {
+    if (event.sender !== mainWindow.webContents) throw new Error('无效窗口');
+    return currentBridgeStatus();
+  });
+  ipcMain.handle('garden:bridge-configure', async (event, patch: { enabled?: boolean; port?: number; rotateToken?: boolean }) => {
+    if (event.sender !== mainWindow.webContents) throw new Error('无效窗口');
+    const userData = app.getPath('userData');
+    const next = applyBridgePatch(userData, {
+      enabled: typeof patch?.enabled === 'boolean' ? patch.enabled : undefined,
+      port: Number.isFinite(patch?.port) ? Number(patch.port) : undefined,
+      rotateToken: !!patch?.rotateToken,
+    });
+    engine.state.settings.agentBridge = next.enabled;
+    engine.publish();
+    try {
+      await syncBridgeFromDisk();
+    } catch (error) {
+      return { ...currentBridgeStatus(), error: error instanceof Error ? error.message : 'bridge_start_failed' };
+    }
+    return currentBridgeStatus();
+  });
+  ipcMain.handle('garden:bridge-snippet', (event, target: 'cursor' | 'claude' | 'codex' | 'deepseek') => {
+    if (event.sender !== mainWindow.webContents) throw new Error('无效窗口');
+    const status = currentBridgeStatus();
+    if (target === 'cursor') return JSON.stringify(cursorMcpConfig(status.mcpEntry, status.bridgeFile), null, 2);
+    if (target === 'claude') return JSON.stringify(claudeDesktopMcpConfig(status.mcpEntry, status.bridgeFile), null, 2);
+    if (target === 'codex') return codexMcpToml(status.mcpEntry, status.bridgeFile);
+    return JSON.stringify(deepseekHarnessHint(status.baseUrl, status.token), null, 2);
+  });
   setInterval(() => engine.tick(), 150);
   engine.tick();
   app.on('second-instance', showChat);
 }).catch(error => { console.error('团子小屋启动失败：', error); app.exit(1); });
 
 app.on('window-all-closed', () => {});
-app.on('before-quit', () => { quitting = true; if (engine) { engine.stop(); clearTimeout(saveTimer); persist(); } globalShortcut.unregisterAll(); });
+app.on('before-quit', () => {
+  quitting = true;
+  if (bridgeServer) void bridgeServer.stop();
+  if (engine) { engine.shutdownAgents(); engine.stop(); clearTimeout(saveTimer); persist(); }
+  globalShortcut.unregisterAll();
+});

@@ -10,5 +10,9 @@ const bridge: DesktopBridge = {
   saveKey: (provider, key) => ipcRenderer.invoke('garden:key', provider, key),
   keyStatus: () => ipcRenderer.invoke('garden:keys'),
   testConnection: (provider, model, endpoint) => ipcRenderer.invoke('garden:test', provider, model, endpoint),
+  pickVideo: () => ipcRenderer.invoke('garden:pick-video'),
+  bridgeStatus: () => ipcRenderer.invoke('garden:bridge-status'),
+  bridgeConfigure: patch => ipcRenderer.invoke('garden:bridge-configure', patch),
+  bridgeInstallSnippet: target => ipcRenderer.invoke('garden:bridge-snippet', target),
 };
 contextBridge.exposeInMainWorld('garden', bridge);

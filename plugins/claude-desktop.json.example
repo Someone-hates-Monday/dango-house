@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "dango-house": {
+      "command": "node",
+      "args": ["C:/Users/Someone/Desktop/DesktopPet/dist-electron/bridge-mcp.cjs"],
+      "env": {
+        "GARDEN_BRIDGE_FILE": "C:/Users/Someone/AppData/Roaming/Qiting/bridge.json"
+      }
+    }
+  }
+}

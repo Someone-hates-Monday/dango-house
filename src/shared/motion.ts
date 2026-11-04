@@ -1,5 +1,5 @@
 import type {Pose} from './types';
-export type Interaction={kind:'pat'|'feed'|'trip'|'affection'|'chat'|'bookmark';startedAt:number;food?:'rice'|'cake'|'fish'|'tea'};
+export type Interaction={kind:'pat'|'feed'|'trip'|'affection'|'chat'|'bookmark'|'clip';startedAt:number;food?:'rice'|'cake'|'fish'|'tea';clipId?:string};
 export const profiles:Record<string,{period:number;breath:number;lean:number;headY:number;bow:number;accent:string}>={
   deepseek:{period:4.2,breath:.012,lean:1.2,headY:.17,bow:2.2,accent:'#8fa9dd'},claude:{period:5.8,breath:.008,lean:-.7,headY:.20,bow:1.4,accent:'#e4b17d'},gpt:{period:6.3,breath:.007,lean:.5,headY:.15,bow:.8,accent:'#c8b5e4'},gemini:{period:4.5,breath:.011,lean:1.6,headY:.14,bow:1.7,accent:'#b5a1e7'},glm:{period:5.1,breath:.009,lean:-1.3,headY:.12,bow:1.1,accent:'#9faed0'},kimi:{period:6.1,breath:.007,lean:.6,headY:.17,bow:1.5,accent:'#a5c9dd'},grok:{period:4.8,breath:.01,lean:-1.6,headY:.12,bow:1.2,accent:'#d5b36d'},
 };

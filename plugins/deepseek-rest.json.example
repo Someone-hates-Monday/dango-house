@@ -1,0 +1,18 @@
+{
+  "kind": "rest",
+  "baseUrl": "http://127.0.0.1:3927",
+  "headers": {
+    "Authorization": "Bearer REPLACE_WITH_TOKEN_FROM_SETTINGS"
+  },
+  "endpoints": {
+    "health": "GET /health",
+    "snapshot": "GET /v1/snapshot",
+    "tools": "GET /v1/tools",
+    "call": "POST /v1/call"
+  },
+  "exampleCall": {
+    "name": "garden_get_snapshot",
+    "arguments": {}
+  },
+  "note": "Keep Dango House running with Agent Bridge enabled. This stage does not replace your harness planner."
+}

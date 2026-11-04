@@ -1,0 +1,45 @@
+import {_electron as electron} from 'playwright';
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
+const out=path.resolve('test-results/deepseek-library');fs.mkdirSync(out,{recursive:true});
+const env={...process.env,GARDEN_TEST_DATA:path.join(out,`profile-${Date.now()}`)};delete env.ELECTRON_RUN_AS_NODE;
+const version=JSON.parse(fs.readFileSync('package.json','utf8')).version;
+const app=await electron.launch(process.argv.includes('--packaged')?{executablePath:path.resolve(`release/v${version}/win-unpacked/团子小屋.exe`),args:[`--user-data-dir=${env.GARDEN_TEST_DATA}`],env}:{args:[process.cwd()],env});const report={errors:[],checks:[],packaged:process.argv.includes('--packaged')};
+try{
+ await app.firstWindow();let main,overlay;
+ for(let i=0;i<100&&(!main||!overlay);i++){main=app.windows().find(p=>p.url().includes('view=chat'));overlay=app.windows().find(p=>p.url().includes('view=pets')&&p.url().includes('primary=true'));if(!main||!overlay)await new Promise(r=>setTimeout(r,100));}
+ assert.ok(main&&overlay);main.on('pageerror',e=>report.errors.push(e.message));overlay.on('pageerror',e=>report.errors.push(e.message));
+ await main.waitForSelector('.room-character');
+ await main.evaluate(async()=>{await window.garden.dispatch({type:'settings',patch:{autonomous:false}});await window.garden.dispatch({type:'room-settings',patch:{autonomous:false,wandering:false}});});
+ const library=JSON.parse(fs.readFileSync('public/video/deepseek/manifest.json','utf8')).records;
+ const decoded=await main.evaluate(async clips=>{const results=[];for(let i=0;i<clips.length;i+=4){results.push(...await Promise.all(clips.slice(i,i+4).map(c=>new Promise(resolve=>{const v=document.createElement('video');v.muted=true;v.preload='auto';const timer=setTimeout(()=>finish(false),10000);function finish(ok){clearTimeout(timer);v.onloadeddata=null;v.onerror=null;v.removeAttribute('src');v.load();resolve({id:c.name,ok});}v.onloadeddata=()=>finish(v.videoWidth>0);v.onerror=()=>finish(false);v.src='./video/deepseek/'+c.path;}))));}return results;},library);
+ assert.equal(decoded.filter(r=>r.ok).length,109);report.checks.push('all 109 assets decode in actual Electron');
+ const menu=main.locator('.interaction-card .companion-interactions');await menu.locator(':scope > summary').click();assert.equal(await menu.locator('[data-clip-choice]').count(),109);
+ const gift=library.find(c=>c.title==='拆礼物'),bow=library.find(c=>c.title==='女仆屈膝礼仪');
+ await menu.locator(`[data-clip-choice="${gift.name}"]`).click();const sprite=main.locator('.room-character[data-character=xia] .video-sprite');
+ await sprite.locator('video').waitFor();await main.waitForFunction(id=>document.querySelector('.room-character[data-character=xia] .video-sprite')?.dataset.clip===id,gift.name);
+ const v=sprite.locator('video');await main.waitForFunction(()=>document.querySelector('.room-character[data-character=xia] video')?.readyState>=2);
+ await menu.locator(`[data-clip-choice="${bow.name}"]`).click();assert.equal(await sprite.getAttribute('data-clip'),gift.name,'does not interrupt current clip');
+ await v.evaluate(v=>{v.currentTime=v.duration-.03;});await main.waitForFunction(id=>document.querySelector('.room-character[data-character=xia] .video-sprite')?.dataset.clip===id,bow.name);
+ report.checks.push('explicit clip selection and full-gesture queue');
+ const sleepStart=library.find(c=>c.title==='睡觉-开始'),sleepLoop=library.find(c=>c.title==='睡觉-循环'),sleepEnd=library.find(c=>c.title==='睡觉-起来');
+ const waitClip=id=>main.waitForFunction(id=>document.querySelector('.room-character[data-character=xia] .video-sprite')?.dataset.clip===id,id);
+ const endVideo=async()=>{await main.waitForFunction(()=>{const v=document.querySelector('.room-character[data-character=xia] video');return v?.readyState>=2&&v.duration>0;});await v.evaluate(v=>{v.currentTime=v.duration-.03;});};
+ await main.evaluate(clipId=>window.garden.dispatch({type:'play-clip',id:'xia',clipId}),sleepStart.name);await endVideo();await waitClip(sleepStart.name);await endVideo();await waitClip(sleepLoop.name);
+ await main.evaluate(clipId=>window.garden.dispatch({type:'play-clip',id:'xia',clipId}),gift.name);await waitClip(sleepEnd.name);await endVideo();await waitClip(gift.name);report.checks.push('sleep start -> loop -> wake -> queued reaction');
+ await menu.locator(':scope > summary').click();await main.screenshot({path:path.join(out,'room-library.png'),scale:'css'});
+ await main.evaluate(()=>window.garden.dispatch({type:'presentation',patch:{desktopMode:'dock'}}));
+ const pet=overlay.locator('.dock-pet[data-character=xia]');await pet.waitFor();await pet.locator('.pet-body').hover();await overlay.waitForFunction(()=>document.querySelector('.dock-pet[data-character=xia]')?.dataset.awake==='true');await pet.locator('.companion-interactions > summary').click();await pet.locator('.companion-panel').waitFor({state:'visible'});
+ assert.equal(await pet.locator('[data-clip-choice]').count(),109);const bounds=await pet.locator('.companion-panel').boundingBox();const viewport=await overlay.evaluate(()=>({width:innerWidth,height:innerHeight}));assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=viewport.width&&bounds.y+bounds.height<=viewport.height,'complete menu stays inside screen');
+ await pet.locator(`[data-clip-choice="${gift.name}"]`).click();await overlay.waitForFunction(id=>document.querySelector('.dock-pet[data-character=xia] .video-sprite')?.dataset.clip===id,gift.name);
+ await overlay.mouse.move(2,2);await overlay.waitForTimeout(1800);assert.equal(await pet.getAttribute('data-awake'),'true');report.checks.push('Dock menu accessible and full reaction holds standing');
+ await overlay.screenshot({path:path.join(out,'dock-library.png'),omitBackground:true,scale:'css'});
+ const itemBounds=await pet.locator(`[data-clip-choice="${gift.name}"]`).boundingBox();assert.ok(itemBounds.width>90&&itemBounds.height<100,'library uses readable rows rather than toolbar-sized icons');
+ await main.evaluate(()=>window.garden.dispatch({type:'settings',patch:{dnd:true}}));await overlay.waitForTimeout(150);assert.ok(await pet.locator('video').evaluate(v=>v.paused));report.checks.push('DND pauses DeepSeek video');
+ await main.evaluate(()=>window.garden.dispatch({type:'settings',patch:{dnd:false}}));
+ await pet.locator('.interaction-close').click();
+ await main.evaluate(()=>window.garden.dispatch({type:'presentation',patch:{desktopMode:'free'}}));
+ const free=overlay.locator('.desktop-pet[data-character=xia]');await free.locator('.pet-body').hover();await free.locator('.companion-interactions > summary').click();await free.locator('.companion-panel').waitFor({state:'visible'});assert.equal(await free.locator('[data-clip-choice]').count(),109);report.checks.push('same full library in free desktop pet');await free.locator('.interaction-close').click();
+ await main.evaluate(()=>window.garden.openPrivate('xia'));let privatePage;for(let i=0;i<60&&!privatePage;i++){privatePage=app.windows().find(p=>p.url().includes('view=private')&&p.url().includes('character=xia'));if(!privatePage)await new Promise(r=>setTimeout(r,100));}assert.ok(privatePage);await privatePage.locator('.companion-interactions > summary').click();assert.equal(await privatePage.locator('[data-clip-choice]').count(),109);report.checks.push('same full library in private chat');
+ await main.evaluate(()=>window.garden.dispatch({type:'presentation',patch:{desktopMode:'dock'}}));
+ assert.deepEqual(report.errors,[]);report.success=true;console.log(JSON.stringify(report));
+}catch(e){report.success=false;report.failure=e.message;console.error(e);process.exitCode=1;}finally{fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify(report,null,2));await app.close();}

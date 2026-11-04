@@ -1,3 +1,4 @@
+import {CompanionInteractions} from './CompanionInteractions';
 import {useEffect,useRef,useState,useMemo} from 'react';
 import {MessageCircle,Heart,Hand} from 'lucide-react';
 import type {AppState,Character,CharacterId,RoomPoint} from './shared/types';
@@ -36,7 +37,7 @@ function DesktopPet({character,state,displayId,now,size,position:p,onDrag}:{char
   const bubble=active&&body.bubble?body.bubble:latest&&now-latest.at<7000?latest.text:'';
   return <div className={`desktop-pet ${dragging?'dragging':''}`} data-character={character.id} style={{left:p.x*Math.max(1,size.w-160),top:p.y*Math.max(1,size.h-210)}} onPointerEnter={()=>{clearTimeout(hover.current);hover.current=setTimeout(()=>void window.garden.dispatch({type:'hover',id:character.id}),450);}} onPointerLeave={()=>clearTimeout(hover.current)}>
     {bubble&&!state.settings.dnd&&<div className="pet-bubble">{bubble.slice(0,66)}{bubble.length>66?'…':''}</div>}
-    <div className="pet-tools"><button title={`和${character.name}私聊`} onClick={()=>window.garden.openPrivate(character.id)}><MessageCircle size={14}/></button><button title="摸摸头" onClick={()=>void window.garden.dispatch({type:'pat',id:character.id})}><Hand size={14}/></button><button title="投喂大米饭" onClick={()=>void window.garden.dispatch({type:'feed',id:character.id,food:'rice'})}>🍚</button><button title="打招呼" onClick={()=>void window.garden.dispatch({type:'perform',id:character.id,intent:{action:'wave',emotion:'happy'}})}><Heart size={14}/></button></div>
+    <div className="pet-tools"><CompanionInteractions id={character.id} state={state} compact/><button title={`和${character.name}私聊`} onClick={()=>window.garden.openPrivate(character.id)}><MessageCircle size={14}/></button><button title="摸摸头" onClick={()=>void window.garden.dispatch({type:'pat',id:character.id})}><Hand size={14}/></button><button title="投喂大米饭" onClick={()=>void window.garden.dispatch({type:'feed',id:character.id,food:'rice'})}>🍚</button><button title="打招呼" onClick={()=>void window.garden.dispatch({type:'perform',id:character.id,intent:{action:'wave',emotion:'happy'}})}><Heart size={14}/></button></div>
     <div className="pet-body" title="点头部摸摸 · 点身体私聊 · 按住拖动" onPointerDown={e=>{
       if(e.button!==0)return;clearTimeout(hover.current);e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,from:p,moved:false};setDragging(true);
     }} onPointerMove={e=>{

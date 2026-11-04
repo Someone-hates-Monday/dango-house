@@ -2,6 +2,7 @@ import { byId, providers } from '../src/shared/characters';
 import type { AppState, CharacterId, AvatarIntent } from '../src/shared/types';
 import { avatarTool, endpointFor } from './avatar-tool';
 import { socialProfiles } from '../src/shared/social';
+import { isImpersonating, preferredProvider, providerLabel } from '../src/shared/cast';
 export async function* sseData(body: ReadableStream<Uint8Array>) {
   const reader = body.getReader(); const decoder = new TextDecoder(); let pending = '';
   try {
@@ -61,12 +62,48 @@ export async function requestText(providerId: string, model: string, key: string
   }
   return combined;
 }
-export async function generateReply(state: AppState, id: CharacterId, _input: string, key: string, signal: AbortSignal, update: (text: string) => void, act?:(intent:AvatarIntent)=>string) {
+export async function generateReply(
+  state: AppState,
+  id: CharacterId,
+  _input: string,
+  getKey: (provider: string) => Promise<string>,
+  signal: AbortSignal,
+  update: (text: string) => void,
+  act?: (intent: AvatarIntent) => string,
+  onFallback?: (wanted: string, used: string) => void,
+) {
+  const wanted = preferredProvider(state, id);
+  let provider = wanted;
+  let key = await getKey(provider);
+  if (!key.trim() && wanted !== state.settings.provider) {
+    provider = state.settings.provider;
+    key = await getKey(provider);
+    onFallback?.(wanted, provider);
+  }
+  const config = state.connections[provider] ?? state.connections[state.settings.provider];
+  const model = config?.model || state.settings.model;
   const baseCharacter = byId[id];
-  const character = {...baseCharacter, personality:baseCharacter.personality+` 伙伴关系：${JSON.stringify(socialProfiles[id])}。有方向的关系熟悉度：${JSON.stringify(state.bonds)}。保持自己的偏好，可以邀请、关心和善意打趣伙伴，别把每个话题都变成争宠。`};
-  const system = `你是团子小屋的${character.name}，不是厂商官方人格。${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然中文，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c=>({id:c.id,name:c.name})))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
-  const messages = state.messages.filter(m => m.speaker !== 'system' && m.text).slice(-24).map(m => ({ role: m.speaker === id ? 'assistant' : 'user', content: `${m.speaker === 'user' ? '用户' : byId[m.speaker as CharacterId].name}：${m.text}` }));
+  const character = {
+    ...baseCharacter,
+    personality:
+      baseCharacter.personality +
+      ` 伙伴关系：${JSON.stringify(socialProfiles[id])}。有方向的关系熟悉度：${JSON.stringify(state.bonds)}。保持自己的偏好，可以邀请、关心和善意打趣伙伴，别把每个话题都变成争宠。`,
+  };
+  const via = providerLabel(provider);
+  const impersonation = isImpersonating(id, provider)
+    ? `后端实际是 ${via} 模型在代言同人角色「${character.name}」，不要声称自己是官方 ${character.name} API 或官方员工。`
+    : `你是同人角色演绎，不是厂商官方人格。`;
+  const system = `你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然中文，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
+  const messages = state.messages
+    .filter(m => m.speaker !== 'system' && m.text)
+    .slice(-24)
+    .map(m => ({
+      role: m.speaker === id ? 'assistant' : 'user',
+      content: `${m.speaker === 'user' ? '用户' : byId[m.speaker as CharacterId].name}：${m.text}`,
+    }));
   if (messages.at(-1)?.role === 'assistant') messages.push({ role: 'user', content: '请对当前话题作简短回应。' });
-  const config=state.connections[state.settings.provider];
-  return requestText(state.settings.provider, config?.model||state.settings.model, key, system, messages, signal, update,{endpoint:config?.endpoint,act:config?.tools===false?undefined:act});
+  return requestText(provider, model, key, system, messages, signal, update, {
+    endpoint: config?.endpoint,
+    act: config?.tools === false ? undefined : act,
+  });
 }

@@ -12,3 +12,9 @@ Captured on Windows with v0.3.7 on 2026-10-30 using `scripts/capture-showcase.mj
 
 截图中的角色和美术继续适用 [素材许可](../../THIRD_PARTY_NOTICES.md)。  
 Characters and artwork in screenshots retain the asset terms.
+
+## 2026-11-04 source Alpha 0.3.9
+
+`pair-alpha-039.png` 来自 `scripts/verify-companion-experience.mjs` 启动的真实 Electron 开发构建、隔离离线存档和内置双人剧情；没有真实 API 请求或用户数据。界面仍显示七人，即使核心三人预设生效；这是已记录的在场编辑限制，不是三人显示验收图。
+
+`pair-alpha-039.png` captures a real Electron source build with an isolated offline profile and a scripted pair scene. No personal data or live API calls. Seven avatars remain visible under the core-three speaker preset: this documents the current presence limitation rather than demonstrating completed visual cast editing.
