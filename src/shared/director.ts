@@ -6,11 +6,14 @@ import { defaultBonds, socialProfiles } from './social';
 import { emptyAgentUi } from './agent';
 import { defaultLocale, isAppLocale, type AppLocale } from './i18n';
 import { demoReplyLocalized, praiseLinesLocalized } from './dialogue/pack';
+import { migratePresentIds, speakingCast } from './cast';
 export const ids = characters.map(c => c.id);
 export function initialState(now = Date.now()): AppState {
   return {
     presentation:{desktopMode:'free',chatForm:'portrait'},
-    version: 1, revision: 0, selected: 'xia', muted: [], affection: Object.fromEntries(ids.map(id=>[id,id==='xia'?32:id==='rin'?28:30])) as AppState['affection'],
+    version: 1, revision: 0, selected: 'xia',
+    presentIds: [...ids] as CharacterId[],
+    muted: [], affection: Object.fromEntries(ids.map(id=>[id,id==='xia'?32:id==='rin'?28:30])) as AppState['affection'],
     mood: Object.fromEntries(ids.map(id=>[id,'idle'])) as AppState['mood'], pets: {},
     skins: Object.fromEntries(characters.map(c=>[c.id,c.atlas===false?'chibi':'animated'])) as AppState['skins'],
     bodies: Object.fromEntries(ids.map(id=>[id,restingBody()])) as AppState['bodies'],
@@ -30,7 +33,7 @@ export function initialState(now = Date.now()): AppState {
   };
 }
 export function chooseSpeakers(state: AppState, text: string, target?: CharacterId): CharacterId[] {
-  const active = ids.filter(id => !state.muted.includes(id));
+  const active = speakingCast(state);
   if (!active.length) return [];
   const mentioned = target ?? ids.find(id => text.includes(`@${byId[id].name}`));
   if (mentioned) return active.includes(mentioned) ? [mentioned] : [];
@@ -65,12 +68,26 @@ export function restoreState(value: unknown, now = Date.now()): AppState {
     if (saved.settings.pairTone === 'soft' || saved.settings.pairTone === 'warm' || saved.settings.pairTone === 'vivid') {
       base.settings.pairTone = saved.settings.pairTone;
     }
-    if (saved.settings.castPreset === 'all' || saved.settings.castPreset === 'core' || saved.settings.castPreset === 'custom') {
-      base.settings.castPreset = saved.settings.castPreset;
-    }
   }
   if (ids.includes(saved.selected!)) base.selected = saved.selected!;
-  base.muted = Array.isArray(saved.muted) ? saved.muted.filter(id => ids.includes(id)) : [];
+  {
+    const migrated = migratePresentIds({
+      presentIds: Array.isArray((saved as { presentIds?: CharacterId[] }).presentIds)
+        ? (saved as { presentIds: CharacterId[] }).presentIds
+        : undefined,
+      muted: Array.isArray(saved.muted) ? saved.muted : undefined,
+      castPreset:
+        saved.settings &&
+        (saved.settings.castPreset === 'all' ||
+          saved.settings.castPreset === 'core' ||
+          saved.settings.castPreset === 'custom')
+          ? saved.settings.castPreset
+          : undefined,
+    });
+    base.presentIds = migrated.presentIds;
+    base.muted = migrated.muted;
+    base.settings.castPreset = migrated.castPreset;
+  }
   if (saved.characterProviders && typeof saved.characterProviders === 'object') {
     const next: AppState['characterProviders'] = {};
     for (const id of ids) {

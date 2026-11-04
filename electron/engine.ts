@@ -16,7 +16,7 @@ import { AgentRuntime, defaultBrowseGrants, defaultWatchGrants } from './agent/r
 import { applyFavor, rivalryEscalationBubbles, rivalryEscalationCast, shouldEscalateRivalry } from '../src/shared/favor';
 import { pickYuriScene, shareSnackBubble, yuriScenes } from '../src/shared/social-yuri';
 import { bondOf, cpPartner } from '../src/shared/bonds';
-import { inferCastPreset, mutedForPreset } from '../src/shared/cast';
+import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent, isSpeaking, normalizePresentIds } from '../src/shared/cast';
 type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act: (intent:AvatarIntent)=>string) => Promise<string>;
 export class GardenEngine {
   state: AppState;
@@ -43,7 +43,10 @@ export class GardenEngine {
     if (!this.state.favor) this.state.favor = { focusId: null, streak: 0 };
     if (!this.state.settings.pairTone) this.state.settings.pairTone = 'warm';
     if (!this.state.characterProviders) this.state.characterProviders = {};
-    if (!this.state.settings.castPreset) this.state.settings.castPreset = inferCastPreset(this.state.muted);
+    if (!Array.isArray(this.state.presentIds)) this.state.presentIds = [...ids] as CharacterId[];
+    this.state.presentIds = normalizePresentIds(this.state.presentIds);
+    this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
+    if (!this.state.settings.castPreset) this.state.settings.castPreset = inferCastPreset(this.state.presentIds);
   }
   /** Wire the independent agent runtime. Chat stop() must not cancel these tasks. */
   enableAgent(mediaCacheDir: string) {
@@ -52,7 +55,7 @@ export class GardenEngine {
       notify: ui => { this.state.agent = ui; this.publish(); },
       perform: (id, intent) => this.perform(id, intent, 'local'),
       say: (speaker, text, kind) => { this.add(speaker, text, kind); },
-      activeCharacters: () => ids.filter(id => !this.state.muted.includes(id)),
+      activeCharacters: () => speakingCast(this.state),
       locale: () => this.state.settings.locale,
     });
     this.state.agent = this.agent.getUi();
@@ -91,18 +94,18 @@ export class GardenEngine {
     return this.t('sys.didAction',{name:byId[id].name,label:labels[intent.action],moving:moving?this.t('sys.movingSuffix'):''});
   }
   private freezeRoom(now=Date.now()) { this.scene=[];for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish(); }
-  private playSocial(id:string,now=Date.now()) {const story=socialScenes.find(s=>s.id===id);if(!story||story.cast.some(actor=>this.state.muted.includes(actor)))return;const loc=localizedScene(this.locale(),id);const steps=story.steps.filter(s=>!this.state.muted.includes(s.actor)&&(!s.intent.target||!this.state.muted.includes(s.intent.target as CharacterId)));this.scene=steps.map((step,i)=>{const bubble=loc?.bubbles[story.steps.indexOf(step)]??step.intent.bubble;return{at:now+i*4200,actor:step.actor,intent:{...step.intent,bubble,duration:9},speech:bubble};});this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;}
+  private playSocial(id:string,now=Date.now()) {const story=socialScenes.find(s=>s.id===id);const speak=speakingCast(this.state);if(!story||story.cast.some(actor=>!speak.includes(actor)))return;const loc=localizedScene(this.locale(),id);const steps=story.steps.filter(s=>speak.includes(s.actor)&&(!s.intent.target||speak.includes(s.intent.target as CharacterId)));this.scene=steps.map((step,i)=>{const bubble=loc?.bubbles[story.steps.indexOf(step)]??step.intent.bubble;return{at:now+i*4200,actor:step.actor,intent:{...step.intent,bubble,duration:9},speech:bubble};});this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;}
   private playYuri(id:string,now=Date.now()) {
     const story = yuriScenes.find(s => s.id === id);
-    if (!story || story.pair.some(actor => this.state.muted.includes(actor))) return;
+    if (!story || story.pair.some(actor => !speakingCast(this.state).includes(actor))) return;
     const tone = this.state.settings.pairTone ?? 'warm';
-    const steps = story.steps(tone).filter(s => !this.state.muted.includes(s.actor) && (!s.intent.target || !this.state.muted.includes(s.intent.target as CharacterId)));
+    const steps = story.steps(tone).filter(s => speakingCast(this.state).includes(s.actor) && (!s.intent.target || speakingCast(this.state).includes(s.intent.target as CharacterId)));
     this.scene = steps.map((step, i) => ({ at: now + i * 4200, actor: step.actor, intent: { ...step.intent, duration: 9 }, speech: step.intent.bubble }));
     this.nextRoomLife = now + steps.length * 4200 + 60000;
     this.nextSocial = now + steps.length * 4200 + 180000;
   }
   private queueRivalryEscalation(favored: CharacterId, now = Date.now()) {
-    if (this.state.settings.dnd || this.state.focus || this.state.muted.includes(favored)) return;
+    if (this.state.settings.dnd || this.state.focus || !isSpeaking(this.state, favored)) return;
     if (!shouldEscalateRivalry(this.state)) return;
     const cast = rivalryEscalationCast(this.state, favored);
     if (!cast.length) return;
@@ -133,7 +136,7 @@ export class GardenEngine {
     try {
       for (const line of lines) {
         if (round !== this.epoch || controller.signal.aborted) break;
-        if (this.state.muted.includes(line.speaker)) continue;
+        if (!isSpeaking(this.state, line.speaker)) continue;
         this.state.mood[line.speaker] = 'talk'; this.state.activity = this.t('sys.thinking',{name:byId[line.speaker].name}); this.publish();
         await this.wait(controller.signal);
         if (round !== this.epoch) break;
@@ -175,17 +178,17 @@ export class GardenEngine {
       case 'presentation': {const p=action.patch;if(p.desktopMode==='dock'||p.desktopMode==='free'){this.freezeRoom();this.state.presentation.desktopMode=p.desktopMode;}if(p.chatForm==='portrait'||p.chatForm==='chibi')this.state.presentation.chatForm=p.chatForm;break;}
       case 'select': if (ids.includes(action.id)) this.state.selected = action.id; break;
       case 'trip': {if(!ids.includes(action.id))return;this.perform(action.id,{action:'sad',emotion:'sad',bubble:tripLine(this.locale()),duration:9},'local',Date.now(),{kind:'trip',startedAt:Date.now()});return;}
-      case 'pat': {if(!ids.includes(action.id))return;this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);applyFavor(this.state,action.id,1);this.perform(action.id,{action:'shy',emotion:'happy',bubble:patLine(this.locale(),action.id),duration:7},'local',Date.now(),{kind:'pat',startedAt:Date.now()});this.queueRivalryEscalation(action.id);return;}
+      case 'pat': {if(!ids.includes(action.id)||!isPresent(this.state,action.id))return;this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);applyFavor(this.state,action.id,0);this.perform(action.id,{action:'shy',emotion:'happy',bubble:patLine(this.locale(),action.id),duration:7},'local',Date.now(),{kind:'pat',startedAt:Date.now()});this.queueRivalryEscalation(action.id);return;}
       case 'feed': {
         if(!ids.includes(action.id)||!['rice','cake','fish','tea'].includes(action.food))return;
         const name=this.t('food.'+action.food);
         const favorite=action.id==='xia'&&action.food==='rice'||action.id==='gemini'&&action.food==='fish'||action.id==='rin'&&action.food==='tea'||action.id==='kimi'&&action.food==='cake';
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+(favorite?4:2));
-        applyFavor(this.state,action.id,2);
+        applyFavor(this.state,action.id,0);
         const now=Date.now();
         this.perform(action.id,{action:'eat',emotion:'happy',bubble:feedLine(this.locale(),action.id,action.food,name,this.state.relationship.address),duration:8},'local',now,{kind:'feed',startedAt:now,food:action.food});
         const partner=cpPartner(action.id);
-        if(!this.state.muted.includes(partner)&&bondOf(this.state.bonds,action.id,partner)>=40){
+        if(isSpeaking(this.state,partner)&&bondOf(this.state.bonds,action.id,partner)>=40){
           const share=shareSnackBubble(this.state.settings.pairTone??'warm',action.id,partner,name);
           this.scene.push({at:now+2800,actor:action.id,intent:{action:'approach',target:partner,emotion:'happy',bubble:share,duration:7},speech:share});
         }
@@ -200,9 +203,9 @@ export class GardenEngine {
         if(!ids.includes(action.id))return;this.state.selected=action.id;const now=Date.now();if(this.privateOpened?.id===action.id&&now-this.privateOpened.at<20000){this.publish();return;}this.privateOpened={id:action.id,at:now};this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
         const address=this.state.relationship.address||(this.locale()==='en'?'you':this.locale()==='ja'?'あなた':'你');
         const greeting=privateGreeting(this.locale(),action.id,address);
-        applyFavor(this.state,action.id,3);
+        applyFavor(this.state,action.id,0);
         this.perform(action.id,{action:'celebrate',emotion:'happy',bubble:greeting.slice(0,52),duration:9},'local',now,{kind:'chat',startedAt:now});this.addPrivate(action.id,action.id,greeting);
-        this.scene=ids.filter(id=>id!==action.id&&!this.state.muted.includes(id)).map((actor,i)=>({at:now+900+i*1100,actor,intent:{action:i===0?'approach':'shy',target:i===0?action.id:undefined,emotion:'shy',bubble:jealousLine(this.locale(),actor),duration:8}}));
+        this.scene=speakingCast(this.state).filter(id=>id!==action.id).slice(0,2).map((actor,i)=>({at:now+900+i*1100,actor,intent:{action:i===0?'approach':'shy',target:i===0?action.id:undefined,emotion:'shy',bubble:jealousLine(this.locale(),actor),duration:8}}));
         this.queueRivalryEscalation(action.id,now);
         this.publish();return;
       }
@@ -223,7 +226,7 @@ export class GardenEngine {
         if(!clip)throw new Error('Unknown animation clip');
         const now=Math.max(Date.now(),(this.state.bodies.xia.interaction?.startedAt??0)+1);
         this.lastDeepseekClip=clip.id;
-        if(clip.group==='food'){this.state.affection.xia=Math.min(100,this.state.affection.xia+2);applyFavor(this.state,'xia',1);}
+        if(clip.group==='food'){this.state.affection.xia=Math.min(100,this.state.affection.xia+2);applyFavor(this.state,'xia',0);}
         this.perform('xia',{action:'think',duration:15,bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});
         this.state.bodies.xia.until=now+Math.max(clip.seconds*1000+500,clip.title==='睡觉-开始'?40000:0);
         this.state.bodies.xia.label=clip.title;this.publish();return;
@@ -244,7 +247,7 @@ export class GardenEngine {
       }
       case 'showcase': {
         this.stop();this.freezeRoom();const now=Date.now();this.nextRoomLife=now+60000;
-        const cast=ids.filter(id=>!this.state.muted.includes(id));
+        const cast=speakingCast(this.state);
         const a=cast.includes('xia')?'xia':cast[0],b=cast.includes('glm')?'glm':cast[1]??a,c=cast.includes('kimi')?'kimi':cast[2]??a;if(!a)return;
         const show=showcaseCopy(this.locale());
         if(action.scene==='welcome')this.scene=cast.map((actor,i)=>{const line=show.report(byId[actor].name);return{at:now+i*750,actor,intent:{action:'wave',emotion:'happy',bubble:line},speech:line};});
@@ -256,13 +259,20 @@ export class GardenEngine {
       case 'praise': {
         if (!ids.includes(action.id)) return;
         this.stop(); this.state.selected = action.id; this.state.affection[action.id] = Math.min(100, this.state.affection[action.id] + 3);
-        applyFavor(this.state, action.id, 3);
+        applyFavor(this.state, action.id, 0);
         this.add('user', praiseUserLine(this.locale(), byId[action.id].name));
         {const round=this.epoch;await this.sequence(praiseLines(action.id, this.state.settings.intimacy, this.locale()));
         // sequence starts and finishes one round; a newer request cancels this reaction.
         if(this.epoch===round+2){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});this.queueRivalryEscalation(action.id,now);}}return;
       }
-      case 'mute': if (ids.includes(action.id)) { this.stop(); this.freezeRoom(); this.state.muted = this.state.muted.includes(action.id) ? this.state.muted.filter(id => id !== action.id) : [...this.state.muted, action.id]; this.state.settings.castPreset = inferCastPreset(this.state.muted); } break;
+      case 'mute':
+        if (!ids.includes(action.id) || !isPresent(this.state, action.id)) break;
+        this.stop();
+        this.freezeRoom();
+        this.state.muted = this.state.muted.includes(action.id)
+          ? this.state.muted.filter(id => id !== action.id)
+          : [...this.state.muted, action.id];
+        break;
       case 'cast-preset': {
         if (action.preset !== 'all' && action.preset !== 'core' && action.preset !== 'custom') return;
         this.stop();
@@ -271,8 +281,31 @@ export class GardenEngine {
           this.state.settings.castPreset = 'custom';
         } else {
           this.state.settings.castPreset = action.preset;
-          this.state.muted = mutedForPreset(action.preset);
+          this.state.presentIds = presentForPreset(action.preset);
+          this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
+          this.scene = this.scene.filter(item =>
+            this.state.presentIds.includes(item.actor) &&
+            (!item.intent.target || this.state.presentIds.includes(item.intent.target as CharacterId) || !ids.includes(item.intent.target as CharacterId))
+          );
         }
+        break;
+      }
+      case 'cast-present': {
+        if (!ids.includes(action.id)) return;
+        this.stop();
+        this.freezeRoom();
+        const next = new Set(presentCast(this.state));
+        if (action.present) next.add(action.id);
+        else {
+          next.delete(action.id);
+          this.state.muted = this.state.muted.filter(id => id !== action.id);
+          this.scene = this.scene.filter(item => item.actor !== action.id && item.intent.target !== action.id);
+          if (this.state.bodies[action.id]) this.state.bodies[action.id] = restingBody();
+          delete this.state.desktopMoves[action.id];
+        }
+        this.state.presentIds = normalizePresentIds([...next]);
+        this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
+        this.state.settings.castPreset = inferCastPreset(this.state.presentIds);
         break;
       }
       case 'character-provider': {
@@ -302,7 +335,7 @@ export class GardenEngine {
       case 'focus': {
         if (!Number.isFinite(action.minutes) || action.minutes < 1 || action.minutes > 180) { this.add('system', this.t('sys.focusRange')); return; }
         if (this.state.focus) { this.add('system', this.t('sys.focusBusy')); return; }
-        const active = ids.filter(id => !this.state.muted.includes(id));
+        const active = speakingCast(this.state);
         const owner = active.includes('rin') ? 'rin' : active[0];
         if (!owner) { this.add('system', this.t('sys.focusNeedMember')); return; }
         this.stop(); this.state.focus = { id: crypto.randomUUID(), endAt: Date.now() + action.minutes * 60_000, minutes: action.minutes, owner };
@@ -321,7 +354,7 @@ export class GardenEngine {
         if (!this.agent) { this.add('system', this.t('sys.watchNotReady'), 'error'); return; }
         if (typeof action.path !== 'string' || !action.path.trim()) { this.add('system', this.t('sys.watchNeedFile'), 'error'); return; }
         const speakers = Array.isArray(action.speakers)
-          ? action.speakers.filter(id => ids.includes(id) && !this.state.muted.includes(id))
+          ? action.speakers.filter(id => ids.includes(id) && isSpeaking(this.state, id))
           : undefined;
         const videoName = action.displayName || this.t('sys.localVideo');
         this.add('system', this.t('sys.watchImport', { name: videoName }), 'notice');
@@ -343,7 +376,7 @@ export class GardenEngine {
         if (!this.agent) { this.add('system', this.t('sys.watchNotReady'), 'error'); return; }
         const query = typeof action.query === 'string' ? action.query.trim().slice(0, 160) : '';
         if (!query) { this.add('system', this.t('sys.browseNeedQuery'), 'error'); return; }
-        const actor = action.actor && ids.includes(action.actor) ? action.actor : ids.find(id => !this.state.muted.includes(id));
+        const actor = action.actor && ids.includes(action.actor) && isSpeaking(this.state, action.actor) ? action.actor : speakingCast(this.state)[0];
         this.add('system', this.t('sys.browseStart', { query }), 'notice');
         await this.agent.start({
           kind: 'browse',
@@ -379,35 +412,35 @@ export class GardenEngine {
     this.publish();
   }
   tick(now = Date.now()) {
-    if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=ids.find(id=>!this.state.muted.includes(id));if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
+    if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
     let changed=false;
     const due=this.scene.filter(item=>item.at<=now);this.scene=this.scene.filter(item=>item.at>now);
-    for(const item of due){if(this.state.muted.includes(item.actor)||this.state.muted.includes(item.intent.target as CharacterId))continue;try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}}
+    for(const item of due){if(!isSpeaking(this.state,item.actor)||(item.intent.target&&ids.includes(item.intent.target as CharacterId)&&!isSpeaking(this.state,item.intent.target as CharacterId)))continue;try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}}
     for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}
     if(changed)this.publish();
     if(now>=this.nextDeepseek){
       this.nextDeepseek=now+120000;
-      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&!this.state.muted.includes('xia')&&!this.state.bodies.xia.until){
+      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&isSpeaking(this.state,'xia')&&!this.state.bodies.xia.until){
         const pool=['东张西望','超大伸懒腰','悠闲哼歌','原地专心玩魔方'].map(clipByTitle).filter(c=>c&&c.id!==this.lastDeepseekClip);
         const clip=pool[this.lifeIndex++%pool.length];if(clip){this.lastDeepseekClip=clip.id;this.perform('xia',{action:'think',duration:15},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});this.state.bodies.xia.until=now+clip.seconds*1000+500;this.publish();}
       }
     }
     if(now>=this.nextBookmark){
       this.nextBookmark=now+95000;
-      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&!this.state.muted.includes('rin')&&!this.state.bodies.rin.until&&!this.state.desktopMoves.rin&&!this.state.room.residents.rin.arrivesAt){
+      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&isSpeaking(this.state,'rin')&&!this.state.bodies.rin.until&&!this.state.desktopMoves.rin&&!this.state.room.residents.rin.arrivesAt){
         this.perform('rin',{action:'think',emotion:'neutral',duration:6},'local',now,{kind:'bookmark',startedAt:now});
         this.state.bodies.rin.label=this.t('sys.bookmarkLabel');this.publish();
       }
     }
     if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&!this.scene.length&&now>=this.nextSocial){
-      const yuri = pickYuriScene(this.state.bonds, this.state.muted, this.yuriIndex++);
+      const yuri = pickYuriScene(this.state.bonds, ids.filter(id => !isSpeaking(this.state, id)), this.yuriIndex++);
       if (yuri && this.yuriIndex % 2 === 0) this.playYuri(yuri.id, now);
       else this.playSocial(socialScenes[this.socialIndex++%socialScenes.length].id,now);
     }
     if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&this.state.room.wandering&&!this.scene.length&&now>=this.nextRoomLife){
       this.nextRoomLife=now+60000;
-      const active=ids.filter(id=>!this.state.muted.includes(id));
+      const active=speakingCast(this.state);
       const id=active[this.lifeIndex++%Math.max(1,active.length)];
       if(id){const action=id==='rin'||id==='kimi'?'read':id==='glm'?'water':this.lifeIndex%4===0?'walk':'sit';try{this.perform(id,{action,emotion:'neutral'},'local',now);}catch{}}
     }
@@ -416,12 +449,12 @@ export class GardenEngine {
       for (const id of ids) { this.state.mood[id] = 'idle'; this.state.affection[id] = Math.min(100, this.state.affection[id] + 1); }
       this.state.activity = this.t('sys.focusDone');
       this.add('system', this.t('sys.focusEnded', { minutes: task.minutes }));
-      if (!this.state.settings.dnd && !this.state.muted.includes(task.owner)) this.add(task.owner, this.t('sys.focusOwnerDone'));
+      if (!this.state.settings.dnd && isSpeaking(this.state, task.owner)) this.add(task.owner, this.t('sys.focusOwnerDone'));
       return;
     }
     if (this.state.settings.dnd || !this.state.settings.autonomous || this.state.focus || this.state.busy || now < this.nextAutonomous || now - this.lastInteraction < 120_000) return;
     this.nextAutonomous = now + 10 * 60_000;
-    const speaker = ids.find(id => !this.state.muted.includes(id));
+    const speaker = speakingCast(this.state)[0];
     if (speaker) this.add(speaker, this.t('sys.idleNudge'));
   }
 }

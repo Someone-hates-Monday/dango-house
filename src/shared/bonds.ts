@@ -27,13 +27,16 @@ export function cpPartner(id: CharacterId): CharacterId {
   return socialProfiles[id].target;
 }
 
-/** Highest mutual-ish bond pair among active residents (directed max of A>B). */
-export function stickiestPair(bonds: Record<string, number>, muted: CharacterId[] = []): { a: CharacterId; b: CharacterId; value: number } | null {
+/**
+ * Highest mutual-ish bond pair among speaking residents.
+ * `excluded` = absent or muted ids (not on speaking cast).
+ */
+export function stickiestPair(bonds: Record<string, number>, excluded: CharacterId[] = []): { a: CharacterId; b: CharacterId; value: number } | null {
   let best: { a: CharacterId; b: CharacterId; value: number } | null = null;
   for (const a of ids) {
-    if (muted.includes(a)) continue;
+    if (excluded.includes(a)) continue;
     const b = socialProfiles[a].target;
-    if (muted.includes(b)) continue;
+    if (excluded.includes(b)) continue;
     const value = bonds[relationshipKey(a, b)] ?? 0;
     if (!best || value > best.value) best = { a, b, value };
   }

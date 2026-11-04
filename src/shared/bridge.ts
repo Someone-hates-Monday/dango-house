@@ -34,6 +34,7 @@ export interface AgentSnapshot {
   relationship: AppState['relationship'];
   favor: AppState['favor'];
   selected: CharacterId;
+  presentIds: CharacterId[];
   muted: CharacterId[];
   stickiest: { a: CharacterId; b: CharacterId; value: number } | null;
   residents: Array<{
@@ -41,6 +42,7 @@ export interface AgentSnapshot {
     name: string;
     affection: number;
     mood: string;
+    present: boolean;
     muted: boolean;
   }>;
   recentMessages: Array<{ speaker: string; text: string; at: number }>;
@@ -176,7 +178,9 @@ export function isCharacterId(value: unknown): value is CharacterId {
 }
 
 export function buildAgentSnapshot(state: AppState): AgentSnapshot {
-  const sticky = stickiestPair(state.bonds, state.muted);
+  const present = state.presentIds ?? characters.map(c => c.id);
+  const excluded = characters.map(c => c.id).filter(id => !present.includes(id) || state.muted.includes(id));
+  const sticky = stickiestPair(state.bonds, excluded);
   return {
     activity: state.activity,
     busy: state.busy,
@@ -186,6 +190,7 @@ export function buildAgentSnapshot(state: AppState): AgentSnapshot {
     relationship: state.relationship,
     favor: state.favor,
     selected: state.selected,
+    presentIds: [...present],
     muted: [...state.muted],
     stickiest: sticky,
     residents: characters.map(c => ({
@@ -193,6 +198,7 @@ export function buildAgentSnapshot(state: AppState): AgentSnapshot {
       name: c.name,
       affection: state.affection[c.id] ?? 0,
       mood: state.mood[c.id] ?? 'idle',
+      present: present.includes(c.id),
       muted: state.muted.includes(c.id),
     })),
     recentMessages: state.messages.slice(-12).map(m => ({ speaker: m.speaker, text: m.text, at: m.at })),

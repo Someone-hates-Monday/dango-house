@@ -1,13 +1,15 @@
 import { Heart, Sparkles } from 'lucide-react';
-import { byId } from './shared/characters';
+import { byId, characters } from './shared/characters';
 import { stickiestPair } from './shared/bonds';
-import type { AppState } from './shared/types';
+import { speakingCast } from './shared/cast';
+import type { AppState, CharacterId } from './shared/types';
 import { useI18n } from './useI18n';
 
 export function FavorStrip({ state }: { state: AppState }) {
   const { t } = useI18n(state);
   const favor = state.favor ?? { focusId: null, streak: 0 };
-  const sticky = stickiestPair(state.bonds, state.muted);
+  const excluded = characters.map(c => c.id as CharacterId).filter(id => !speakingCast(state).includes(id));
+  const sticky = stickiestPair(state.bonds, excluded);
   return (
     <div className="favor-strip">
       <div>

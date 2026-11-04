@@ -4,7 +4,7 @@ import { characters, providers } from './shared/characters';
 import type { AppState, Action, AppLocale, BridgeStatus, CastPreset, CharacterId } from './shared/types';
 import { locales } from './shared/i18n';
 import { useI18n } from './useI18n';
-import { providerLabel } from './shared/cast';
+import { providerLabel, presentCast } from './shared/cast';
 
 const send = (action: Action) => window.garden.dispatch(action);
 
@@ -364,6 +364,26 @@ export function Connections({ state }: { state: AppState }) {
               {state.settings.castPreset === item.id && <Check size={15} />}
             </button>
           ))}
+        </div>
+        <p className="helper">{t('settings.castPresentCount', { n: String(presentCast(state).length) })}</p>
+        <div className="cast-present-grid" role="group" aria-label={t('settings.castTitle')}>
+          {characters.map(c => {
+            const on = presentCast(state).includes(c.id as CharacterId);
+            return (
+              <label key={c.id} className={`cast-present-card ${on ? 'on' : 'off'}`}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={e => void send({ type: 'cast-present', id: c.id as CharacterId, present: e.target.checked })}
+                />
+                <span className="cast-present-swatch" style={{ background: c.pale }} />
+                <span>
+                  <strong>{c.name}</strong>
+                  <small>{on ? t('settings.castOnStage') : t('settings.castOffStage')}</small>
+                </span>
+              </label>
+            );
+          })}
         </div>
         <p className="helper">{t('settings.castHint')}</p>
       </div>

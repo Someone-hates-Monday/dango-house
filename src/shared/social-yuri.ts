@@ -116,16 +116,17 @@ export const yuriScenes: YuriScene[] = [
   },
 ];
 
-export function yuriScenesForBond(bonds: Record<string, number>, muted: CharacterId[] = []): YuriScene[] {
+/** `excluded` = absent or muted — pair scenes need both speakers present and unmuted. */
+export function yuriScenesForBond(bonds: Record<string, number>, excluded: CharacterId[] = []): YuriScene[] {
   return yuriScenes.filter(scene => {
     const [a, b] = scene.pair;
-    if (muted.includes(a) || muted.includes(b)) return false;
+    if (excluded.includes(a) || excluded.includes(b)) return false;
     return Math.max(bondOf(bonds, a, b), bondOf(bonds, b, a)) >= scene.minBond;
   });
 }
 
-export function pickYuriScene(bonds: Record<string, number>, muted: CharacterId[], index: number): YuriScene | undefined {
-  const pool = yuriScenesForBond(bonds, muted);
+export function pickYuriScene(bonds: Record<string, number>, excluded: CharacterId[], index: number): YuriScene | undefined {
+  const pool = yuriScenesForBond(bonds, excluded);
   if (!pool.length) return undefined;
   return pool[index % pool.length];
 }

@@ -24,7 +24,11 @@ export type CastPreset = 'all' | 'core' | 'custom';
 export interface ConnectionProfile { model: string; endpoint: string; tools: boolean; }
 export interface FavorState { focusId: CharacterId | null; streak: number; }
 export interface AppState {
-  version: 1; messages: Message[]; selected: CharacterId; muted: CharacterId[];
+  version: 1; messages: Message[]; selected: CharacterId;
+  /** Who is living on stage today (room / Dock / free pets). Empty = gentle empty house. */
+  presentIds: CharacterId[];
+  /** Quiet while present — does not hide from stage. Always a subset of presentIds after normalize. */
+  muted: CharacterId[];
   affection: Record<CharacterId, number>; mood: Record<CharacterId, Mood>; pets: Partial<Record<CharacterId, PetState>>;
   skins: Record<CharacterId, 'chibi' | 'animated'>;
   bodies: Record<CharacterId, Embodiment>;
@@ -51,7 +55,7 @@ export interface AppState {
     pairTone: PairTone;
     /** Optional localhost Agent Bridge for Cursor/Claude/Codex plugins; app remains the primary product. */
     agentBridge: boolean;
-    /** Today’s cast size preset; muted[] is the source of truth for who may speak. */
+    /** Today’s cast size preset; inferred from presentIds (not muted). */
     castPreset: CastPreset;
   };
   memories: Memory[]; focus: FocusTask | null;
@@ -87,6 +91,8 @@ export type Action =
   | { type: 'praise'; id: CharacterId }
   | { type: 'mute'; id: CharacterId }
   | { type: 'cast-preset'; preset: CastPreset }
+  /** Toggle whether a character is present on stage today (independent of mute). */
+  | { type: 'cast-present'; id: CharacterId; present: boolean }
   | { type: 'character-provider'; id: CharacterId; provider: string | null }
   | { type: 'settings'; patch: Partial<AppState['settings']> }
   | { type: 'focus'; minutes: number }

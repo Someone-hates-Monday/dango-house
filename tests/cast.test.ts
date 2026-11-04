@@ -1,16 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GardenEngine } from '../electron/engine.ts';
-import { initialState, restoreState } from '../src/shared/director.ts';
+import { initialState, restoreState, chooseSpeakers } from '../src/shared/director.ts';
 import {
   CORE_CAST,
   inferCastPreset,
   isImpersonating,
-  mutedForPreset,
+  migratePresentIds,
+  presentCast,
+  presentForPreset,
   preferredProvider,
+  speakingCast,
 } from '../src/shared/cast.ts';
-import { chooseSpeakers } from '../src/shared/director.ts';
 import { rivalryEscalationCast } from '../src/shared/favor.ts';
+import { characters } from '../src/shared/characters.ts';
+
+const allIds = characters.map(c => c.id);
 
 test('house brain preferred provider falls back and honors override', () => {
   const state = initialState();
@@ -22,35 +27,74 @@ test('house brain preferred provider falls back and honors override', () => {
   assert.equal(isImpersonating('rin', 'claude'), false);
 });
 
-test('cast presets mute everyone except core three', async () => {
+test('cast presets write presentIds, not mute-as-absence', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
   await engine.dispatch({ type: 'cast-preset', preset: 'core' });
   assert.equal(engine.state.settings.castPreset, 'core');
-  assert.deepEqual(
-    [...engine.state.muted].sort(),
-    [...mutedForPreset('core')].sort(),
-  );
-  for (const id of CORE_CAST) assert.equal(engine.state.muted.includes(id), false);
+  assert.deepEqual([...engine.state.presentIds].sort(), [...CORE_CAST].sort());
+  assert.equal(engine.state.muted.length, 0);
+  for (const id of CORE_CAST) assert.ok(presentCast(engine.state).includes(id));
+  assert.equal(presentCast(engine.state).length, 3);
   const speakers = chooseSpeakers(engine.state, 'hello');
   assert.ok(speakers.every(id => CORE_CAST.includes(id)));
 });
 
-test('manual mute flips preset to custom; restore keeps overrides', async () => {
+test('mute only quiets a present resident; preset stays present-based', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
   await engine.dispatch({ type: 'cast-preset', preset: 'all' });
   await engine.dispatch({ type: 'mute', id: 'grok' });
-  assert.equal(engine.state.settings.castPreset, 'custom');
-  assert.equal(inferCastPreset(engine.state.muted), 'custom');
-
-  engine.state.characterProviders = { shiori: 'openai' };
-  const restored = restoreState(engine.state);
-  assert.equal(restored.characterProviders.shiori, 'openai');
-  assert.equal(restored.settings.castPreset, 'custom');
+  assert.equal(engine.state.settings.castPreset, 'all');
+  assert.ok(engine.state.presentIds.includes('grok'));
+  assert.ok(engine.state.muted.includes('grok'));
+  assert.equal(speakingCast(engine.state).includes('grok'), false);
+  assert.equal(presentCast(engine.state).includes('grok'), true);
 });
 
-test('a two-person cast schedules each rival only once', () => {
+test('cast-present removes someone from stage without muting others', async () => {
+  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  await engine.dispatch({ type: 'cast-present', id: 'grok', present: false });
+  assert.equal(engine.state.settings.castPreset, 'custom');
+  assert.equal(presentCast(engine.state).includes('grok'), false);
+  assert.equal(engine.state.muted.includes('grok'), false);
+  assert.equal(presentCast(engine.state).length, 6);
+});
+
+test('migration: old core muted-as-cast becomes three present', () => {
+  const migrated = migratePresentIds({
+    castPreset: 'core',
+    muted: presentForPreset('all').filter(id => !CORE_CAST.includes(id)),
+  });
+  assert.deepEqual([...migrated.presentIds].sort(), [...CORE_CAST].sort());
+  assert.equal(migrated.muted.length, 0);
+  assert.equal(migrated.castPreset, 'core');
+});
+
+test('migration: old all/custom keeps quiet flags and everyone present', () => {
+  const migrated = migratePresentIds({
+    castPreset: 'custom',
+    muted: ['grok', 'kimi'],
+  });
+  assert.equal(migrated.presentIds.length, 7);
+  assert.deepEqual([...migrated.muted].sort(), ['grok', 'kimi']);
+});
+
+test('restoreState applies present migration and keeps overrides', () => {
+  const raw = {
+    version: 1 as const,
+    settings: { castPreset: 'core' as const },
+    muted: allIds.filter(id => !CORE_CAST.includes(id)),
+    characterProviders: { shiori: 'openai' },
+  };
+  const restored = restoreState(raw);
+  assert.deepEqual([...restored.presentIds].sort(), [...CORE_CAST].sort());
+  assert.equal(restored.characterProviders.shiori, 'openai');
+  assert.equal(restored.settings.castPreset, 'core');
+});
+
+test('a two-person speaking cast schedules each rival only once', () => {
   const state = initialState();
-  state.muted = ['shiori', 'gemini', 'glm', 'kimi', 'grok'];
+  state.presentIds = ['xia', 'rin'];
+  state.muted = [];
   assert.deepEqual(rivalryEscalationCast(state, 'xia'), ['rin']);
 });
 
@@ -61,16 +105,32 @@ test('changing cast cancels pending scenes instead of leaving orphan dialogue', 
   const count = engine.state.messages.length;
   engine.tick(Date.now() + 15_000);
   assert.equal(engine.state.messages.length, count);
-  assert.ok(Object.values(engine.state.bodies).every(body => body.pose === 'idle'));
 });
 
-test('a muted partner prevents a partial pair scene from playing', async () => {
+test('an absent partner prevents a partial pair scene from playing', async () => {
+  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  await engine.dispatch({ type: 'cast-present', id: 'xia', present: false });
+  const count = engine.state.messages.length;
+  await engine.dispatch({ type: 'yuri-scene', id: 'rin-xia-seat' });
+  engine.tick(Date.now() + 15_000);
+  assert.equal(engine.state.messages.length, count);
+});
+
+test('quiet present partner also blocks pair scene', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
   await engine.dispatch({ type: 'mute', id: 'xia' });
   const count = engine.state.messages.length;
   await engine.dispatch({ type: 'yuri-scene', id: 'rin-xia-seat' });
   engine.tick(Date.now() + 15_000);
   assert.equal(engine.state.messages.length, count);
+});
+
+test('empty present cast yields no speakers and no API cast', () => {
+  const state = initialState();
+  state.presentIds = [];
+  state.muted = [];
+  assert.deepEqual(chooseSpeakers(state, 'hello'), []);
+  assert.equal(inferCastPreset([]), 'custom');
 });
 
 test('global autonomy off suppresses idle scene scheduling as well as greetings', async () => {

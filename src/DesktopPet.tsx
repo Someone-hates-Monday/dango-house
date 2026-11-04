@@ -8,12 +8,14 @@ import {Sprite,EmotionFx} from './Sprite';
 import {DockCast} from './DockCast';
 import {useActualPose} from './useActualPose';
 import {useNow} from './Room';
+import {presentCast} from './shared/cast';
 
 function FreeCast({state,displayId,primary}:{state:AppState;displayId:number;primary:boolean}){
   const now=useNow();const[size,setSize]=useState({w:innerWidth,h:innerHeight});
   const[draft,setDraft]=useState<{id:CharacterId;point:RoomPoint}|null>(null);
   useEffect(()=>{const resize=()=>setSize({w:innerWidth,h:innerHeight});addEventListener('resize',resize);return()=>removeEventListener('resize',resize);},[]);
-  const cast=characters.filter(c=>state.pets[c.id]?state.pets[c.id]!.displayId===displayId:primary);
+  const present=presentCast(state);
+  const cast=characters.filter(c=>present.includes(c.id)&&(state.pets[c.id]?state.pets[c.id]!.displayId===displayId:primary));
   const availableW=Math.max(1,size.w-160),availableH=Math.max(1,size.h-210);
   const boxes=cast.map((c,i)=>{
     const base=state.pets[c.id]??{x:.08+i*.13,y:.96};const movement=state.desktopMoves[c.id];

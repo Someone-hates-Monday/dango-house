@@ -6,11 +6,13 @@ import {characters} from './shared/characters';
 import {dockPosition} from './shared/motion';
 import {Sprite,EmotionFx} from './Sprite';
 import {useNow} from './Room';
+import {presentCast} from './shared/cast';
 
 export function DockCast({state,displayId,primary}:{state:AppState;displayId:number;primary:boolean}){
   const now=useNow();const[size,setSize]=useState({w:innerWidth,h:innerHeight});
   useEffect(()=>{const resize=()=>setSize({w:innerWidth,h:innerHeight});addEventListener('resize',resize);return()=>removeEventListener('resize',resize);},[]);
-  const cast=characters.filter(c=>state.pets[c.id]?state.pets[c.id]!.displayId===displayId:primary);
+  const present=presentCast(state);
+  const cast=characters.filter(c=>present.includes(c.id)&&(state.pets[c.id]?state.pets[c.id]!.displayId===displayId:primary));
   return <div className="dock-cast" data-mode="dock">{cast.map((c,index)=><DockPet key={c.id} character={c} state={state} now={now} index={index} count={cast.length} size={size}/>)}</div>;
 }
 function DockPet({character:c,state,now,index,count,size}:{character:Character;state:AppState;now:number;index:number;count:number;size:{w:number;h:number}}){

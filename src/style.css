@@ -80,3 +80,13 @@
 .override-grid{display:grid;gap:8px;margin-top:10px}
 .override-row{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:center;font-size:13px}
 .override-row select{width:100%}
+.cast-present-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin:12px 0 4px}
+.cast-present-card{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line,#e4d8df);border-radius:10px;background:#fffafc;cursor:pointer;font-size:12px}
+.cast-present-card.off{opacity:.55;background:#f4f0f2}
+.cast-present-card input{accent-color:#d989a4}
+.cast-present-swatch{width:28px;height:28px;border-radius:8px;flex-shrink:0}
+.cast-present-card strong{display:block;font-size:13px}
+.cast-present-card small{color:#8a7f8c}
+.member-list button.absent{opacity:.62}
+.member-list .absent-dot{background:#b7aeb8!important}
+.room-empty-cast{position:absolute;inset:38% 12% auto;text-align:center;color:#8a7383;font-size:14px;pointer-events:none}

@@ -17,7 +17,7 @@ export function WatchParty({ state }: { state: AppState }) {
   const [query, setQuery] = useState('');
   const [notice, setNotice] = useState('');
   const party = state.agent?.watchParty;
-  const active = characters.filter(c => !state.muted.includes(c.id));
+  const active = characters.filter(c => (state.presentIds ?? []).includes(c.id) && !state.muted.includes(c.id));
 
   const toggle = (id: CharacterId) => {
     setSpeakers(prev => {

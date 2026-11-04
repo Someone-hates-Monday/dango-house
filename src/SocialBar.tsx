@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { byId } from './shared/characters';
+import { byId, characters } from './shared/characters';
 import { socialProfiles, socialScenes, relationshipKey } from './shared/social';
 import { yuriScenes, yuriScenesForBond } from './shared/social-yuri';
 import { bondTier } from './shared/bonds';
-
-import type { AppState } from './shared/types';
+import { speakingCast } from './shared/cast';
+import type { AppState, CharacterId } from './shared/types';
 import { useI18n } from './useI18n';
 import { localizedProfile, localizedScene } from './shared/dialogue/pack';
 
@@ -18,7 +18,11 @@ export function SocialBar({ state }: { state: AppState }) {
   const origin = story?.origin ?? socialScenes.find(s => s.id === scene)?.origin ?? '';
   const bond = state.bonds[relationshipKey(state.selected, targetId)] ?? 0;
   const tier = bondTier(bond);
-  const availableYuri = useMemo(() => yuriScenesForBond(state.bonds, state.muted), [state.bonds, state.muted]);
+  const excluded = useMemo(() => {
+    const speak = speakingCast(state);
+    return characters.map(c => c.id as CharacterId).filter(id => !speak.includes(id));
+  }, [state.presentIds, state.muted]);
+  const availableYuri = useMemo(() => yuriScenesForBond(state.bonds, excluded), [state.bonds, excluded]);
 
   return (
     <section className="social-bar">
