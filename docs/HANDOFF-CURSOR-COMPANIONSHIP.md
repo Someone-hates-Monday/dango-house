@@ -7,7 +7,7 @@ Repo commits (local, not pushed as Release):
 
 1. `2e06188` — **A** presentIds ≠ mute  
 2. `a3a16da` — **B** director / events / three offline loops  
-3. **C** reply origins, optional story LLM hook, try-play + docs (commit hash filled after push of this handoff)  
+3. `4dc5428` — **C** reply origins, optional story LLM hook, try-play + docs  
 
 ## Done
 
