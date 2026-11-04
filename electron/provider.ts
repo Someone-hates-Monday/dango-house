@@ -62,6 +62,34 @@ export async function requestText(providerId: string, model: string, key: string
   }
   return combined;
 }
+/** Dedicated one-shot story aside: prompt is the request body, avatar tools off. */
+export async function generateStoryAside(
+  state: AppState,
+  id: CharacterId,
+  prompt: string,
+  getKey: (provider: string) => Promise<string>,
+  signal: AbortSignal,
+  update: (text: string) => void = () => {},
+  onFallback?: (wanted: string, used: string) => void,
+) {
+  const wanted = preferredProvider(state, id);
+  let provider = wanted;
+  let key = await getKey(provider);
+  if (!key.trim() && wanted !== state.settings.provider) {
+    provider = state.settings.provider;
+    key = await getKey(provider);
+    onFallback?.(wanted, provider);
+  }
+  const config = state.connections[provider] ?? state.connections[state.settings.provider];
+  const model = config?.model || state.settings.model;
+  const system = '你是团子小屋的旁白助手。只输出一句极短收束旁白，不要调用工具，不要扮演系统。';
+  const text = await requestText(provider, model, key, system, [{ role: 'user', content: prompt }], signal, update, {
+    endpoint: config?.endpoint,
+    // intentionally no act → no tools
+  });
+  return { text, provider, model };
+}
+
 export async function generateReply(
   state: AppState,
   id: CharacterId,
@@ -72,6 +100,10 @@ export async function generateReply(
   act?: (intent: AvatarIntent) => string,
   onFallback?: (wanted: string, used: string) => void,
 ) {
+  // Story enrichment must not ride the chat tool loop — use the dedicated aside path.
+  if (typeof _input === 'string' && _input.includes('极短的旁白')) {
+    return generateStoryAside(state, id, _input, getKey, signal, update, onFallback);
+  }
   const wanted = preferredProvider(state, id);
   let provider = wanted;
   let key = await getKey(provider);

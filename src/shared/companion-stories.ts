@@ -70,7 +70,8 @@ export function rivalLine(actor: CharacterId, favored: CharacterId, tone: PairTo
 }
 
 export function privateReturnLine(favored: CharacterId, rivals: CharacterId[], events: CompanionEvent[], tone: PairTone): string {
-  const again = hasRecentKind(events, 'chose-companion', 10 * 60_000);
+  // Revisit copy only after a prior settled private-return — not on first wrap of this visit.
+  const again = hasRecentKind(events, 'private-return', 24 * 60 * 60_000);
   if (again) {
     return tonePick(tone,
       '你又回来了。我们还在，不用每次都重新打招呼。',
