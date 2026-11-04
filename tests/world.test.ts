@@ -23,9 +23,11 @@ test('animation intent validates capabilities and bounded room movements settle'
 });
 test('all seven are covered by scenes and directed relationships persist separately',async()=>{
   assert.deepEqual([...new Set(socialScenes.flatMap(s=>s.cast))].sort(),[...ids].sort());
-  const e=new GardenEngine();const before=e.state.bonds['rin>xia'];e.perform('rin',{action:'approach',target:'xia'});assert.equal(e.state.bonds['rin>xia'],before+2);assert.equal(e.state.bonds['xia>rin'],35);
+  const e=new GardenEngine();const before=e.state.bonds['rin>xia'];e.perform('rin',{action:'approach',target:'xia'});
+  // Approach alone must not silently farm pair bond — rewards come from settled scenes.
+  assert.equal(e.state.bonds['rin>xia'],before);assert.equal(e.state.bonds['xia>rin'],35);
   await e.dispatch({type:'social-scene',id:'cat-fox'});const t=Date.now();e.tick(t+4500);assert.ok(e.state.messages.some(m=>m.speaker==='glm'&&m.text.includes('点心预算')));
-  assert.equal(restoreState(e.state).bonds['rin>xia'],before+2);
+  assert.equal(restoreState(e.state).bonds['rin>xia'],before);
 });
 test('private greeting, touch and favorite food affect affection with private context isolation',async()=>{
   let received:string[]=[];const e=new GardenEngine(initialState(),()=>{},async(s)=>{received=s.messages.map(m=>m.text);return '我在认真听。';},0);

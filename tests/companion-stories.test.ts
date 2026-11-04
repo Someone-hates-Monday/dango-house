@@ -2,9 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GardenEngine } from '../electron/engine.ts';
 import { initialState, restoreState } from '../src/shared/director.ts';
-import { planSeatShare, planStarFox, planChoseHer } from '../src/shared/companion-stories.ts';
+import { planSeatShare, planStarFox, planChoseHer, privateReturnLine } from '../src/shared/companion-stories.ts';
 import { pushCompanionEvent } from '../src/shared/events.ts';
 import { relationshipKey } from '../src/shared/social.ts';
+import { DEFAULT_SETTLE_MS } from '../src/shared/scene-director.ts';
+
+/** Advance the director through the last beat and settle window. */
+function settleStory(engine: GardenEngine, from = Date.now(), lastOffset = 12_000) {
+  const end = from + lastOffset + DEFAULT_SETTLE_MS + 50;
+  for (let t = from; t <= end; t += 500) engine.tick(t);
+}
 
 test('chose-her plans Claude rivals with character lines', () => {
   const state = initialState();
@@ -33,39 +40,59 @@ test('seat-share and star-fox need present speakers; sequel changes lines', () =
   assert.equal(planStarFox(state, Date.now()), null);
 });
 
-test('private-open records event and queues rival beats; return wraps with variant', async () => {
-  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
-  await engine.dispatch({ type: 'private-open', id: 'rin' });
-  assert.ok(engine.state.companionEvents.some(e => e.kind === 'chose-companion'));
-  assert.ok(engine.state.privateMessages.rin.length >= 1);
-  const before = engine.state.messages.length;
-  engine.tick(Date.now() + 2500);
-  assert.ok(engine.state.messages.length >= before);
-  await engine.dispatch({ type: 'private-return', id: 'rin' });
-  assert.ok(engine.state.companionEvents.some(e => e.kind === 'private-return'));
-  const count = engine.state.companionEvents.filter(e => e.kind === 'private-return').length;
-  await engine.dispatch({ type: 'private-return', id: 'rin' });
-  // second return without reopen still ok (idempotent wrap allowed for tryplay)
-  assert.ok(engine.state.companionEvents.filter(e => e.kind === 'private-return').length >= count);
+test('privateReturnLine uses prior private-return for revisit, not chose-companion', () => {
+  const first = privateReturnLine('rin', ['xia'], [], 'warm');
+  assert.ok(!/又回来|第二次|又溜回来/.test(first));
+  const revisit = privateReturnLine('rin', ['xia'], [{
+    id: 'e1', at: Date.now() - 1000, kind: 'private-return', actors: ['rin'], trigger: 't', result: 'wrap', recall: 'x',
+  }], 'warm');
+  assert.ok(/又回来|第二次|又溜回来/.test(revisit));
 });
 
-test('companion-story seat-share bumps pair bond only for shared event', async () => {
+test('private-open queues chose-her; reward commits after settle; return is visit-idempotent', async () => {
+  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  const now = Date.now();
+  await engine.dispatch({ type: 'private-open', id: 'rin' });
+  assert.equal(engine.state.companionEvents.some(e => e.kind === 'chose-companion'), false, 'must not commit on open alone');
+  settleStory(engine, now, 8_000);
+  assert.ok(engine.state.companionEvents.some(e => e.kind === 'chose-companion'));
+  assert.ok(engine.state.privateMessages.rin.length >= 1);
+  await engine.dispatch({ type: 'private-return', id: 'rin' });
+  assert.equal(engine.state.companionEvents.filter(e => e.kind === 'private-return').length, 1);
+  await engine.dispatch({ type: 'private-return', id: 'rin' });
+  assert.equal(engine.state.companionEvents.filter(e => e.kind === 'private-return').length, 1, 'duplicate return must not re-book');
+});
+
+test('companion-story seat-share commits bond+event only after settle; cancel keeps both clean', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
   const key = relationshipKey('rin', 'xia');
   const before = engine.state.bonds[key] ?? 0;
   await engine.dispatch({ type: 'pat', id: 'rin' });
   assert.equal(engine.state.bonds[key] ?? 0, before);
+  const t0 = Date.now();
   await engine.dispatch({ type: 'companion-story', id: 'seat-share' });
+  assert.equal(engine.state.companionEvents.some(e => e.kind === 'seat-share'), false, 'queued ≠ completed');
+  assert.equal(engine.state.bonds[key] ?? 0, before);
+  settleStory(engine, t0, 10_000);
   assert.ok((engine.state.bonds[key] ?? 0) > before);
   assert.ok(engine.state.companionEvents.some(e => e.kind === 'seat-share'));
+
+  const e2 = new GardenEngine(initialState(), () => {}, undefined, 0);
+  const bonds = { ...e2.state.bonds };
+  await e2.dispatch({ type: 'companion-story', id: 'seat-share' });
+  await e2.dispatch({ type: 'stop' });
+  assert.deepEqual(e2.state.bonds, bonds);
+  assert.equal(e2.state.companionEvents.some(e => e.kind === 'seat-share'), false);
 });
 
 test('companion-story star-fox plays with bystander when present', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  const t0 = Date.now();
   await engine.dispatch({ type: 'companion-story', id: 'star-fox' });
-  assert.ok(engine.state.companionEvents.some(e => e.kind === 'star-fox-care'));
-  engine.tick(Date.now() + 1000);
+  engine.tick(t0 + 1000);
   assert.ok(engine.state.bodies.gemini.bubble || engine.state.bodies.glm.bubble);
+  settleStory(engine, t0, 10_000);
+  assert.ok(engine.state.companionEvents.some(e => e.kind === 'star-fox-care'));
 });
 
 test('absent cast skips stories; events restore without keys', async () => {
@@ -83,9 +110,11 @@ test('absent cast skips stories; events restore without keys', async () => {
   assert.ok(!JSON.stringify(restored).includes('sk-'));
 });
 
-test('clear companion events works', async () => {
+test('clear companion events works after real completion', async () => {
   const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  const t0 = Date.now();
   await engine.dispatch({ type: 'companion-story', id: 'seat-share' });
+  settleStory(engine, t0, 10_000);
   assert.ok(engine.state.companionEvents.length);
   await engine.dispatch({ type: 'clear-companion-events' });
   assert.equal(engine.state.companionEvents.length, 0);

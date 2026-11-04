@@ -17,12 +17,12 @@ import { applyFavor, rivalryEscalationBubbles, rivalryEscalationCast, shouldEsca
 import { pickYuriScene, shareSnackBubble, yuriScenes } from '../src/shared/social-yuri';
 import { bondOf, bumpBond, cpPartner } from '../src/shared/bonds';
 import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent, isSpeaking, normalizePresentIds } from '../src/shared/cast';
-import { SceneDirector } from '../src/shared/scene-director';
-import { pushCompanionEvent, clearCompanionEvents } from '../src/shared/events';
+import { SceneDirector, type SceneJob, type ScenePriority, type SceneReward } from '../src/shared/scene-director';
+import { pushCompanionEvent, clearCompanionEvents, type CompanionEventKind } from '../src/shared/events';
 import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
 import { shouldAttemptStoryLlm, storyLlmPrompt } from '../src/shared/story-llm';
 type GenerateResult = { text: string; provider: string; model: string };
-type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act: (intent:AvatarIntent)=>string) => Promise<string | GenerateResult>;
+type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act?: (intent:AvatarIntent)=>string) => Promise<string | GenerateResult>;
 export class GardenEngine {
   state: AppState;
   agent?: AgentRuntime;
@@ -35,8 +35,11 @@ export class GardenEngine {
   private nextSocial = Date.now()+180000;
   private socialIndex = 0;
   private yuriIndex = 0;
-  private scene: {at:number;actor:CharacterId;intent:AvatarIntent;speech?:string}[] = [];
   private director = new SceneDirector();
+  private storyAbort?: AbortController;
+  private storyJobId: string | null = null;
+  /** Active private visit per character — return settles once. */
+  private privateVisits = new Map<CharacterId, { visitId: string; settled: boolean; openedAt: number }>();
   private privateOpened: {id:CharacterId;at:number}|null=null;
   private hovered: Partial<Record<CharacterId,number>>={};
   private lastGreeting=0;
@@ -77,7 +80,10 @@ export class GardenEngine {
   private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string,origin?:Message['origin']){const message={id:crypto.randomUUID(),speaker,text,at:Date.now(),origin};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
   perform(id:CharacterId,value:unknown,source:'local'|'model'='local',now=Date.now(),interaction?:Interaction) {
     if(!ids.includes(id))throw new Error(this.t('sys.unknownCharacter'));
+    if(!isPresent(this.state,id))throw new Error(this.t('cast.needInvite',{name:byId[id].name}));
     const intent=validatedIntent(value);
+    const charTarget=this.characterTargetId(intent.target);
+    if(charTarget&&!isPresent(this.state,charTarget))throw new Error(this.t('cast.needInvite',{name:byId[charTarget].name}));
     if(id==='xia'&&!interaction){const clipId=socialDeepseekClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
     const resident=this.state.room.residents[id];
     const current=residentPosition(resident,now);let point: {x:number;y:number}|undefined;
@@ -87,7 +93,7 @@ export class GardenEngine {
     if(intent.action==='walk'&&!point)point=boundedPoint(intent.x??current.x+(this.lifeIndex%2?10:-10),intent.y??current.y);
     if(!this.state.room.wandering)point=undefined;
     const targetId=ids.find(other=>other===target||byId[other].name.toLowerCase()===target?.toLowerCase());
-    if(targetId&&targetId!==id){const key=relationshipKey(id,targetId);this.state.bonds[key]=Math.min(100,(this.state.bonds[key]??0)+2);if(source==='model')this.scene.push({at:now+3500,actor:targetId,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),targetId).response,duration:7}});}
+    if(targetId&&targetId!==id&&source==='model'){this.queueJob({id:`model-reply-${targetId}-${now}`,source:'model-reply',priority:'reaction',cast:[targetId]},[{at:now+3500,actor:targetId,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),targetId).response,duration:7}}],now);}
     const after=poseForAction(intent.action); const duration=intent.duration!*1000;
     const moving=point&&Math.hypot(point.x-current.x,point.y-current.y)>1;
     const travel=moving?Math.max(800,Math.min(5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85)):0;
@@ -100,19 +106,70 @@ export class GardenEngine {
     this.state.room.log.unshift({id:crypto.randomUUID(),actor:id,text:`${labels[intent.action]}${target?` · ${targetDescription(target,this.state.room.furniture)}`:''}`,at:now,source});this.state.room.log=this.state.room.log.slice(0,35);this.publish();
     return this.t('sys.didAction',{name:byId[id].name,label:labels[intent.action],moving:moving?this.t('sys.movingSuffix'):''});
   }
-  private freezeRoom(now=Date.now()) { this.scene=[];for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish(); }
-  private playSocial(id:string,now=Date.now()) {const story=socialScenes.find(s=>s.id===id);const speak=speakingCast(this.state);if(!story||story.cast.some(actor=>!speak.includes(actor)))return;const loc=localizedScene(this.locale(),id);const steps=story.steps.filter(s=>speak.includes(s.actor)&&(!s.intent.target||speak.includes(s.intent.target as CharacterId)));this.scene=steps.map((step,i)=>{const bubble=loc?.bubbles[story.steps.indexOf(step)]??step.intent.bubble;return{at:now+i*4200,actor:step.actor,intent:{...step.intent,bubble,duration:9},speech:bubble};});this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;}
+  private requirePresent(id: CharacterId, role: 'actor' | 'target' = 'actor') {
+    if (!ids.includes(id) || !isPresent(this.state, id)) {
+      throw new Error(role === 'target' ? this.t('cast.needInvite', { name: byId[id]?.name ?? id }) : this.t('cast.needInvite', { name: byId[id]?.name ?? id }));
+    }
+  }
+  private characterTargetId(target?: string): CharacterId | undefined {
+    if (!target) return undefined;
+    return ids.find(other => other === target || byId[other].name.toLowerCase() === target.toLowerCase());
+  }
+  private cancelScenes(reason: string = 'cancel') {
+    this.storyAbort?.abort();
+    this.storyAbort = undefined;
+    this.storyJobId = null;
+    this.director.clear();
+  }
+  private queueJob(
+    meta: { id: string; source: string; priority: ScenePriority; cast: CharacterId[]; reward?: SceneReward },
+    steps: { at: number; actor: CharacterId; intent: AvatarIntent; speech?: string }[],
+    now = Date.now(),
+  ) {
+    const present = presentCast(this.state);
+    if (meta.cast.some(id => !present.includes(id))) return null;
+    const { outcome, job } = this.director.schedule({ ...meta, steps }, now);
+    if (outcome === 'rejected') return null;
+    return job;
+  }
+  private commitJobReward(job: SceneJob) {
+    if (!this.director.tryCommit(job) || !job.reward) return;
+    const reward = job.reward;
+    if (reward.bondBump) {
+      bumpBond(this.state.bonds, reward.bondBump.a, reward.bondBump.b, reward.bondBump.delta);
+      bumpBond(this.state.bonds, reward.bondBump.b, reward.bondBump.a, Math.max(1, Math.floor(reward.bondBump.delta / 2)));
+    }
+    const kind = reward.kind as CompanionEventKind;
+    this.state.companionEvents = pushCompanionEvent(this.state.companionEvents, {
+      at: Date.now(),
+      kind: ['chose-companion','rival-react','private-return','seat-share','star-fox-care','pair-scene','other'].includes(kind) ? kind : 'other',
+      actors: reward.actors,
+      trigger: reward.trigger,
+      result: reward.result,
+      recall: reward.recall,
+    });
+  }
+  private freezeRoom(now=Date.now()) {
+    this.cancelScenes('freeze');
+    for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
+  }
+  private playSocial(id:string,now=Date.now()) {
+    const story=socialScenes.find(s=>s.id===id);const speak=speakingCast(this.state);
+    if(!story||story.cast.some(actor=>!speak.includes(actor)))return;
+    const loc=localizedScene(this.locale(),id);
+    const steps=story.steps.filter(s=>speak.includes(s.actor)&&(!s.intent.target||speak.includes(s.intent.target as CharacterId))).map((step,i)=>{const bubble=loc?.bubbles[story.steps.indexOf(step)]??step.intent.bubble;return{at:now+i*4200,actor:step.actor,intent:{...step.intent,bubble,duration:9},speech:bubble};});
+    this.queueJob({id:`social-${id}-${now}`,source:`social:${id}`,priority:'idle',cast:[...story.cast]},steps,now);
+    this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;
+  }
   private playYuri(id:string,now=Date.now()) {
     const story = yuriScenes.find(s => s.id === id);
     if (!story || story.pair.some(actor => !speakingCast(this.state).includes(actor))) return;
     const tone = this.state.settings.pairTone ?? 'warm';
-    const steps = story.steps(tone).filter(s => speakingCast(this.state).includes(s.actor) && (!s.intent.target || speakingCast(this.state).includes(s.intent.target as CharacterId)));
-    this.scene = steps.map((step, i) => ({ at: now + i * 4200, actor: step.actor, intent: { ...step.intent, duration: 9 }, speech: step.intent.bubble }));
-    bumpBond(this.state.bonds, story.pair[0], story.pair[1], 3);
-    bumpBond(this.state.bonds, story.pair[1], story.pair[0], 2);
-    this.state.companionEvents = pushCompanionEvent(this.state.companionEvents, {
-      at: now, kind: 'pair-scene', actors: [...story.pair], trigger: 'yuri-scene', result: id, recall: `${story.pair[0]}×${story.pair[1]}`,
-    });
+    const steps = story.steps(tone).filter(s => speakingCast(this.state).includes(s.actor) && (!s.intent.target || speakingCast(this.state).includes(s.intent.target as CharacterId))).map((step, i) => ({ at: now + i * 4200, actor: step.actor, intent: { ...step.intent, duration: 9 }, speech: step.intent.bubble }));
+    this.queueJob({
+      id:`yuri-${id}-${now}`,source:`yuri:${id}`,priority:'idle',cast:[...story.pair],
+      reward:{kind:'pair-scene',actors:[...story.pair],trigger:'yuri-scene',result:id,recall:`${story.pair[0]}×${story.pair[1]}`,bondBump:{a:story.pair[0],b:story.pair[1],delta:3}},
+    },steps,now);
     this.nextRoomLife = now + steps.length * 4200 + 60000;
     this.nextSocial = now + steps.length * 4200 + 180000;
   }
@@ -122,18 +179,20 @@ export class GardenEngine {
     const cast = rivalryEscalationCast(this.state, favored);
     if (!cast.length) return;
     const bubbles = rivalryEscalationBubbles(this.state.settings.pairTone ?? 'warm', favored, cast);
-    const queue = bubbles.map((line, i) => ({
+    const steps = bubbles.map((line, i) => ({
       at: now + 900 + i * 1400,
       actor: line.actor,
       intent: { action: i === 0 ? 'approach' : 'shy', target: i === 0 ? favored : undefined, emotion: 'shy' as const, bubble: line.bubble, duration: 8 },
       speech: line.bubble,
     }));
-    this.scene = [...queue, ...this.scene];
-    this.add('system', this.t('sys.favorRivalry', { name: byId[favored].name, n: this.state.favor.streak }), 'notice');
+    const job = this.queueJob({id:`rivalry-${favored}-${now}`,source:'rivalry',priority:'reaction',cast:[favored,...cast]},steps,now);
+    if (job) this.add('system', this.t('sys.favorRivalry', { name: byId[favored].name, n: this.state.favor.streak }), 'notice');
   }
+
   stop() {
-    // Stops chat/demo turns only. Long agent jobs keep their own controllers.
+    // Stops chat/demo turns and cancels staged scenes / story aside.
     this.epoch++; this.abort?.abort(); this.abort = undefined; this.state.busy = false;
+    this.cancelScenes('stop');
     for (const id of ids) this.state.mood[id] = this.state.focus ? 'focus' : 'idle';
     this.state.activity = this.state.focus ? this.t('sys.activityFocus') : this.t('sys.activityYard'); this.publish();
   }
@@ -193,7 +252,7 @@ export class GardenEngine {
       case 'cg-dismiss': if(this.state.cgSession?.id===action.sessionId)this.state.cgSession=undefined; break;
       case 'send': {
         if (typeof action.text !== 'string' || !action.text.trim()) return;
-        const text = action.text.trim().slice(0, 4000); this.scene=[];this.stop(); this.add('user', text);
+        const text = action.text.trim().slice(0, 4000); this.stop(); this.add('user', text);
         const selected = chooseSpeakers(this.state, text, action.target);
         if (!selected.length) { this.add('system', this.t('sys.muted')); return; }
         if(/(挥手|跳一|跳舞|走一|走走|看书|读书|害羞|坐下|浇水|wave|jump|walk|read|shy|sit|water|手を振|ジャンプ|歩く|読む)/i.test(text)&&this.state.settings.mode==='demo') {const matched=/(挥手|wave|手を振)/i.test(text)?'wave':/(跳|jump|ジャンプ)/i.test(text)?'jump':/(走|walk|歩く)/i.test(text)?'walk':/(书|read|読む)/i.test(text)?'read':/(害羞|shy)/i.test(text)?'shy':/(浇水|water)/i.test(text)?'water':'sit';this.perform(selected[0],{action:matched,bubble:this.t('sys.demoAckBubble')});this.add(selected[0],this.t('sys.demoAck'));return;}
@@ -209,7 +268,7 @@ export class GardenEngine {
       case 'trip': {if(!ids.includes(action.id))return;this.perform(action.id,{action:'sad',emotion:'sad',bubble:tripLine(this.locale()),duration:9},'local',Date.now(),{kind:'trip',startedAt:Date.now()});return;}
       case 'pat': {if(!ids.includes(action.id)||!isPresent(this.state,action.id))return;this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);applyFavor(this.state,action.id,0);this.perform(action.id,{action:'shy',emotion:'happy',bubble:patLine(this.locale(),action.id),duration:7},'local',Date.now(),{kind:'pat',startedAt:Date.now()});this.queueRivalryEscalation(action.id);return;}
       case 'feed': {
-        if(!ids.includes(action.id)||!['rice','cake','fish','tea'].includes(action.food))return;
+        if(!ids.includes(action.id)||!isPresent(this.state,action.id)||!['rice','cake','fish','tea'].includes(action.food))return;
         const name=this.t('food.'+action.food);
         const favorite=action.id==='xia'&&action.food==='rice'||action.id==='gemini'&&action.food==='fish'||action.id==='rin'&&action.food==='tea'||action.id==='kimi'&&action.food==='cake';
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+(favorite?4:2));
@@ -219,7 +278,7 @@ export class GardenEngine {
         const partner=cpPartner(action.id);
         if(isSpeaking(this.state,partner)&&bondOf(this.state.bonds,action.id,partner)>=40){
           const share=shareSnackBubble(this.state.settings.pairTone??'warm',action.id,partner,name);
-          this.scene.push({at:now+2800,actor:action.id,intent:{action:'approach',target:partner,emotion:'happy',bubble:share,duration:7},speech:share});
+          this.queueJob({id:`feed-share-${action.id}-${now}`,source:'feed-share',priority:'reaction',cast:[action.id,partner]},[{at:now+2800,actor:action.id,intent:{action:'approach',target:partner,emotion:'happy',bubble:share,duration:7},speech:share}],now);
         }
         this.queueRivalryEscalation(action.id,now);
         return;
@@ -235,7 +294,10 @@ export class GardenEngine {
           this.publish();return;
         }
         this.state.selected=action.id;const now=Date.now();
-        if(this.privateOpened?.id===action.id&&now-this.privateOpened.at<20000){this.publish();return;}
+        const existing=this.privateVisits.get(action.id);
+        if(existing&&!existing.settled&&now-existing.openedAt<20000){this.publish();return;}
+        const visitId=crypto.randomUUID();
+        this.privateVisits.set(action.id,{visitId,settled:false,openedAt:now});
         this.privateOpened={id:action.id,at:now};
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
         const address=this.state.relationship.address||(this.locale()==='en'?'you':this.locale()==='ja'?'あなた':'你');
@@ -245,9 +307,11 @@ export class GardenEngine {
         this.addPrivate(action.id,action.id,greeting);
         const plan=planChoseHer(this.state,action.id,now);
         if(plan){
-          this.scene=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
-          this.director.schedule({id:`chose-${now}`,cast:plan.cast,source:'chose-her',priority:'user',steps:this.scene},now);
-          this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'chose-companion',actors:plan.cast,trigger:'private-open',result:plan.variant,recall:plan.recall});
+          const steps=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
+          this.queueJob({
+            id:`chose-${visitId}`,source:'chose-her',priority:'user',cast:plan.cast,
+            reward:{kind:'chose-companion',actors:plan.cast,trigger:'private-open',result:plan.variant,recall:plan.recall,bondBump:plan.bondBump},
+          },steps,now);
         }
         this.queueRivalryEscalation(action.id,now);
         this.publish();return;
@@ -255,13 +319,18 @@ export class GardenEngine {
       case 'private-return': {
         if(!ids.includes(action.id))return;
         const now=Date.now();
+        const visit=this.privateVisits.get(action.id);
+        // No open visit → ignore duplicate try-play / stray returns (idempotent).
+        if(!visit||visit.settled){this.privateOpened=null;this.publish();return;}
+        visit.settled=true;
+        this.privateVisits.set(action.id,visit);
         const rivals=choseHerRivals(this.state,action.id);
         const line=privateReturnLine(action.id,rivals,this.state.companionEvents,this.state.settings.pairTone??'warm');
         if(isPresent(this.state,action.id)){
           this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
           this.add(action.id,line);
         }
-        this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'private-return',actors:[action.id,...rivals],trigger:'private-return',result:'wrap',recall:line.slice(0,120)});
+        this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'private-return',actors:[action.id,...rivals],trigger:`private-return:${visit.visitId}`,result:'wrap',recall:line.slice(0,120)});
         this.privateOpened=null;
         this.publish();return;
       }
@@ -277,40 +346,57 @@ export class GardenEngine {
         }
         if(!plan||!plan.beats.length){this.add('system',this.t('cast.storySkip'),'notice');this.publish();return;}
         if(!this.director.canSchedule(plan.id,now)){this.add('system',this.t('cast.storyCooldown'),'notice');this.publish();return;}
-        this.scene=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
-        this.director.schedule({id:`${plan.id}-${now}`,cast:plan.cast,source:plan.id,priority:'user',steps:this.scene},now);
-        if(plan.bondBump){
-          bumpBond(this.state.bonds,plan.bondBump.a,plan.bondBump.b,plan.bondBump.delta);
-          bumpBond(this.state.bonds,plan.bondBump.b,plan.bondBump.a,Math.max(1,Math.floor(plan.bondBump.delta/2)));
-        }
+        this.storyAbort?.abort();
+        const jobId=`${plan.id}-${now}-${crypto.randomUUID().slice(0,8)}`;
         const kind=plan.id==='seat-share'?'seat-share':plan.id==='star-fox'?'star-fox-care':'chose-companion';
-        this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind,actors:plan.cast,trigger:'companion-story',result:plan.variant,recall:plan.recall});
-        if(shouldAttemptStoryLlm(this.state)&&this.generate){
-          try{
-            const controller=new AbortController();
-            const timer=setTimeout(()=>controller.abort(),8000);
-            const raw=await this.generate(this.state,plan.cast[0],storyLlmPrompt(plan),controller.signal,()=>{},()=> '');
-            clearTimeout(timer);
-            const result=typeof raw==='string'?{text:raw,provider:this.state.settings.provider,model:this.state.settings.model}:raw;
-            if(result.text.trim())this.add('system',result.text.trim().slice(0,80),'notice',{backend:'model',provider:result.provider,model:result.model});
-          }catch{/* keep offline plan */}
-        }
+        const steps=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
+        const job=this.queueJob({
+          id:jobId,source:plan.id,priority:'user',cast:plan.cast,
+          reward:{kind,actors:plan.cast,trigger:'companion-story',result:plan.variant,recall:plan.recall,bondBump:plan.bondBump},
+        },steps,now);
+        if(!job){this.add('system',this.t('cast.storySkip'),'notice');this.publish();return;}
+        this.storyJobId=jobId;
         this.tick(now);
+        if(shouldAttemptStoryLlm(this.state)&&this.generate){
+          const controller=new AbortController();
+          this.storyAbort=controller;
+          const timer=setTimeout(()=>controller.abort(),8000);
+          try{
+            // No act callback → generateReply/generateStoryAside must omit avatar tools.
+            const raw=await this.generate(this.state,plan.cast[0],storyLlmPrompt(plan),controller.signal,()=>{});
+            clearTimeout(timer);
+            if(controller.signal.aborted||this.storyJobId!==jobId){
+              /* Stop / replace / leave — discard late aside */
+            }else{
+              const result=typeof raw==='string'?{text:raw,provider:this.state.settings.provider,model:this.state.settings.model}:raw;
+              if(result.text.trim())this.add('system',result.text.trim().slice(0,80),'notice',{backend:'model',provider:result.provider,model:result.model});
+            }
+          }catch{/* keep offline plan */}
+          finally{
+            clearTimeout(timer);
+            if(this.storyAbort===controller)this.storyAbort=undefined;
+          }
+        }
         this.publish();return;
       }
       case 'clear-companion-events': this.state.companionEvents=clearCompanionEvents(); break;
       case 'private-send': {
-        if(!ids.includes(action.id)||typeof action.text!=='string'||!action.text.trim())return;this.stop();this.addPrivate(action.id,'user',action.text.trim().slice(0,4000));
+        if(!ids.includes(action.id)||!isPresent(this.state,action.id)||typeof action.text!=='string'||!action.text.trim())return;this.stop();this.addPrivate(action.id,'user',action.text.trim().slice(0,4000));
         await this.sequence([{speaker:action.id,text:demoReply(action.id,action.text,this.state.settings.intimacy,0,this.locale())}],this.state.settings.mode==='api',action.text,action.id);return;
       }
       case 'companion-visit': {
         if(!ids.includes(action.id)||!ids.includes(action.target)||action.id===action.target)throw new Error('Invalid companion');
-        const now=Date.now();this.perform(action.id,{action:'approach',target:action.target,emotion:'happy',bubble:localizedProfile(this.locale(),action.id).response,duration:9},'local',now);
-        this.scene.push({at:now+3500,actor:action.target,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),action.target).response,duration:9}});
+        if(!isPresent(this.state,action.id)||!isPresent(this.state,action.target))throw new Error(this.t('cast.needInvite',{name:byId[!isPresent(this.state,action.id)?action.id:action.target].name}));
+        const now=Date.now();
+        this.perform(action.id,{action:'approach',target:action.target,emotion:'happy',bubble:localizedProfile(this.locale(),action.id).response,duration:9},'local',now);
+        this.queueJob({id:`visit-${action.id}-${action.target}-${now}`,source:'companion-visit',priority:'reaction',cast:[action.id,action.target]},[
+          {at:now+3500,actor:action.target,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),action.target).response,duration:9}},
+        ],now);
         this.add(action.id,localizedProfile(this.locale(),action.id).response);return;
       }
       case 'play-clip': {
         if(action.id!=='xia')throw new Error('This video pack belongs to DeepSeek.');
+        if(!isPresent(this.state,'xia'))throw new Error(this.t('cast.needInvite',{name:byId.xia.name}));
         const pool=deepseekClips.filter(c=>(!action.group||c.group===action.group)&&c.id!==this.lastDeepseekClip);
         const clip=action.clipId?clipById(action.clipId):pool[Math.floor(Math.random()*pool.length)];
         if(!clip)throw new Error('Unknown animation clip');
@@ -340,14 +426,16 @@ export class GardenEngine {
         const cast=speakingCast(this.state);
         const a=cast.includes('xia')?'xia':cast[0],b=cast.includes('glm')?'glm':cast[1]??a,c=cast.includes('kimi')?'kimi':cast[2]??a;if(!a)return;
         const show=showcaseCopy(this.locale());
-        if(action.scene==='welcome')this.scene=cast.map((actor,i)=>{const line=show.report(byId[actor].name);return{at:now+i*750,actor,intent:{action:'wave',emotion:'happy',bubble:line},speech:line};});
-        if(action.scene==='tea'){const lines=show.tea();this.scene=[{at:now,actor:a,intent:{action:'eat',target:this.state.room.furniture.find(f=>f.kind==='table')?.id,emotion:'happy',bubble:lines[0]},speech:lines[0]},{at:now+2500,actor:b,intent:{action:'approach',target:a,bubble:lines[1]},speech:lines[1]},{at:now+5500,actor:c,intent:{action:'read',target:this.state.room.furniture.find(f=>f.kind==='bookshelf')?.id,bubble:lines[2]},speech:lines[2]},{at:now+10500,actor:a,intent:{action:'jump',emotion:'happy',bubble:lines[3]},speech:lines[3]}];}
-        if(action.scene==='rivalry'){const bubbles=show.rivalry();const speech=show.rivalrySpeech();this.scene=[{at:now,actor:a,intent:{action:'jump',emotion:'happy',bubble:bubbles[0]},speech:speech[0]},{at:now+2200,actor:b,intent:{action:'approach',target:a,emotion:'curious',bubble:bubbles[1]},speech:speech[1]},{at:now+5000,actor:a,intent:{action:'shy',emotion:'shy',bubble:bubbles[2]},speech:speech[2]},{at:now+8000,actor:c,intent:{action:'wave',emotion:'happy',bubble:bubbles[3]},speech:speech[3]}];}
+        let steps:{at:number;actor:CharacterId;intent:AvatarIntent;speech?:string}[]=[];
+        if(action.scene==='welcome')steps=cast.map((actor,i)=>{const line=show.report(byId[actor].name);return{at:now+i*750,actor,intent:{action:'wave' as const,emotion:'happy' as const,bubble:line},speech:line};});
+        if(action.scene==='tea'){const lines=show.tea();steps=[{at:now,actor:a,intent:{action:'eat',target:this.state.room.furniture.find(f=>f.kind==='table')?.id,emotion:'happy',bubble:lines[0]},speech:lines[0]},{at:now+2500,actor:b,intent:{action:'approach',target:a,bubble:lines[1]},speech:lines[1]},{at:now+5500,actor:c,intent:{action:'read',target:this.state.room.furniture.find(f=>f.kind==='bookshelf')?.id,bubble:lines[2]},speech:lines[2]},{at:now+10500,actor:a,intent:{action:'jump',emotion:'happy',bubble:lines[3]},speech:lines[3]}];}
+        if(action.scene==='rivalry'){const bubbles=show.rivalry();const speech=show.rivalrySpeech();steps=[{at:now,actor:a,intent:{action:'jump',emotion:'happy',bubble:bubbles[0]},speech:speech[0]},{at:now+2200,actor:b,intent:{action:'approach',target:a,emotion:'curious',bubble:bubbles[1]},speech:speech[1]},{at:now+5000,actor:a,intent:{action:'shy',emotion:'shy',bubble:bubbles[2]},speech:speech[2]},{at:now+8000,actor:c,intent:{action:'wave',emotion:'happy',bubble:bubbles[3]},speech:speech[3]}];}
+        if(steps.length)this.queueJob({id:`showcase-${action.scene}-${now}`,source:`showcase:${action.scene}`,priority:'user',cast:[...new Set(steps.map(s=>s.actor))]},steps,now);
         this.tick(now);return;
       }
       case 'skin': if (ids.includes(action.id) && (action.skin === 'chibi' || action.skin === 'animated')) this.state.skins[action.id] = byId[action.id].atlas===false?'chibi':action.skin; break;
       case 'praise': {
-        if (!ids.includes(action.id)) return;
+        if (!ids.includes(action.id)||!isPresent(this.state,action.id)) return;
         this.stop(); this.state.selected = action.id; this.state.affection[action.id] = Math.min(100, this.state.affection[action.id] + 3);
         applyFavor(this.state, action.id, 0);
         this.add('user', praiseUserLine(this.locale(), byId[action.id].name));
@@ -373,10 +461,7 @@ export class GardenEngine {
           this.state.settings.castPreset = action.preset;
           this.state.presentIds = presentForPreset(action.preset);
           this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
-          this.scene = this.scene.filter(item =>
-            this.state.presentIds.includes(item.actor) &&
-            (!item.intent.target || this.state.presentIds.includes(item.intent.target as CharacterId) || !ids.includes(item.intent.target as CharacterId))
-          );
+          this.director.dropMissing(this.state.presentIds);
         }
         break;
       }
@@ -389,7 +474,7 @@ export class GardenEngine {
         else {
           next.delete(action.id);
           this.state.muted = this.state.muted.filter(id => id !== action.id);
-          this.scene = this.scene.filter(item => item.actor !== action.id && item.intent.target !== action.id);
+          this.director.dropMissing([...presentCast(this.state)].filter(id => id !== action.id));
           if (this.state.bodies[action.id]) this.state.bodies[action.id] = restingBody();
           delete this.state.desktopMoves[action.id];
         }
@@ -505,31 +590,39 @@ export class GardenEngine {
     if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
     let changed=false;
     if(this.state.cgSession&&(now>=this.state.cgSession.expiresAt||this.state.settings.dnd||this.state.focus||!isPresent(this.state,'rin')||!isPresent(this.state,'xia')||(this.state.cgSession.host==='desktop'&&!this.state.settings.petsVisible))){this.state.cgSession=undefined;changed=true;}
-    const due=this.scene.filter(item=>item.at<=now);this.scene=this.scene.filter(item=>item.at>now);
-    for(const item of due){if(!isSpeaking(this.state,item.actor)||(item.intent.target&&ids.includes(item.intent.target as CharacterId)&&!isSpeaking(this.state,item.intent.target as CharacterId)))continue;try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}}
+    this.director.dropMissing(presentCast(this.state));
+    const {steps:due,completed}=this.director.due(now);
+    for(const item of due){
+      if(!isPresent(this.state,item.actor))continue;
+      const tgt=item.intent.target&&ids.includes(item.intent.target as CharacterId)?item.intent.target as CharacterId:undefined;
+      if(tgt&&!isPresent(this.state,tgt))continue;
+      if(!isSpeaking(this.state,item.actor)||(tgt&&!isSpeaking(this.state,tgt)))continue;
+      try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}
+    }
+    if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;changed=true;}
     for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}
     if(changed)this.publish();
     if(now>=this.nextDeepseek){
       this.nextDeepseek=now+120000;
-      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&isSpeaking(this.state,'xia')&&!this.state.bodies.xia.until){
+      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.director.hasActiveJob()&&isSpeaking(this.state,'xia')&&!this.state.bodies.xia.until){
         const pool=['东张西望','超大伸懒腰','悠闲哼歌','原地专心玩魔方'].map(clipByTitle).filter(c=>c&&c.id!==this.lastDeepseekClip);
         const clip=pool[this.lifeIndex++%pool.length];if(clip){this.lastDeepseekClip=clip.id;this.perform('xia',{action:'think',duration:15},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});this.state.bodies.xia.until=now+clip.seconds*1000+500;this.publish();}
       }
     }
     if(now>=this.nextBookmark){
       this.nextBookmark=now+95000;
-      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.scene.length&&isSpeaking(this.state,'rin')&&!this.state.bodies.rin.until&&!this.state.desktopMoves.rin&&!this.state.room.residents.rin.arrivesAt){
+      if(this.state.settings.autonomous&&this.state.room.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&!this.director.hasActiveJob()&&isSpeaking(this.state,'rin')&&!this.state.bodies.rin.until&&!this.state.desktopMoves.rin&&!this.state.room.residents.rin.arrivesAt){
         this.perform('rin',{action:'think',emotion:'neutral',duration:6},'local',now,{kind:'bookmark',startedAt:now});
         this.state.bodies.rin.label=this.t('sys.bookmarkLabel');this.publish();
       }
     }
-    if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&!this.scene.length&&now>=this.nextSocial){
+    if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&!this.director.hasActiveJob()&&now>=this.nextSocial){
       const yuri = pickYuriScene(this.state.bonds, ids.filter(id => !isSpeaking(this.state, id)), this.yuriIndex++);
       if (yuri && this.yuriIndex % 2 === 0) this.playYuri(yuri.id, now);
       else this.playSocial(socialScenes[this.socialIndex++%socialScenes.length].id,now);
     }
-    if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&this.state.room.wandering&&!this.scene.length&&now>=this.nextRoomLife){
+    if(this.state.settings.autonomous&&!this.state.settings.dnd&&!this.state.focus&&!this.state.busy&&this.state.room.autonomous&&this.state.room.wandering&&!this.director.hasActiveJob()&&now>=this.nextRoomLife){
       this.nextRoomLife=now+60000;
       const active=speakingCast(this.state);
       const id=active[this.lifeIndex++%Math.max(1,active.length)];
