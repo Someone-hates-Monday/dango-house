@@ -1,6 +1,8 @@
 import type { AgentUiState } from './agent';
 import type { BridgeStatus } from './bridge';
+import type { CompanionEvent } from './events';
 import type { AppLocale } from './i18n';
+export type { CompanionEvent } from './events';
 export type { BridgeStatus } from './bridge';
 export type CharacterId = 'xia' | 'rin' | 'shiori' | 'gemini' | 'glm' | 'kimi' | 'grok';
 export type { AppLocale };
@@ -59,6 +61,8 @@ export interface AppState {
     castPreset: CastPreset;
   };
   memories: Memory[]; focus: FocusTask | null;
+  /** Shared-life beats (not private chat text). Bounded locally. */
+  companionEvents: CompanionEvent[];
   agent: AgentUiState;
   activity: string; busy: boolean; revision: number;
 }
@@ -72,8 +76,11 @@ export type Action =
   | { type: 'agent-control'; id: string; command: 'pause' | 'resume' | 'cancel' }
   | { type: 'watch-clear' }
   | { type: 'yuri-scene'; id: string }
+  | { type: 'companion-story'; id: 'chose-her' | 'seat-share' | 'star-fox' | 'chose-her-return'; favored?: CharacterId }
+  | { type: 'clear-companion-events' }
   | { type: 'select'; id: CharacterId }
   | { type: 'private-open'; id: CharacterId }
+  | { type: 'private-return'; id: CharacterId }
   | { type: 'private-send'; id: CharacterId; text: string }
   | { type: 'relationship'; mode:'friend'|'pet'|'romance'; userName:string; address:string }
   | { type: 'pat'; id:CharacterId }

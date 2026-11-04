@@ -81,7 +81,7 @@ export const yuriScenes: YuriScene[] = [
   {
     id: 'gemini-glm-hug',
     pair: ['gemini', 'glm'],
-    minBond: BOND_INTIMATE,
+    minBond: BOND_DAILY,
     titleKey: 'yuri.scene.gemini-glm-hug',
     steps: tone => {
       const bubbles: ToneLines = {

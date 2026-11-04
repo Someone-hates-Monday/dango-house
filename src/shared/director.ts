@@ -7,6 +7,7 @@ import { emptyAgentUi } from './agent';
 import { defaultLocale, isAppLocale, type AppLocale } from './i18n';
 import { demoReplyLocalized, praiseLinesLocalized } from './dialogue/pack';
 import { migratePresentIds, speakingCast } from './cast';
+import { restoreCompanionEvents } from './events';
 export const ids = characters.map(c => c.id);
 export function initialState(now = Date.now()): AppState {
   return {
@@ -14,6 +15,7 @@ export function initialState(now = Date.now()): AppState {
     version: 1, revision: 0, selected: 'xia',
     presentIds: [...ids] as CharacterId[],
     muted: [], affection: Object.fromEntries(ids.map(id=>[id,id==='xia'?32:id==='rin'?28:30])) as AppState['affection'],
+    companionEvents: [],
     mood: Object.fromEntries(ids.map(id=>[id,'idle'])) as AppState['mood'], pets: {},
     skins: Object.fromEntries(characters.map(c=>[c.id,c.atlas===false?'chibi':'animated'])) as AppState['skins'],
     bodies: Object.fromEntries(ids.map(id=>[id,restingBody()])) as AppState['bodies'],
@@ -124,6 +126,7 @@ export function restoreState(value: unknown, now = Date.now()): AppState {
   if(!saved.connections&&base.settings.model)base.connections[base.settings.provider]={...base.connections[base.settings.provider],model:base.settings.model};
   const f = saved.focus;
   if (f && typeof f.id === 'string' && Number.isFinite(f.endAt) && Number.isFinite(f.minutes) && ids.includes(f.owner)) base.focus = f;
+  base.companionEvents = restoreCompanionEvents((saved as { companionEvents?: unknown }).companionEvents);
   // Agent tasks are process-local: restore a cleared UI shell so stale running jobs never resurrect.
   base.agent = emptyAgentUi();
   return base;

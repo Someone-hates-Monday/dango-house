@@ -68,6 +68,19 @@ export function SocialBar({ state }: { state: AppState }) {
           {t('social.playYuri')}
         </button>
       </div>
+      <div className="tryplay-strip" data-tryplay="true">
+        <strong>{t('tryplay.title')}</strong>
+        <button type="button" onClick={() => { void window.garden.dispatch({ type: 'select', id: 'rin' }); window.garden.openPrivate('rin'); }}>{t('tryplay.chose')}</button>
+        <button type="button" onClick={() => void window.garden.dispatch({ type: 'companion-story', id: 'seat-share' })}>{t('tryplay.seat')}</button>
+        <button type="button" onClick={() => void window.garden.dispatch({ type: 'companion-story', id: 'star-fox' })}>{t('tryplay.star')}</button>
+        <button type="button" onClick={() => void window.garden.dispatch({ type: 'presentation', patch: { desktopMode: 'dock' } })}>{t('tryplay.rest')}</button>
+        <small>
+          {t('tryplay.memory')}:{' '}
+          {state.companionEvents?.length
+            ? state.companionEvents.at(-1)!.recall
+            : t('tryplay.memoryEmpty')}
+        </small>
+      </div>
     </section>
   );
 }

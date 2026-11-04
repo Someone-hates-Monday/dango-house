@@ -15,8 +15,11 @@ import {
 import { AgentRuntime, defaultBrowseGrants, defaultWatchGrants } from './agent/runtime';
 import { applyFavor, rivalryEscalationBubbles, rivalryEscalationCast, shouldEscalateRivalry } from '../src/shared/favor';
 import { pickYuriScene, shareSnackBubble, yuriScenes } from '../src/shared/social-yuri';
-import { bondOf, cpPartner } from '../src/shared/bonds';
+import { bondOf, bumpBond, cpPartner } from '../src/shared/bonds';
 import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent, isSpeaking, normalizePresentIds } from '../src/shared/cast';
+import { SceneDirector } from '../src/shared/scene-director';
+import { pushCompanionEvent, clearCompanionEvents } from '../src/shared/events';
+import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
 type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act: (intent:AvatarIntent)=>string) => Promise<string>;
 export class GardenEngine {
   state: AppState;
@@ -31,6 +34,7 @@ export class GardenEngine {
   private socialIndex = 0;
   private yuriIndex = 0;
   private scene: {at:number;actor:CharacterId;intent:AvatarIntent;speech?:string}[] = [];
+  private director = new SceneDirector();
   private privateOpened: {id:CharacterId;at:number}|null=null;
   private hovered: Partial<Record<CharacterId,number>>={};
   private lastGreeting=0;
@@ -43,6 +47,7 @@ export class GardenEngine {
     if (!this.state.favor) this.state.favor = { focusId: null, streak: 0 };
     if (!this.state.settings.pairTone) this.state.settings.pairTone = 'warm';
     if (!this.state.characterProviders) this.state.characterProviders = {};
+    if (!Array.isArray(this.state.companionEvents)) this.state.companionEvents = [];
     if (!Array.isArray(this.state.presentIds)) this.state.presentIds = [...ids] as CharacterId[];
     this.state.presentIds = normalizePresentIds(this.state.presentIds);
     this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
@@ -101,6 +106,11 @@ export class GardenEngine {
     const tone = this.state.settings.pairTone ?? 'warm';
     const steps = story.steps(tone).filter(s => speakingCast(this.state).includes(s.actor) && (!s.intent.target || speakingCast(this.state).includes(s.intent.target as CharacterId)));
     this.scene = steps.map((step, i) => ({ at: now + i * 4200, actor: step.actor, intent: { ...step.intent, duration: 9 }, speech: step.intent.bubble }));
+    bumpBond(this.state.bonds, story.pair[0], story.pair[1], 3);
+    bumpBond(this.state.bonds, story.pair[1], story.pair[0], 2);
+    this.state.companionEvents = pushCompanionEvent(this.state.companionEvents, {
+      at: now, kind: 'pair-scene', actors: [...story.pair], trigger: 'yuri-scene', result: id, recall: `${story.pair[0]}×${story.pair[1]}`,
+    });
     this.nextRoomLife = now + steps.length * 4200 + 60000;
     this.nextSocial = now + steps.length * 4200 + 180000;
   }
@@ -200,15 +210,66 @@ export class GardenEngine {
       case 'relationship': {if(!['friend','pet','romance'].includes(action.mode))return;this.state.relationship={mode:action.mode,userName:String(action.userName).slice(0,30),address:String(action.address).slice(0,30)};break;}
       case 'private-open': {
         this.stop();
-        if(!ids.includes(action.id))return;this.state.selected=action.id;const now=Date.now();if(this.privateOpened?.id===action.id&&now-this.privateOpened.at<20000){this.publish();return;}this.privateOpened={id:action.id,at:now};this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
+        if(!ids.includes(action.id))return;
+        if(!isPresent(this.state,action.id)){
+          this.add('system', this.t('cast.needInvite', { name: byId[action.id].name }), 'notice');
+          this.publish();return;
+        }
+        this.state.selected=action.id;const now=Date.now();
+        if(this.privateOpened?.id===action.id&&now-this.privateOpened.at<20000){this.publish();return;}
+        this.privateOpened={id:action.id,at:now};
+        this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
         const address=this.state.relationship.address||(this.locale()==='en'?'you':this.locale()==='ja'?'あなた':'你');
         const greeting=privateGreeting(this.locale(),action.id,address);
         applyFavor(this.state,action.id,0);
-        this.perform(action.id,{action:'celebrate',emotion:'happy',bubble:greeting.slice(0,52),duration:9},'local',now,{kind:'chat',startedAt:now});this.addPrivate(action.id,action.id,greeting);
-        this.scene=speakingCast(this.state).filter(id=>id!==action.id).slice(0,2).map((actor,i)=>({at:now+900+i*1100,actor,intent:{action:i===0?'approach':'shy',target:i===0?action.id:undefined,emotion:'shy',bubble:jealousLine(this.locale(),actor),duration:8}}));
+        this.perform(action.id,{action:'celebrate',emotion:'happy',bubble:greeting.slice(0,52),duration:9},'local',now,{kind:'chat',startedAt:now});
+        this.addPrivate(action.id,action.id,greeting);
+        const plan=planChoseHer(this.state,action.id,now);
+        if(plan){
+          this.scene=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
+          this.director.schedule({id:`chose-${now}`,cast:plan.cast,source:'chose-her',priority:'user',steps:this.scene},now);
+          this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'chose-companion',actors:plan.cast,trigger:'private-open',result:plan.variant,recall:plan.recall});
+        }
         this.queueRivalryEscalation(action.id,now);
         this.publish();return;
       }
+      case 'private-return': {
+        if(!ids.includes(action.id))return;
+        const now=Date.now();
+        const rivals=choseHerRivals(this.state,action.id);
+        const line=privateReturnLine(action.id,rivals,this.state.companionEvents,this.state.settings.pairTone??'warm');
+        if(isPresent(this.state,action.id)){
+          this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
+          this.add(action.id,line);
+        }
+        this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'private-return',actors:[action.id,...rivals],trigger:'private-return',result:'wrap',recall:line.slice(0,120)});
+        this.privateOpened=null;
+        this.publish();return;
+      }
+      case 'companion-story': {
+        const now=Date.now();
+        if(action.id==='chose-her-return'){
+          await this.dispatch({type:'private-return',id:action.favored&&ids.includes(action.favored)?action.favored:this.state.selected});
+          return;
+        }
+        let plan=planStory(this.state,action.id,now);
+        if(action.id==='chose-her'&&action.favored&&ids.includes(action.favored)){
+          const prev=this.state.selected;this.state.selected=action.favored;plan=planChoseHer(this.state,action.favored,now);this.state.selected=prev;
+        }
+        if(!plan||!plan.beats.length){this.add('system',this.t('cast.storySkip'),'notice');this.publish();return;}
+        if(!this.director.canSchedule(plan.id,now)){this.add('system',this.t('cast.storyCooldown'),'notice');this.publish();return;}
+        this.scene=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
+        this.director.schedule({id:`${plan.id}-${now}`,cast:plan.cast,source:plan.id,priority:'user',steps:this.scene},now);
+        if(plan.bondBump){
+          bumpBond(this.state.bonds,plan.bondBump.a,plan.bondBump.b,plan.bondBump.delta);
+          bumpBond(this.state.bonds,plan.bondBump.b,plan.bondBump.a,Math.max(1,Math.floor(plan.bondBump.delta/2)));
+        }
+        const kind=plan.id==='seat-share'?'seat-share':plan.id==='star-fox'?'star-fox-care':'chose-companion';
+        this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind,actors:plan.cast,trigger:'companion-story',result:plan.variant,recall:plan.recall});
+        this.tick(now);
+        this.publish();return;
+      }
+      case 'clear-companion-events': this.state.companionEvents=clearCompanionEvents(); break;
       case 'private-send': {
         if(!ids.includes(action.id)||typeof action.text!=='string'||!action.text.trim())return;this.stop();this.addPrivate(action.id,'user',action.text.trim().slice(0,4000));
         await this.sequence([{speaker:action.id,text:demoReply(action.id,action.text,this.state.settings.intimacy,0,this.locale())}],this.state.settings.mode==='api',action.text,action.id);return;
