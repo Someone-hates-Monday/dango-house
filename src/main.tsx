@@ -1,4 +1,5 @@
 import {PortraitSprite} from './PortraitSprite';
+import {CGMoment} from './CGMoment';
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowUp, MessageCircle, Users, Sprout, Settings2, Minus, X, ChevronDown, ChevronRight, Heart, Moon, Sun, Volume2, VolumeX, Sparkles, Coffee, Clock3, PanelTop, Square, Plug, Check, Trash2, Plus, ArrowLeft, Eye, EyeOff, Leaf, Send, BookOpen, Clapperboard } from 'lucide-react';
@@ -151,14 +152,14 @@ function Pets() {
   useEffect(() => {
     document.documentElement.classList.add('pet-document');
     let interactive = false;
-    const move = (e: PointerEvent) => { const next = !!(e.target as Element)?.closest('.desktop-pet'); if (next !== interactive) { interactive = next; window.garden.hitTest(next); } };
+    const move = (e: PointerEvent) => { const next = !!(e.target as Element)?.closest('.desktop-pet,.cg-moment,.cg-memory-chip'); if (next !== interactive) { interactive = next; window.garden.hitTest(next); } };
     document.addEventListener('pointermove', move);
     const leave = () => { interactive = false; window.garden.hitTest(false); };
     document.addEventListener('pointerleave', leave);
     return () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
   }, []);
   if (!state) return null;
-  return <div className="pet-overlay"><DesktopCast state={state} displayId={displayId} primary={primary}/></div>;
+  return <div className="pet-overlay"><DesktopCast state={state} displayId={displayId} primary={primary}/><CGMoment state={state} host="desktop" primary={primary}/></div>;
 }
 function PrivateWindow(){const {state,error}=useGarden();const id=new URLSearchParams(location.search).get('character') as CharacterId;const locale=state?.settings.locale??'zh-CN';const loading=translate(locale,'private.loading');return state&&byId[id]?<PrivateChat state={state} id={id}/>:<div className="loading">{error||loading}</div>;}
 const view = new URLSearchParams(location.search).get('view');

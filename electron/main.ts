@@ -52,7 +52,7 @@ function secure(win: BrowserWindow) {
 function persist() {
   if (!engine || !database) return;
   // Agent UI is process-local; do not resurrect running jobs from disk.
-  const snapshot = { ...engine.state, busy: false, agent: { tasks: [], activeTaskId: null, watchParty: null, events: [] } };
+    const snapshot = { ...engine.state, cgSession: undefined, busy: false, agent: { tasks: [], activeTaskId: null, watchParty: null, events: [] } };
   database.prepare('INSERT INTO state (id, data) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(JSON.stringify(snapshot));
 }
 function broadcast(state: AppState) {

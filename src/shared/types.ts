@@ -39,6 +39,8 @@ export type CastPreset = 'all' | 'core' | 'custom';
 export interface ConnectionProfile { model: string; endpoint: string; tools: boolean; }
 export interface FavorState { focusId: CharacterId | null; streak: number; }
 export interface AppState {
+  /** Manual experimental CG session; process-local, never restored from disk. */
+  cgSession?: { id: string; asset: 'rin-xia-hair-v1'; host: 'room' | 'desktop'; startedAt: number; expiresAt: number };
   version: 1; messages: Message[]; selected: CharacterId;
   /** Who is living on stage today (room / Dock / free pets). Empty = gentle empty house. */
   presentIds: CharacterId[];
@@ -80,6 +82,8 @@ export interface AppState {
   activity: string; busy: boolean; revision: number;
 }
 export type Action =
+  | { type: 'cg-preview'; host: 'room' | 'desktop' }
+  | { type: 'cg-dismiss'; sessionId: string }
   | {type:'play-clip';id:CharacterId;clipId?:string;group?:string}
   | {type:'companion-visit';id:CharacterId;target:CharacterId}
   | {type:'presentation';patch:Partial<AppState['presentation']>}

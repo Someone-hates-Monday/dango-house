@@ -1,0 +1,37 @@
+{
+  "id": "rin-xia-hair-v1",
+  "participants": [
+    "rin",
+    "xia"
+  ],
+  "mode": "manual-trial-only",
+  "approved_for_automatic_playback": false,
+  "art_review": "Suitable for manual trial; subtle camera pullback and limited interaction amplitude remain. Not a completed dedicated embrace animation.",
+  "source_model": "Wan2.2 I2V A14B FP8 high/low noise",
+  "initial_image_source": "built-in imagegen with existing portrait references",
+  "width": 832,
+  "height": 480,
+  "frames": 81,
+  "fps": 16,
+  "seconds": 5.0625,
+  "steps": 24,
+  "cfg": 3.5,
+  "seed": 2026110401,
+  "inference_seconds": 927.66,
+  "references": [
+    "../../portraits/manifest.json",
+    "../NOTICE.md"
+  ],
+  "files": {
+    "clip.webm": {
+      "sha256": "fdba455f3eebe51afb8374afcc9f24db0a00ffe8bdc6311b63bb8df08ff72af9",
+      "bytes": 2014659
+    },
+    "poster.png": {
+      "sha256": "555acde6bdbf5814ec89c35206338ba7c0abbd272dc4c684e1eb7f050a579e29",
+      "bytes": 2805602
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

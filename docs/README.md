@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [Cursor 本轮验收与修正](REVIEW-CURSOR-COMPANIONSHIP.zh-CN.md) · [English](REVIEW-CURSOR-COMPANIONSHIP.en.md) · [修正提示词](CURSOR-REPAIR-PROMPT.md)
+- [关系瞬间 CG 设计](CG-MOMENTS.zh-CN.md) · [English](CG-MOMENTS.en.md)
 - [下一阶段：共同生活与社交闭环](CURSOR-COMPANIONSHIP-NEXT.zh-CN.md) · [English](CURSOR-COMPANIONSHIP-NEXT.en.md) · [给 Cursor 的提示词](CURSOR-NEXT-PROMPT.md)
 - [定位对比与插件验收 / Positioning and bridge verification](PRODUCT-REVIEW.zh-CN.md) · [English](PRODUCT-REVIEW.en.md)
 - [项目介绍 / Project introduction](../README.md)

@@ -183,6 +183,14 @@ export class GardenEngine {
     if (!action || typeof action !== 'object') throw new Error(this.t('sys.badAction'));
     this.lastInteraction = Date.now();
     switch (action.type) {
+      case 'cg-preview': {
+        if (!['room', 'desktop'].includes(action.host) || this.state.settings.dnd || this.state.focus || !isPresent(this.state,'rin') || !isPresent(this.state,'xia')) return;
+        if (action.host === 'desktop' && !this.state.settings.petsVisible) return;
+        const now=Date.now();
+        this.state.cgSession={id:crypto.randomUUID(),asset:'rin-xia-hair-v1',host:action.host,startedAt:now,expiresAt:now+15000};
+        break;
+      }
+      case 'cg-dismiss': if(this.state.cgSession?.id===action.sessionId)this.state.cgSession=undefined; break;
       case 'send': {
         if (typeof action.text !== 'string' || !action.text.trim()) return;
         const text = action.text.trim().slice(0, 4000); this.scene=[];this.stop(); this.add('user', text);
@@ -431,7 +439,7 @@ export class GardenEngine {
       case 'banter':
         if (this.state.focus) { this.add('system', this.t('sys.focusQuiet')); return; }
         this.stop();this.playSocial(socialScenes[this.socialIndex++%socialScenes.length].id);this.tick();return;
-      case 'stop': this.stop();this.freezeRoom(); return;
+      case 'stop': this.state.cgSession=undefined;this.stop();this.freezeRoom(); return;
       case 'watch-start': {
         if (!this.agent) { this.add('system', this.t('sys.watchNotReady'), 'error'); return; }
         if (typeof action.path !== 'string' || !action.path.trim()) { this.add('system', this.t('sys.watchNeedFile'), 'error'); return; }
@@ -496,6 +504,7 @@ export class GardenEngine {
   tick(now = Date.now()) {
     if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
     let changed=false;
+    if(this.state.cgSession&&(now>=this.state.cgSession.expiresAt||this.state.settings.dnd||this.state.focus||!isPresent(this.state,'rin')||!isPresent(this.state,'xia')||(this.state.cgSession.host==='desktop'&&!this.state.settings.petsVisible))){this.state.cgSession=undefined;changed=true;}
     const due=this.scene.filter(item=>item.at<=now);this.scene=this.scene.filter(item=>item.at>now);
     for(const item of due){if(!isSpeaking(this.state,item.actor)||(item.intent.target&&ids.includes(item.intent.target as CharacterId)&&!isSpeaking(this.state,item.intent.target as CharacterId)))continue;try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}}
     for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
