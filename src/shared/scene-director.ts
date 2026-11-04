@@ -27,7 +27,11 @@ export interface SceneJob {
   cancelled: boolean;
   steps: SceneStep[];
   startedAt: number;
-  /** After the last step is dispatched, wait until this time before committing success. */
+  /** True after the last step wave was handed to the engine for dispatch. */
+  awaitingOwned?: boolean;
+  /** Max end time of actions/moves this job actually dispatched (not foreign touches). */
+  ownedUntil?: number;
+  /** Wall time when success may commit; derived from ownedUntil after sealSettle. */
   settleUntil?: number;
   reward?: SceneReward;
   /** True once success was committed for this instance (idempotent). */
@@ -38,7 +42,10 @@ export type ScheduleOutcome = 'accepted' | 'rejected' | 'replaced';
 
 const priorityRank: Record<ScenePriority, number> = { user: 3, reaction: 2, idle: 1 };
 
-/** Default settle after last step fires: cover short bubbles + walk tail. */
+/**
+ * Fallback grace only when a dispatched step reports no until/arrivesAt.
+ * Not used to outrun a longer owned action.
+ */
 export const DEFAULT_SETTLE_MS = 4500;
 
 export class SceneDirector {
@@ -61,6 +68,13 @@ export class SceneDirector {
     return was;
   }
 
+  /** Cancel without success when a necessary cast step cannot run. */
+  failEssential(): void {
+    if (!this.current || this.current.cancelled) return;
+    this.current.cancelled = true;
+    this.current = null;
+  }
+
   /** Cancel current job if any cast member is missing from present. */
   dropMissing(present: CharacterId[]): boolean {
     if (!this.current || this.current.cancelled) return false;
@@ -81,7 +95,7 @@ export class SceneDirector {
    * unless the new job outranks (or equal+user).
    */
   schedule(
-    job: Omit<SceneJob, 'cancelled' | 'startedAt' | 'committed' | 'settleUntil'> & { startedAt?: number },
+    job: Omit<SceneJob, 'cancelled' | 'startedAt' | 'committed' | 'settleUntil' | 'awaitingOwned' | 'ownedUntil'> & { startedAt?: number },
     now = Date.now(),
   ): { outcome: ScheduleOutcome; job: SceneJob | null } {
     if (!job.steps.length) return { outcome: 'rejected', job: this.current };
@@ -100,14 +114,17 @@ export class SceneDirector {
       cancelled: false,
       startedAt: job.startedAt ?? now,
       committed: false,
+      awaitingOwned: false,
+      ownedUntil: undefined,
+      settleUntil: undefined,
     };
     this.cooldowns.set(job.source, now);
     return { outcome: 'accepted', job: this.current };
   }
 
   /**
-   * Pop due steps. When the queue empties after firing steps, enter settle window.
-   * When settle elapses without cancel, return `completed` once for reward commit.
+   * Pop due steps. After the final wave is returned, the engine must call
+   * noteOwnedEnd for each successful dispatch, then sealSettle(now).
    */
   due(now = Date.now()): { steps: SceneStep[]; completed: SceneJob | null } {
     if (!this.current || this.current.cancelled) {
@@ -123,12 +140,39 @@ export class SceneDirector {
       }
       return { steps: [], completed: null };
     }
+    if (job.awaitingOwned) {
+      return { steps: [], completed: null };
+    }
     const ready = job.steps.filter(s => s.at <= now);
     job.steps = job.steps.filter(s => s.at > now);
     if (!job.steps.length && ready.length) {
-      job.settleUntil = now + this.settleMs;
+      job.awaitingOwned = true;
     }
     return { steps: ready, completed: null };
+  }
+
+  /** Record end time of an action this job just dispatched for a cast member. */
+  noteOwnedEnd(until: number): void {
+    if (!this.current || this.current.cancelled || !Number.isFinite(until) || until <= 0) return;
+    this.current.ownedUntil = Math.max(this.current.ownedUntil ?? 0, until);
+  }
+
+  /**
+   * After the engine finishes the due wave: bind settle to owned action ends.
+   * No successful owned end → cancel (no reward). Does not use a fixed window
+   * that outruns a longer body.until / arrivesAt.
+   */
+  sealSettle(now = Date.now()): void {
+    const job = this.current;
+    if (!job || job.cancelled || !job.awaitingOwned || job.settleUntil != null) return;
+    if (job.ownedUntil == null) {
+      job.cancelled = true;
+      this.current = null;
+      return;
+    }
+    // Floor: never settle before "now" if clocks skew; never earlier than owned end.
+    job.settleUntil = Math.max(job.ownedUntil, now);
+    job.awaitingOwned = false;
   }
 
   /** Mark reward committed; returns false if already done or cancelled. */

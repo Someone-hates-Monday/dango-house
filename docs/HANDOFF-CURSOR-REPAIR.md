@@ -68,11 +68,23 @@ Tests used isolated profiles / HTTP fixtures only — **no personal API keys or 
 
 `src/shared/scene-director.ts`, `src/shared/companion-stories.ts`, `electron/engine.ts`, `electron/provider.ts`, `tests/scene-director.test.ts`, `tests/companion-stories.test.ts`, `tests/world.test.ts`, `scripts/review-companion-contract.mjs` (**not weakened**).
 
+## P2 follow-up (Codex re-review)
+
+Source: [REVIEW-CURSOR-REPAIR.zh-CN.md](REVIEW-CURSOR-REPAIR.zh-CN.md) · script `scripts/review-companion-repair.mjs`.
+
+| Issue | Fix |
+| --- | --- |
+| Fixed 4.5s settle while last action still running | `SceneDirector` now `noteOwnedEnd` / `sealSettle` from this job’s `body.until` / `arrivesAt`; no reward until owned end. Essential skip/fail cancels. |
+| `companion-visit` performed before queue admit | Approach + speech are job steps; rejected reaction leaves body/log untouched. |
+| Leave then late `private-return` still remembered | `cancelPrivateVisit` on cast leave; return requires active non-cancelled visit **and** present. |
+
+Verification: repair contracts **3/3**, original contracts **7/7**, `npm test` **86** pass (after this patch).
+
 ## Boundaries / residual
 
-- Settle window is fixed 4500ms — long walks that finish after settle could theoretically commit slightly early relative to body pose; still better than queue-as-done. Optional: settle on max(`until`, travel).
+- Settle binds to owned action/move ends for dispatched steps; foreign touches are not attributed. Clips without `until` still need a reported end or the wave cancels.
 - `generateReply` still ignores ordinary `_input` for chat (messages come from state); only story marker routes aside. Dedicated `generateStoryAside` is the real path.
-- Chose-her reward also waits settle after private-open rivals — UI may show beats before the event row appears.
+- Chose-her reward also waits owned settle after private-open rivals — UI may show beats before the event row appears.
 - No browse / voice / Live2D / seven-Agent framework this round.
 - No new story batch; no auto CG unlock; no push; no Release.
 - Prior HANDOFF-CURSOR-COMPANIONSHIP claims of “B complete” should be read as **superseded** by this repair for lifecycle contracts.

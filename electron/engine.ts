@@ -38,8 +38,8 @@ export class GardenEngine {
   private director = new SceneDirector();
   private storyAbort?: AbortController;
   private storyJobId: string | null = null;
-  /** Active private visit per character — return settles once. */
-  private privateVisits = new Map<CharacterId, { visitId: string; settled: boolean; openedAt: number }>();
+  /** Active private visit per character — return settles once; leave cancels. */
+  private privateVisits = new Map<CharacterId, { visitId: string; settled: boolean; cancelled: boolean; openedAt: number }>();
   private privateOpened: {id:CharacterId;at:number}|null=null;
   private hovered: Partial<Record<CharacterId,number>>={};
   private lastGreeting=0;
@@ -120,6 +120,20 @@ export class GardenEngine {
     this.storyAbort = undefined;
     this.storyJobId = null;
     this.director.clear();
+  }
+  private cancelPrivateVisit(id: CharacterId) {
+    const visit = this.privateVisits.get(id);
+    if (!visit || visit.settled) return;
+    visit.cancelled = true;
+    visit.settled = true;
+    this.privateVisits.set(id, visit);
+    if (this.privateOpened?.id === id) this.privateOpened = null;
+  }
+  private ownedEndFor(id: CharacterId): number {
+    const bodyUntil = this.state.bodies[id]?.until ?? 0;
+    const arrive = this.state.room.residents[id]?.arrivesAt ?? 0;
+    const desk = this.state.desktopMoves[id]?.arrivesAt ?? 0;
+    return Math.max(bodyUntil, arrive, desk);
   }
   private queueJob(
     meta: { id: string; source: string; priority: ScenePriority; cast: CharacterId[]; reward?: SceneReward },
@@ -297,7 +311,7 @@ export class GardenEngine {
         const existing=this.privateVisits.get(action.id);
         if(existing&&!existing.settled&&now-existing.openedAt<20000){this.publish();return;}
         const visitId=crypto.randomUUID();
-        this.privateVisits.set(action.id,{visitId,settled:false,openedAt:now});
+        this.privateVisits.set(action.id,{visitId,settled:false,cancelled:false,openedAt:now});
         this.privateOpened={id:action.id,at:now};
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
         const address=this.state.relationship.address||(this.locale()==='en'?'you':this.locale()==='ja'?'あなた':'你');
@@ -320,16 +334,18 @@ export class GardenEngine {
         if(!ids.includes(action.id))return;
         const now=Date.now();
         const visit=this.privateVisits.get(action.id);
-        // No open visit → ignore duplicate try-play / stray returns (idempotent).
-        if(!visit||visit.settled){this.privateOpened=null;this.publish();return;}
+        // No open visit / already settled / cancelled on leave → ignore (idempotent).
+        if(!visit||visit.settled||visit.cancelled){this.privateOpened=null;this.publish();return;}
+        if(!isPresent(this.state,action.id)){
+          this.cancelPrivateVisit(action.id);
+          this.publish();return;
+        }
         visit.settled=true;
         this.privateVisits.set(action.id,visit);
         const rivals=choseHerRivals(this.state,action.id);
         const line=privateReturnLine(action.id,rivals,this.state.companionEvents,this.state.settings.pairTone??'warm');
-        if(isPresent(this.state,action.id)){
-          this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
-          this.add(action.id,line);
-        }
+        this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
+        this.add(action.id,line);
         this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind:'private-return',actors:[action.id,...rivals],trigger:`private-return:${visit.visitId}`,result:'wrap',recall:line.slice(0,120)});
         this.privateOpened=null;
         this.publish();return;
@@ -388,11 +404,15 @@ export class GardenEngine {
         if(!ids.includes(action.id)||!ids.includes(action.target)||action.id===action.target)throw new Error('Invalid companion');
         if(!isPresent(this.state,action.id)||!isPresent(this.state,action.target))throw new Error(this.t('cast.needInvite',{name:byId[!isPresent(this.state,action.id)?action.id:action.target].name}));
         const now=Date.now();
-        this.perform(action.id,{action:'approach',target:action.target,emotion:'happy',bubble:localizedProfile(this.locale(),action.id).response,duration:9},'local',now);
-        this.queueJob({id:`visit-${action.id}-${action.target}-${now}`,source:'companion-visit',priority:'reaction',cast:[action.id,action.target]},[
-          {at:now+3500,actor:action.target,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),action.target).response,duration:9}},
+        const fromLine=localizedProfile(this.locale(),action.id).response;
+        const toLine=localizedProfile(this.locale(),action.target).response;
+        // Admit to the director first — never perform/speak if reaction loses to a user story.
+        const job=this.queueJob({id:`visit-${action.id}-${action.target}-${now}`,source:'companion-visit',priority:'reaction',cast:[action.id,action.target]},[
+          {at:now,actor:action.id,intent:{action:'approach',target:action.target,emotion:'happy',bubble:fromLine,duration:9},speech:fromLine},
+          {at:now+3500,actor:action.target,intent:{action:'wave',emotion:'happy',bubble:toLine,duration:9},speech:toLine},
         ],now);
-        this.add(action.id,localizedProfile(this.locale(),action.id).response);return;
+        if(job)this.tick(now);
+        return;
       }
       case 'play-clip': {
         if(action.id!=='xia')throw new Error('This video pack belongs to DeepSeek.');
@@ -459,7 +479,9 @@ export class GardenEngine {
           this.state.settings.castPreset = 'custom';
         } else {
           this.state.settings.castPreset = action.preset;
-          this.state.presentIds = presentForPreset(action.preset);
+          const nextIds = presentForPreset(action.preset);
+          for (const id of ids) if (!nextIds.includes(id)) this.cancelPrivateVisit(id);
+          this.state.presentIds = nextIds;
           this.state.muted = this.state.muted.filter(id => this.state.presentIds.includes(id));
           this.director.dropMissing(this.state.presentIds);
         }
@@ -474,6 +496,7 @@ export class GardenEngine {
         else {
           next.delete(action.id);
           this.state.muted = this.state.muted.filter(id => id !== action.id);
+          this.cancelPrivateVisit(action.id);
           this.director.dropMissing([...presentCast(this.state)].filter(id => id !== action.id));
           if (this.state.bodies[action.id]) this.state.bodies[action.id] = restingBody();
           delete this.state.desktopMoves[action.id];
@@ -591,14 +614,19 @@ export class GardenEngine {
     let changed=false;
     if(this.state.cgSession&&(now>=this.state.cgSession.expiresAt||this.state.settings.dnd||this.state.focus||!isPresent(this.state,'rin')||!isPresent(this.state,'xia')||(this.state.cgSession.host==='desktop'&&!this.state.settings.petsVisible))){this.state.cgSession=undefined;changed=true;}
     this.director.dropMissing(presentCast(this.state));
-    const {steps:due,completed}=this.director.due(now);
+    let {steps:due,completed}=this.director.due(now);
     for(const item of due){
-      if(!isPresent(this.state,item.actor))continue;
       const tgt=item.intent.target&&ids.includes(item.intent.target as CharacterId)?item.intent.target as CharacterId:undefined;
-      if(tgt&&!isPresent(this.state,tgt))continue;
-      if(!isSpeaking(this.state,item.actor)||(tgt&&!isSpeaking(this.state,tgt)))continue;
-      try{this.perform(item.actor,item.intent,'local',now);if(item.speech)this.add(item.actor,item.speech);}catch{}
+      const runnable=isPresent(this.state,item.actor)&&(!tgt||isPresent(this.state,tgt))&&isSpeaking(this.state,item.actor)&&(!tgt||isSpeaking(this.state,tgt));
+      if(!runnable){this.director.failEssential();due=[];break;}
+      try{
+        this.perform(item.actor,item.intent,'local',now);
+        if(item.speech)this.add(item.actor,item.speech);
+        this.director.noteOwnedEnd(this.ownedEndFor(item.actor));
+      }catch{this.director.failEssential();due=[];break;}
     }
+    this.director.sealSettle(now);
+    if(!completed){({completed}=this.director.due(now));}
     if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;changed=true;}
     for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}

@@ -5,11 +5,9 @@ import { initialState, restoreState } from '../src/shared/director.ts';
 import { planSeatShare, planStarFox, planChoseHer, privateReturnLine } from '../src/shared/companion-stories.ts';
 import { pushCompanionEvent } from '../src/shared/events.ts';
 import { relationshipKey } from '../src/shared/social.ts';
-import { DEFAULT_SETTLE_MS } from '../src/shared/scene-director.ts';
-
-/** Advance the director through the last beat and settle window. */
+/** Advance through beats and owned action tails until the job can commit. */
 function settleStory(engine: GardenEngine, from = Date.now(), lastOffset = 12_000) {
-  const end = from + lastOffset + DEFAULT_SETTLE_MS + 50;
+  const end = from + lastOffset + 20_000;
   for (let t = from; t <= end; t += 500) engine.tick(t);
 }
 
