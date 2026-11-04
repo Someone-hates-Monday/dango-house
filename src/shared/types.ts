@@ -8,7 +8,20 @@ export type CharacterId = 'xia' | 'rin' | 'shiori' | 'gemini' | 'glm' | 'kimi' |
 export type { AppLocale };
 export type Mood = 'idle' | 'happy' | 'talk' | 'focus';
 export interface Character { id: CharacterId; name: string; subtitle: string; color: string; pale: string; file: string; personality: string; tags: string[]; greeting: string; source: string; atlas?: boolean; }
-export interface Message { id: string; speaker: CharacterId | 'user' | 'system'; text: string; at: number; kind?: 'error' | 'notice'; }
+export interface ReplyOrigin {
+  backend: 'local' | 'model';
+  /** Actual provider used after fallback, not merely preferred. */
+  provider?: string;
+  model?: string;
+}
+export interface Message {
+  id: string;
+  speaker: CharacterId | 'user' | 'system';
+  text: string;
+  at: number;
+  kind?: 'error' | 'notice';
+  origin?: ReplyOrigin;
+}
 export interface Memory { id: string; text: string; at: number; }
 export interface PetState { x: number; y: number; displayId: number; }
 export interface FocusTask { id: string; endAt: number; minutes: number; owner: CharacterId; }

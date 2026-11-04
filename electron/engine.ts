@@ -20,7 +20,9 @@ import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent
 import { SceneDirector } from '../src/shared/scene-director';
 import { pushCompanionEvent, clearCompanionEvents } from '../src/shared/events';
 import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
-type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act: (intent:AvatarIntent)=>string) => Promise<string>;
+import { shouldAttemptStoryLlm, storyLlmPrompt } from '../src/shared/story-llm';
+type GenerateResult = { text: string; provider: string; model: string };
+type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act: (intent:AvatarIntent)=>string) => Promise<string | GenerateResult>;
 export class GardenEngine {
   state: AppState;
   agent?: AgentRuntime;
@@ -68,11 +70,11 @@ export class GardenEngine {
   private locale() { return this.state.settings.locale; }
   private t(key: string, vars?: Record<string, string | number>) { return translate(this.locale(), key, vars); }
   publish() { this.state.revision++; this.notify(this.state); }
-  add(speaker: Message['speaker'], text: string, kind?: Message['kind']) {
-    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind };
+  add(speaker: Message['speaker'], text: string, kind?: Message['kind'], origin?: Message['origin']) {
+    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind, origin };
     this.state.messages.push(message); this.state.messages = this.state.messages.slice(-500); this.publish(); return message;
   }
-  private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string){const message={id:crypto.randomUUID(),speaker,text,at:Date.now()};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
+  private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string,origin?:Message['origin']){const message={id:crypto.randomUUID(),speaker,text,at:Date.now(),origin};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
   perform(id:CharacterId,value:unknown,source:'local'|'model'='local',now=Date.now(),interaction?:Interaction) {
     if(!ids.includes(id))throw new Error(this.t('sys.unknownCharacter'));
     const intent=validatedIntent(value);
@@ -155,15 +157,24 @@ export class GardenEngine {
           try {
             let acted=false;
             const context=channel?{...this.state,messages:this.state.privateMessages[channel]}:this.state;
-            const result = await this.generate(context, line.speaker, input, controller.signal, text => { if (round === this.epoch) { message.text = text; this.publish(); } },intent=>{if(round!==this.epoch||controller.signal.aborted)throw new Error(this.t('sys.roundCancelled'));acted=true;return this.perform(line.speaker,intent,'model');});
-            if (round === this.epoch) { message.text = result; if (!result.trim()) throw new Error(this.t('sys.emptyModel')); }
-            if(round===this.epoch&&!acted)this.perform(line.speaker,inferredIntent(result));
+            const raw = await this.generate(context, line.speaker, input, controller.signal, text => { if (round === this.epoch) { message.text = text; this.publish(); } },intent=>{if(round!==this.epoch||controller.signal.aborted)throw new Error(this.t('sys.roundCancelled'));acted=true;return this.perform(line.speaker,intent,'model');});
+            const result = typeof raw === 'string' ? { text: raw, provider: this.state.settings.provider, model: this.state.settings.model } : raw;
+            if (round === this.epoch) {
+              message.text = result.text;
+              message.origin = { backend: 'model', provider: result.provider, model: result.model };
+              if (!result.text.trim()) throw new Error(this.t('sys.emptyModel'));
+            }
+            if(round===this.epoch&&!acted)this.perform(line.speaker,inferredIntent(result.text));
           } catch (error) {
             if (round !== this.epoch) { if (!message.text) {if(channel)this.state.privateMessages[channel]=this.state.privateMessages[channel].filter(m=>m.id!==message.id);else this.state.messages = this.state.messages.filter(m => m.id !== message.id);} break; }
             if (!message.text){if(channel)this.state.privateMessages[channel]=this.state.privateMessages[channel].filter(m=>m.id!==message.id);else this.state.messages = this.state.messages.filter(m => m.id !== message.id);}
             const errorText=error instanceof Error ? error.message : this.t('sys.connectFail');if(channel)this.addPrivate(channel,'system',errorText);else this.add('system',errorText,'error');break;
           }
-        } else {this.perform(line.speaker,{...inferredIntent(line.text),bubble:line.text.slice(0,45)});if(channel)this.addPrivate(channel,line.speaker,line.text);else this.add(line.speaker, line.text);}
+        } else {
+          this.perform(line.speaker,{...inferredIntent(line.text),bubble:line.text.slice(0,45)});
+          const origin={backend:'local' as const,provider:'demo',model:'offline'};
+          if(channel)this.addPrivate(channel,line.speaker,line.text,origin);else this.add(line.speaker, line.text, undefined, origin);
+        }
         this.state.mood[line.speaker] = this.state.focus ? 'focus' : 'idle';this.state.affection[line.speaker]=Math.min(100,this.state.affection[line.speaker]+1); this.publish();
       }
     } finally { if (round === this.epoch) this.stop(); }
@@ -266,6 +277,16 @@ export class GardenEngine {
         }
         const kind=plan.id==='seat-share'?'seat-share':plan.id==='star-fox'?'star-fox-care':'chose-companion';
         this.state.companionEvents=pushCompanionEvent(this.state.companionEvents,{at:now,kind,actors:plan.cast,trigger:'companion-story',result:plan.variant,recall:plan.recall});
+        if(shouldAttemptStoryLlm(this.state)&&this.generate){
+          try{
+            const controller=new AbortController();
+            const timer=setTimeout(()=>controller.abort(),8000);
+            const raw=await this.generate(this.state,plan.cast[0],storyLlmPrompt(plan),controller.signal,()=>{},()=> '');
+            clearTimeout(timer);
+            const result=typeof raw==='string'?{text:raw,provider:this.state.settings.provider,model:this.state.settings.model}:raw;
+            if(result.text.trim())this.add('system',result.text.trim().slice(0,80),'notice',{backend:'model',provider:result.provider,model:result.model});
+          }catch{/* keep offline plan */}
+        }
         this.tick(now);
         this.publish();return;
       }

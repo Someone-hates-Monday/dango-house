@@ -102,8 +102,9 @@ export async function generateReply(
       content: `${m.speaker === 'user' ? '用户' : byId[m.speaker as CharacterId].name}：${m.text}`,
     }));
   if (messages.at(-1)?.role === 'assistant') messages.push({ role: 'user', content: '请对当前话题作简短回应。' });
-  return requestText(provider, model, key, system, messages, signal, update, {
+  const text = await requestText(provider, model, key, system, messages, signal, update, {
     endpoint: config?.endpoint,
     act: config?.tools === false ? undefined : act,
   });
+  return { text, provider, model };
 }

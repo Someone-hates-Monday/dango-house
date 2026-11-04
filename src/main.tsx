@@ -108,7 +108,15 @@ function ChatMessage({ message, locale, t }: { message: Message; locale: string;
   const user = message.speaker === 'user';
   const character = user ? null : byId[message.speaker as CharacterId];
   const stamp = new Date(message.at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-  return <div className={`chat-message ${user ? 'user' : ''}`}>{!user && <Avatar id={character!.id}/>}<div className="message-body"><div className="message-meta"><strong>{user ? t('chat.me') : character!.name}</strong>{!user && <span className="role-label">{character!.tags[0]}</span>}<time>{stamp}</time></div><div className="bubble">{message.text || <span className="pending">{t('chat.pending')}</span>}</div></div>{user && <span className="user-avatar">{t('chat.me')}</span>}</div>;
+  const originLabel = !user && message.origin
+    ? message.origin.backend === 'local'
+      ? t('chat.originLocal')
+      : t('chat.originModel', {
+          name: message.origin.provider || 'api',
+          model: message.origin.model ? ` · ${message.origin.model}` : '',
+        })
+    : '';
+  return <div className={`chat-message ${user ? 'user' : ''}`}>{!user && <Avatar id={character!.id}/>}<div className="message-body"><div className="message-meta"><strong>{user ? t('chat.me') : character!.name}</strong>{!user && <span className="role-label">{character!.tags[0]}</span>}{originLabel && <span className="origin-label">{originLabel}</span>}<time>{stamp}</time></div><div className="bubble">{message.text || <span className="pending">{t('chat.pending')}</span>}</div></div>{user && <span className="user-avatar">{t('chat.me')}</span>}</div>;
 }
 function CharacterLibrary({ state, onSelect }: { state: AppState; onSelect: (id: CharacterId) => void }) {
   const { t } = useI18n(state);

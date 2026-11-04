@@ -252,6 +252,8 @@ export const ja: MessageCatalog = {
   'tryplay.memory': '最近の共同記憶',
   'tryplay.memoryEmpty': 'まだ共同の出来事がありません。',
   'tryplay.clearMemory': '共同記憶を消す',
+  'chat.originLocal': 'ローカル台本',
+  'chat.originModel': '実バックエンド {name}{model}',
   'settings.overrideTitle': 'キャラ別バックエンド（上級）',
   'settings.overrideHint': '既定は小屋の脳に従います。2本目のキーがあるときだけ変更。無い場合は脳へフォールバック。',
   'settings.overrideHouse': '小屋の脳に従う',

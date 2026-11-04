@@ -63,6 +63,14 @@ try {
   await main.screenshot({ path: path.join(out, 'rivalry-room.png'), scale: 'css' });
   await overlay.screenshot({ path: path.join(out, 'rivalry-dock.png'), omitBackground: true, scale: 'css' });
   report.checks.push('three pats produce real rival speech and avatar bubbles in room and Dock');
+  await main.getByRole('button', { name: /互动小屋/ }).click();
+  await main.getByRole('button', { name: '大小姐留座', exact: true }).click();
+  await main.waitForFunction(async () => {
+    const s = await window.garden.getState();
+    return s.companionEvents.some(e => e.kind === 'seat-share') && (s.bodies.rin.bubble || s.bodies.xia.bubble);
+  });
+  await main.screenshot({ path: path.join(out, 'seat-share.png'), scale: 'css' });
+  report.checks.push('try-play seat-share records shared event and shows pair bubbles');
   const playPair = async tone => {
     await dispatch({ type: 'settings', patch: { pairTone: tone } });
     await main.locator('#yuri-scene').selectOption('rin-xia-seat');

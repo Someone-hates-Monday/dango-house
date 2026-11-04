@@ -252,6 +252,8 @@ export const zhCN: MessageCatalog = {
   'tryplay.memory': '最近共同记忆',
   'tryplay.memoryEmpty': '还没有共同记忆——去偏爱或点播小剧场吧。',
   'tryplay.clearMemory': '清除共同记忆',
+  'chat.originLocal': '本地剧本',
+  'chat.originModel': '实际 {name}{model}',
   'settings.overrideTitle': '个别角色后端（高级）',
   'settings.overrideHint': '默认跟随小屋大脑。仅当你有第二把 Key 时才需要改。缺 Key 会回落到小屋大脑。',
   'settings.overrideHouse': '跟随小屋大脑',

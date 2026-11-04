@@ -252,6 +252,8 @@ export const en: MessageCatalog = {
   'tryplay.memory': 'Recent shared memory',
   'tryplay.memoryEmpty': 'No shared beats yet—favor someone or play a scene.',
   'tryplay.clearMemory': 'Clear shared memories',
+  'chat.originLocal': 'Local script',
+  'chat.originModel': 'via {name}{model}',
   'settings.overrideTitle': 'Per-character backend (advanced)',
   'settings.overrideHint': 'Default follows the house brain. Change only when you have a second key. Missing keys fall back to the house brain.',
   'settings.overrideHouse': 'Follow house brain',

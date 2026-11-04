@@ -80,6 +80,11 @@ export function SocialBar({ state }: { state: AppState }) {
             ? state.companionEvents.at(-1)!.recall
             : t('tryplay.memoryEmpty')}
         </small>
+        {!!state.companionEvents?.length && (
+          <button type="button" onClick={() => void window.garden.dispatch({ type: 'clear-companion-events' })}>
+            {t('tryplay.clearMemory')}
+          </button>
+        )}
       </div>
     </section>
   );
