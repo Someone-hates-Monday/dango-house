@@ -1,0 +1,6 @@
+/* Only the currently used Dock toolbar occupies space; awake animations alone
+   must not stack seven toolbars above neighbouring pets. */
+.dock-pet.awake:not(:hover):not(:focus-within):not(:has(details[open])) .pet-tools{opacity:0;pointer-events:none}
+.pet-bubble,.room-speech{z-index:40}
+.companion-panel{overscroll-behavior:contain}
+@media(prefers-reduced-motion:reduce){.pet-bubble,.room-speech{transition:none}}

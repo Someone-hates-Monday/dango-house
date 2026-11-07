@@ -88,6 +88,10 @@ test('companion-story star-fox plays with bystander when present', async () => {
   const t0 = Date.now();
   await engine.dispatch({ type: 'companion-story', id: 'star-fox' });
   engine.tick(t0 + 1000);
+  // Approach travels first — speech is logged immediately; gesture bubble waits until arrive.
+  assert.ok(engine.state.messages.some(m => m.speaker === 'gemini'));
+  const arrive = engine.state.room.residents.gemini.arrivesAt;
+  if (arrive) engine.tick(arrive);
   assert.ok(engine.state.bodies.gemini.bubble || engine.state.bodies.glm.bubble);
   settleStory(engine, t0, 10_000);
   assert.ok(engine.state.companionEvents.some(e => e.kind === 'star-fox-care'));
@@ -116,4 +120,38 @@ test('clear companion events works after real completion', async () => {
   assert.ok(engine.state.companionEvents.length);
   await engine.dispatch({ type: 'clear-companion-events' });
   assert.equal(engine.state.companionEvents.length, 0);
+});
+
+test('remove / reinvite / late return never books private-return after leave', async () => {
+  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  await engine.dispatch({ type: 'private-open', id: 'rin' });
+  await engine.dispatch({ type: 'cast-present', id: 'rin', present: false });
+  await engine.dispatch({ type: 'private-return', id: 'rin' });
+  assert.equal(engine.state.companionEvents.some(e => e.kind === 'private-return'), false);
+
+  await engine.dispatch({ type: 'cast-present', id: 'rin', present: true });
+  await engine.dispatch({ type: 'private-return', id: 'rin' });
+  assert.equal(engine.state.companionEvents.some(e => e.kind === 'private-return'), false, 'old visit must stay cancelled after reinvite');
+
+  // grok is outside CORE_CAST — preset swap must cancel her open visit.
+  await engine.dispatch({ type: 'private-open', id: 'grok' });
+  await engine.dispatch({ type: 'cast-preset', preset: 'core' });
+  assert.ok(!engine.state.presentIds.includes('grok'));
+  await engine.dispatch({ type: 'private-return', id: 'grok' });
+  assert.equal(engine.state.companionEvents.filter(e => e.kind === 'private-return').length, 0);
+});
+
+test('stop clears pending arrival so cancelled travel cannot land a stale clip', async () => {
+  const engine = new GardenEngine(initialState(), () => {}, undefined, 0);
+  engine.state.room.wandering = true;
+  const t0 = Date.now();
+  engine.perform('rin', { action: 'approach', target: 'xia', bubble: '迟到气泡', duration: 8 }, 'local', t0, { kind: 'clip', clipId: 'chat', startedAt: t0 });
+  const arrive = engine.state.room.residents.rin.arrivesAt;
+  assert.ok(arrive > t0);
+  assert.equal(engine.state.bodies.rin.interaction, undefined);
+  await engine.dispatch({ type: 'stop' });
+  assert.equal(engine.state.room.residents.rin.arrivesAt, 0);
+  engine.tick(arrive + 50);
+  assert.notEqual(engine.state.bodies.rin.bubble, '迟到气泡');
+  assert.equal(engine.state.bodies.rin.pose, 'idle');
 });

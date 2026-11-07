@@ -1,4 +1,5 @@
 import {CompanionInteractions} from './CompanionInteractions';
+import {useFloatingLayout} from './useFloatingLayout';
 import {CGMoment,CGPreviewButtons} from './CGMoment';
 import { useEffect,useRef,useState } from 'react';
 import { Hand,MessageCircle,Paintbrush,Play,Pause,Plus,Trash2,Sun,Moon,ArrowUp } from 'lucide-react';
@@ -25,6 +26,7 @@ export function FurnitureArt({kind}:{kind:FurnitureKind}){return <svg viewBox="0
   {kind==='cushion'&&<><ellipse cx="75" cy="125" rx="60" ry="12" fill="#c8b7d5" opacity=".2"/><ellipse cx="75" cy="99" rx="57" ry="31" fill="#baa9da"/><ellipse cx="75" cy="94" rx="57" ry="30" fill="#ddd1f0" stroke="#bca9d3" strokeWidth="2"/><path d="M46 93q29 13 58 0" fill="none" stroke="#bba6cc" strokeWidth="2"/><circle cx="75" cy="94" r="4" fill="#c3b1da"/></>}
   </svg>;}
 export function Room({state}:{state:AppState}){
+  useFloatingLayout();
   const {t}=useI18n(state);
   const now=useNow();const area=useRef<HTMLDivElement>(null);const[editing,setEditing]=useState(false);const[picked,setPicked]=useState<string|null>(null);const[selectedKind,setKind]=useState<FurnitureKind>('plant');const[draft,setDraft]=useState<Record<string,{x:number;y:number}>>({});const drag=useRef<string|null>(null);const[command,setCommand]=useState('');
   const size=useElementSize(area);const actorWidth=innerWidth<=1150?80:90;
@@ -52,5 +54,7 @@ export function Room({state}:{state:AppState}){
 
 function RoomActor({id,state,now,x,y,label}:{id:CharacterId;state:AppState;now:number;x:number;y:number;label:string}){
  const c=byId[id],body=state.bodies[id],active=body.until>now;const pose=useActualPose(body.pose,x,y,now);
- return <button className={`room-character ${id===state.selected?'selected':''}`} data-character={id} aria-label={label} style={{left:x,top:y,zIndex:Math.floor(y)+1}} onClick={e=>{e.stopPropagation();send({type:'select',id});}} onDoubleClick={()=>window.garden.openPrivate(id)}><span className="room-char-shadow"/>{active&&body.bubble&&<span className="room-speech">{body.bubble}</span>}<span className={`character-motion motion-${pose}`}><Sprite character={c} skin={state.skins[id]} pose={pose} cue={body.until} activity={body.bubble} interaction={body.interaction} stoppedAt={body.stoppedAt} frozen={state.settings.dnd}/><EmotionFx emotion={active?body.emotion:'neutral'}/></span><span className="room-name">{c.name}{active&&<small>{body.label}</small>}</span></button>;
+ const moving=pose.startsWith('walk')||!!state.room.residents[id].arrivesAt;
+ const interaction=moving&&body.interaction?.kind!=='trip'?undefined:body.interaction;
+ return <button className={`room-character ${id===state.selected?'selected':''}`} data-character={id} aria-label={label} style={{left:x,top:y,zIndex:Math.floor(y)+1}} onClick={e=>{e.stopPropagation();send({type:'select',id});}} onDoubleClick={()=>window.garden.openPrivate(id)}><span className="room-char-shadow"/>{active&&body.bubble&&!moving&&<span className="room-speech">{body.bubble}</span>}<span className={`character-motion motion-${pose}`}><Sprite character={c} skin={state.skins[id]} pose={pose} cue={body.until} activity={moving?'':body.bubble} interaction={interaction} stoppedAt={body.stoppedAt} frozen={state.settings.dnd}/><EmotionFx emotion={active&&!moving?body.emotion:'neutral'}/></span> <span className="room-name">{c.name}{active&&<small>{body.label}</small>}</span></button>;
 }

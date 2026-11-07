@@ -24,7 +24,8 @@ try{
  await main.evaluate(()=>window.garden.dispatch({type:'perform',id:'rin',intent:{action:'read',duration:7}}));await ready(main,selector,'bookmark');observed.push('bookmark');await ready(main,selector,'idle');
  await main.evaluate(()=>window.garden.dispatch({type:'presentation',patch:{desktopMode:'dock',chatForm:'chibi'}}));
  const pet=overlay.locator('.dock-pet[data-character=rin]'),box=await pet.locator('.pet-body').boundingBox();await overlay.mouse.move(box.x+box.width/2,box.y+box.height-12);
- await pet.getByTitle('和Claude私聊',{exact:true}).click();
+ // Transparent pets overlay: #root owns hit-testing; force reaches the real dock control.
+ await pet.getByTitle('和Claude私聊',{exact:true}).click({force:true});
  let privatePage;for(let i=0;i<70&&!privatePage;i++){privatePage=app.windows().find(p=>p.url().includes('view=private')&&p.url().includes('character=rin'));if(!privatePage)await new Promise(r=>setTimeout(r,100));}
  assert.ok(privatePage);await ready(privatePage,'.claude-video-sprite','chat');await privatePage.waitForTimeout(1700);await privatePage.screenshot({path:path.join(out,'private-chat.png'),scale:'css'});observed.push('chat');
  await overlay.waitForSelector('.dock-pet[data-character=rin] .claude-video-sprite[data-clip=chat]');await overlay.screenshot({path:path.join(out,'dock-chat.png'),omitBackground:true,scale:'css'});

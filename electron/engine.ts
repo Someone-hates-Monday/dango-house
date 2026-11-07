@@ -1,5 +1,7 @@
 import {clipById,clipByTitle,socialDeepseekClip} from '../src/shared/deepseek-animation';
 import {deepseekClips} from '../src/shared/deepseek-clips';
+import {socialClaudeClip} from '../src/shared/claude-animation';
+import {claudeClipById,claudeClips} from '../src/shared/claude-clips';
 import type {Interaction} from '../src/shared/motion';
 import { byId, providers } from '../src/shared/characters';
 import { socialScenes, relationshipKey } from '../src/shared/social';
@@ -45,6 +47,8 @@ export class GardenEngine {
   private lastGreeting=0;
   private nextDeepseek=Date.now()+120000;
   private lastDeepseekClip="";
+  private lastClaudeClip="";
+  private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction}>();
   private nextBookmark=Date.now()+95000;
   constructor(state: AppState = initialState(), private notify: (state: AppState) => void = () => {}, private generate?: Generate, private delay = 650) {
     this.state = state;
@@ -84,7 +88,6 @@ export class GardenEngine {
     const intent=validatedIntent(value);
     const charTarget=this.characterTargetId(intent.target);
     if(charTarget&&!isPresent(this.state,charTarget))throw new Error(this.t('cast.needInvite',{name:byId[charTarget].name}));
-    if(id==='xia'&&!interaction){const clipId=socialDeepseekClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
     const resident=this.state.room.residents[id];
     const current=residentPosition(resident,now);let point: {x:number;y:number}|undefined;
     let target=intent.target;
@@ -96,11 +99,18 @@ export class GardenEngine {
     if(targetId&&targetId!==id&&source==='model'){this.queueJob({id:`model-reply-${targetId}-${now}`,source:'model-reply',priority:'reaction',cast:[targetId]},[{at:now+3500,actor:targetId,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),targetId).response,duration:7}}],now);}
     const after=poseForAction(intent.action); const duration=intent.duration!*1000;
     const moving=point&&Math.hypot(point.x-current.x,point.y-current.y)>1;
+    if(!interaction){
+      if(id==='xia'){const clipId=socialDeepseekClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
+      if(id==='rin'){const clipId=socialClaudeClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
+    }
     const travel=moving?Math.max(800,Math.min(5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85)):0;
     if(moving)this.state.room.residents[id]={...point!,from:current,startedAt:now,arrivesAt:now+travel,after,destination:target?targetDescription(target,this.state.room.furniture):this.t('sys.nearby')};
     else if(intent.action!=='approach')this.state.room.residents[id]={...resident,...current,from:current,startedAt:0,arrivesAt:0,after,destination:''};
     const labels:Record<string,string>={wave:this.t('act.wave'),jump:this.t('act.jump'),celebrate:this.t('act.celebrate'),think:this.t('act.think'),read:this.t('act.read'),shy:this.t('act.shy'),sad:this.t('act.sad'),sit:this.t('act.sit'),water:this.t('act.water'),eat:this.t('act.eat'),sleep:this.t('act.sleep'),walk:this.t('act.walk'),approach:this.t('act.approach'),idle:this.t('act.idle')};
-    this.state.bodies[id]={pose:moving?(point!.x>current.x?'walk-right':'walk-left'):after,emotion:intent.emotion??({shy:'shy',sad:'sad',celebrate:'happy',jump:'happy',think:'curious'} as Record<string,Emotion>)[intent.action]??'neutral',until:now+travel+duration,label:labels[intent.action],bubble:intent.bubble??'',interaction};
+    // Travel: walk only; bubble + gesture/clip land on arrival (see tick + pendingArrive).
+    if(moving)this.pendingArrive.set(id,{bubble:intent.bubble??'',interaction});
+    else this.pendingArrive.delete(id);
+    this.state.bodies[id]={pose:moving?(point!.x>current.x?'walk-right':'walk-left'):after,emotion:intent.emotion??({shy:'shy',sad:'sad',celebrate:'happy',jump:'happy',think:'curious'} as Record<string,Emotion>)[intent.action]??'neutral',until:now+travel+duration,label:labels[intent.action],bubble:moving?'':(intent.bubble??''),interaction:moving?undefined:interaction};
     const pet=this.state.pets[id];const other=target?ids.find(other=>other===target||byId[other].name.toLowerCase()===target!.toLowerCase()):undefined;
     if(pet&&moving&&this.state.room.wandering&&this.state.presentation.desktopMode==='free'){const progress=this.state.desktopMoves[id];const t=progress?Math.max(0,Math.min(1,(now-progress.startedAt)/(progress.arrivesAt-progress.startedAt))):1;const from=progress?{x:progress.from.x+(progress.to.x-progress.from.x)*t,y:progress.from.y+(progress.to.y-progress.from.y)*t}:{x:pet.x,y:pet.y};const destination=other?this.state.pets[other]:undefined;let x=from.x+(this.lifeIndex%2?0.07:-0.07),y=from.y;if(destination&&destination.displayId===pet.displayId){x=from.x+Math.max(-.22,Math.min(.22,destination.x+(from.x<destination.x?-.08:.08)-from.x));y=destination.y;}const to={x:Math.max(.02,Math.min(.95,x)),y:Math.max(.05,Math.min(.98,y))};const duration=Math.max(1000,Math.abs(to.x-from.x)*22000);this.state.desktopMoves[id]={from,to,startedAt:now,arrivesAt:now+duration,displayId:pet.displayId};this.state.bodies[id].until=Math.max(this.state.bodies[id].until,now+duration+2000);}
     this.state.room.log.unshift({id:crypto.randomUUID(),actor:id,text:`${labels[intent.action]}${target?` · ${targetDescription(target,this.state.room.furniture)}`:''}`,at:now,source});this.state.room.log=this.state.room.log.slice(0,35);this.publish();
@@ -165,6 +175,7 @@ export class GardenEngine {
   }
   private freezeRoom(now=Date.now()) {
     this.cancelScenes('freeze');
+    this.pendingArrive.clear();
     for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
   }
   private playSocial(id:string,now=Date.now()) {
@@ -415,6 +426,17 @@ export class GardenEngine {
         return;
       }
       case 'play-clip': {
+        if(action.id==='rin'){
+          if(!isPresent(this.state,'rin'))throw new Error(this.t('cast.needInvite',{name:byId.rin.name}));
+          const pool=claudeClips.filter(c=>(!action.group||c.group===action.group)&&c.id!==this.lastClaudeClip&&c.id!=='idle');
+          const clip=action.clipId?claudeClipById(action.clipId):pool[Math.floor(Math.random()*Math.max(pool.length,1))];
+          if(!clip)throw new Error('Unknown Claude animation clip');
+          const now=Math.max(Date.now(),(this.state.bodies.rin.interaction?.startedAt??0)+1);
+          this.lastClaudeClip=clip.id;
+          this.perform('rin',{action:'think',duration:Math.max(6,clip.seconds+1),bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});
+          this.state.bodies.rin.until=now+clip.seconds*1000+500;
+          this.state.bodies.rin.label=clip.title;this.publish();return;
+        }
         if(action.id!=='xia')throw new Error('This video pack belongs to DeepSeek.');
         if(!isPresent(this.state,'xia'))throw new Error(this.t('cast.needInvite',{name:byId.xia.name}));
         const pool=deepseekClips.filter(c=>(!action.group||c.group===action.group)&&c.id!==this.lastDeepseekClip);
@@ -628,7 +650,7 @@ export class GardenEngine {
     this.director.sealSettle(now);
     if(!completed){({completed}=this.director.due(now));}
     if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;changed=true;}
-    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
+    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}
     if(changed)this.publish();
     if(now>=this.nextDeepseek){

@@ -11,12 +11,24 @@ test('dock slots are fixed, evenly spaced and remain within resized displays',()
 test('ordinary running excludes fall, explicit trip holds down then recovers',()=>{
  assert.ok(walkClip.loopEnd<4.45);assert.equal(tripSample(.8).phase,'fall');assert.deepEqual(tripSample(1),tripSample(3.3));assert.equal(tripSample(3.5).phase,'recover');assert.ok(tripSample(4.5).time>tripSample(3.5).time);assert.equal(tripSample(7).phase,'settle');
 });
+test('travel only plays walk; deferred gesture/clip starts after arrival',()=>{
+ const e=new GardenEngine();const t=Date.now();
+ e.perform('rin',{action:'wave',emotion:'happy',target:'xia',bubble:'嗨'},'local',t);
+ const arrive=e.state.room.residents.rin.arrivesAt;assert.ok(arrive>t);
+ assert.ok(e.state.bodies.rin.pose.startsWith('walk'));assert.equal(e.state.bodies.rin.interaction,undefined);assert.equal(e.state.bodies.rin.bubble,'');
+ e.tick(arrive);assert.equal(e.state.bodies.rin.pose,'wave');assert.equal(e.state.bodies.rin.bubble,'嗨');
+ e.perform('xia',{action:'sad',emotion:'sad',bubble:'摔倒了'},'local',arrive+10,{kind:'trip',startedAt:arrive+10});
+ assert.equal(e.state.bodies.xia.interaction?.kind,'trip');assert.equal(e.state.bodies.xia.pose,'sad');
+});
 test('dock preferences persist and preserve free pet positions; touches carry distinct metadata',async()=>{
  const e=new GardenEngine();e.state.pets.rin={x:.3,y:.8,displayId:1};const before=structuredClone(e.state.pets);
  await e.dispatch({type:'presentation',patch:{desktopMode:'dock',chatForm:'chibi'}});assert.deepEqual(e.state.pets,before);
  e.perform('rin',{action:'approach',target:'xia'});assert.equal(e.state.desktopMoves.rin,undefined);
  await e.dispatch({type:'pat',id:'rin'});assert.equal(e.state.bodies.rin.interaction?.kind,'pat');
- await e.dispatch({type:'feed',id:'rin',food:'tea'});assert.equal(e.state.bodies.rin.interaction?.food,'tea');
+ await e.dispatch({type:'feed',id:'rin',food:'tea'});
+ const feedArrive=e.state.room.residents.rin.arrivesAt;
+ if(feedArrive){assert.equal(e.state.bodies.rin.interaction,undefined);e.tick(feedArrive);}
+ assert.equal(e.state.bodies.rin.interaction?.food,'tea');
  const restored=restoreState(e.state);assert.equal(restored.presentation.desktopMode,'dock');assert.equal(restored.presentation.chatForm,'chibi');assert.deepEqual(restored.pets,before);
  await e.dispatch({type:'presentation',patch:{desktopMode:'free'}});assert.deepEqual(e.state.pets,before);
 });

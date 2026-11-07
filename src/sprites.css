@@ -15,6 +15,7 @@
 .pet-body>.sprite{width:140px}
 .sprite.video-sprite{position:relative;display:inline-block;overflow:hidden;vertical-align:bottom}
 .video-sprite video,.video-sprite .video-snapshot{position:absolute;inset:auto;top:0;left:50%;width:auto;height:100%;max-width:none;aspect-ratio:16/9;object-fit:fill;translate:-50% 0}
-.video-sprite[data-clip=walk] video{height:83%;top:8.5%}
+/* DeepSeek walk plate is taller; Claude walk shares idle framing for size unity. */
+.video-sprite:not(.claude-video-sprite)[data-clip=walk] video,.video-sprite:not(.claude-video-sprite)[data-clip=walk] .video-snapshot{height:83%;top:8.5%}
 .sprite.atlas.rig-sprite,.sprite.atlas.video-sprite{overflow:visible!important;contain:layout}
-.claude-video-sprite video,.claude-video-sprite .video-snapshot{top:6.666667%}
+.claude-video-sprite video,.claude-video-sprite .video-snapshot{top:0;transform-origin:50% 85%}

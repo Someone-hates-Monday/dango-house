@@ -3,8 +3,14 @@ import type {Interaction} from './motion';
 import type {Pose} from './types';
 export const clipById=(id:string)=>deepseekClips.find(c=>c.id===id);
 export const clipByTitle=(title:string)=>deepseekClips.find(c=>c.title===title);
+/** While walking/running, only locomotion clips (walk + trip overlay) may play. */
+export function locomotionInteraction(interaction?:Interaction):Interaction|undefined{
+  return interaction?.kind==='trip'?interaction:undefined;
+}
 export function chooseDeepseekClip(pose:Pose,cue:number,interaction?:Interaction){
+  // Walk/trip always beat social gestures — never skate across the room waving or eating.
   if(pose.startsWith('walk'))return 'walk';
+  if(interaction?.kind==='trip')return 'walk';
   if(interaction?.kind==='clip')return clipById(interaction.clipId??'')?.id??'idle';
   const pick=(titles:string[])=>clipByTitle(titles[Math.abs(Math.trunc(cue))%titles.length])?.id??'idle';
   if(interaction?.kind==='pat')return pick(['点击回应-害羞惊讶','点击回应-挠痒咯咯笑']);

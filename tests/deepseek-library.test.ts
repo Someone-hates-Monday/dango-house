@@ -11,7 +11,10 @@ test('every pinned DeepSeek video is indexed and locally available',()=>{
 test('explicit library playback rejects arbitrary paths and other characters',async()=>{
  const e=new GardenEngine();
  await assert.rejects(e.dispatch({type:'play-clip',id:'xia',clipId:'../../credentials'}));
- await assert.rejects(e.dispatch({type:'play-clip',id:'rin',clipId:'idle'}));
+ await assert.rejects(e.dispatch({type:'play-clip',id:'glm',clipId:'idle'}));
+ await assert.rejects(e.dispatch({type:'play-clip',id:'rin',clipId:'not-a-real-clip'}));
+ await e.dispatch({type:'play-clip',id:'rin',clipId:'reassure'});
+ assert.equal(e.state.bodies.rin.interaction?.clipId,'reassure');
  const clip=clipByTitle('拆礼物')!;await e.dispatch({type:'play-clip',id:'xia',clipId:clip.id});
  assert.equal(e.state.bodies.xia.interaction?.clipId,clip.id);
  assert.equal(chooseDeepseekClip('think',e.state.bodies.xia.until,e.state.bodies.xia.interaction),clip.id);
@@ -22,7 +25,9 @@ test('random category selection avoids immediate repeats; social and touch have 
  await e.dispatch({type:'play-clip',id:'xia',group:'food'});assert.notEqual(e.state.bodies.xia.interaction?.clipId,first);
  await e.dispatch({type:'pat',id:'xia'});assert.ok(['shy','pat'].includes(chooseDeepseekClip('wait',e.state.bodies.xia.until,e.state.bodies.xia.interaction)));
  e.perform('xia',{action:'approach',target:'rin',bubble:'一起坐，给你留了座位'});
- assert.equal(e.state.bodies.xia.interaction?.clipId,clipByTitle('女仆屈膝礼仪')!.id);
+ const arrive=e.state.room.residents.xia.arrivesAt;
+ assert.ok(arrive>0);assert.ok(e.state.bodies.xia.pose.startsWith('walk'));assert.equal(e.state.bodies.xia.interaction,undefined);
+ e.tick(arrive);assert.equal((e.state.bodies.xia.interaction as import('../src/shared/motion').Interaction|undefined)?.clipId,clipByTitle('女仆屈膝礼仪')!.id);
 });
 test('autonomous variety respects quiet mode and explicit disable',()=>{
  const e=new GardenEngine();e.state.settings.dnd=true;e.tick(Date.now()+125000);assert.notEqual(e.state.bodies.xia.interaction?.kind,'clip');

@@ -1,4 +1,5 @@
 import {CompanionInteractions} from './CompanionInteractions';
+import {useFloatingLayout} from './useFloatingLayout';
 import {useEffect,useRef,useState,useMemo} from 'react';
 import {MessageCircle,Heart,Hand} from 'lucide-react';
 import type {AppState,Character,CharacterId,RoomPoint} from './shared/types';
@@ -35,8 +36,10 @@ function DesktopPet({character,state,displayId,now,size,position:p,onDrag}:{char
   useEffect(()=>()=>clearTimeout(hover.current),[]);
   const movement=state.desktopMoves[character.id];const body=state.bodies[character.id];const active=body.until>now;
   const resolvedPose=useActualPose(body.pose,p.x*(size.w-160),p.y*(size.h-210),now);const pose=dragging?'wait':resolvedPose;
+  const moving=!!movement||pose.startsWith('walk')||!!state.room.residents[character.id]?.arrivesAt;
+  const interaction=moving&&body.interaction?.kind!=='trip'?undefined:body.interaction;
   const latest=[...state.messages].reverse().find(m=>m.speaker===character.id&&m.text);
-  const bubble=active&&body.bubble?body.bubble:latest&&now-latest.at<7000?latest.text:'';
+  const bubble=!moving&&active&&body.bubble?body.bubble:!moving&&latest&&now-latest.at<7000?latest.text:'';
   return <div className={`desktop-pet ${dragging?'dragging':''}`} data-character={character.id} style={{left:p.x*Math.max(1,size.w-160),top:p.y*Math.max(1,size.h-210)}} onPointerEnter={()=>{clearTimeout(hover.current);hover.current=setTimeout(()=>void window.garden.dispatch({type:'hover',id:character.id}),450);}} onPointerLeave={()=>clearTimeout(hover.current)}>
     {bubble&&!state.settings.dnd&&<div className="pet-bubble">{bubble.slice(0,66)}{bubble.length>66?'…':''}</div>}
     <div className="pet-tools"><CompanionInteractions id={character.id} state={state} compact/><button title={`和${character.name}私聊`} onClick={()=>window.garden.openPrivate(character.id)}><MessageCircle size={14}/></button><button title="摸摸头" onClick={()=>void window.garden.dispatch({type:'pat',id:character.id})}><Hand size={14}/></button><button title="投喂大米饭" onClick={()=>void window.garden.dispatch({type:'feed',id:character.id,food:'rice'})}>🍚</button><button title="打招呼" onClick={()=>void window.garden.dispatch({type:'perform',id:character.id,intent:{action:'wave',emotion:'happy'}})}><Heart size={14}/></button></div>
@@ -50,9 +53,9 @@ function DesktopPet({character,state,displayId,now,size,position:p,onDrag}:{char
       drag.current=null;setDragging(false);e.currentTarget.releasePointerCapture(e.pointerId);
       if(d.moved)void window.garden.dispatch({type:'move',id:character.id,...p,displayId}).finally(()=>onDrag(null));
       else{onDrag(null);if(head)void window.garden.dispatch({type:'pat',id:character.id});else window.garden.openPrivate(character.id);}
-    }} onPointerCancel={()=>{drag.current=null;setDragging(false);onDrag(null);}}><Sprite character={character} skin={state.skins[character.id]} pose={pose} cue={body.until} activity={body.bubble} interaction={body.interaction} stoppedAt={body.stoppedAt} frozen={state.settings.dnd}/><EmotionFx emotion={active?body.emotion:'neutral'}/></div>
+    }} onPointerCancel={()=>{drag.current=null;setDragging(false);onDrag(null);}}><Sprite character={character} skin={state.skins[character.id]} pose={pose} cue={body.until} activity={moving?'':body.bubble} interaction={interaction} stoppedAt={body.stoppedAt} frozen={state.settings.dnd}/><EmotionFx emotion={active&&!moving?body.emotion:'neutral'}/></div>
     <div className="pet-name">{character.name}<span>{active?body.label:'点头摸摸 · 点身体私聊'}</span></div>
   </div>;
 }
 
-export function DesktopCast(props:{state:AppState;displayId:number;primary:boolean}){return props.state.presentation.desktopMode==='dock'?<DockCast {...props}/>:<FreeCast {...props}/>;}
+export function DesktopCast(props:{state:AppState;displayId:number;primary:boolean}){useFloatingLayout();return props.state.presentation.desktopMode==='dock'?<DockCast {...props}/>:<FreeCast {...props}/>;}
