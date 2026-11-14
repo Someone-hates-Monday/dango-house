@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.2 · 2026-11-15 · Natural encounters / 自然相遇
+
+- 恢复 GPT 已接入的主体 S1 待机，撤销误退 Oct29 的整段回滚，保留循环与暂停修复。Restore accepted S1 idle while retaining playback fixes.
+- 移除试玩条、剧情演示按钮与 CG 点播菜单；普通互动和角色关系继续触发演出。Remove tryout/story/CG preview controls; retain interaction-driven scenes.
+- 增加独立存档的本机录制脚本，详见 [录制说明 / Recording](docs/DEMO-RECORDING.md)。Add an isolated local recording harness.
+
 ## 0.4.0-alpha.1 · 2026-11-15 · Relationship scenes / 关系演出
 
 - 接入九段关系与用户向 CG，支持前置对话、单人/双人/多人共用一个头顶播放器和结束/取消回执。Nine relationship/POV clips, dialogue preludes, shared overhead playback and completion/cancellation receipts.

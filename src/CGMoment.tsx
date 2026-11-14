@@ -2,7 +2,7 @@ import {useEffect,useLayoutEffect,useRef,useState,type CSSProperties} from 'reac
 import {createPortal} from 'react-dom';
 import type {AppState,CharacterId} from './shared/types';
 import {fallbackStageAnchor,groupOverheadAnchor} from './shared/cg-anchor';
-import {cgClip,cgClips} from './shared/cg-catalog';
+import {cgClip} from './shared/cg-catalog';
 import {isPresent} from './shared/cast';
 import {byId} from './shared/characters';
 import './cg-moment.css';
@@ -40,16 +40,6 @@ function characterBox(host:'room'|'desktop',id:CharacterId){
 /** Full viewport — CG may leave the dollhouse clip and sit above other UI. */
 function overlayBounds(){
   return{left:8,top:8,width:Math.max(1,innerWidth-16),height:Math.max(1,innerHeight-16)};
-}
-
-function castReady(state:AppState,participants:readonly CharacterId[]){
-  return !state.settings.dnd&&!state.focus&&participants.every(id=>isPresent(state,id));
-}
-
-export function CGPreviewButtons({state}:{state:AppState}){
- const t=text(state);
- const preview=(host:'room'|'desktop',asset:typeof cgClips[number]['id'],button:HTMLButtonElement)=>{button.closest('details')?.removeAttribute('open');void window.garden.dispatch({type:'cg-preview',host,asset});};
- return <details className="cg-preview-buttons" title={t.hint}><summary>✦ {t.label}</summary><div>{cgClips.map(clip=>{const ready=castReady(state,clip.participants);return <span key={clip.id}><button disabled={!ready} onClick={e=>preview('room',clip.id,e.currentTarget)}>{clip.copy[state.settings.locale].menu} · {t.room}</button><button disabled={!ready||!state.settings.petsVisible} onClick={e=>preview('desktop',clip.id,e.currentTarget)}>{t.desktop}</button></span>;})}</div></details>;
 }
 
 export function CGMoment({state,host,primary=true}:{state:AppState;host:'room'|'desktop';primary?:boolean}){

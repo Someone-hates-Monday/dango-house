@@ -16,7 +16,7 @@ try{
   for(let i=0;i<115;i++){await new Promise(r=>setTimeout(r,200));if(v.currentTime<previous-.5)wraps++;previous=v.currentTime;if(e.dataset.clip!=='idle')errors.push({clip:e.dataset.clip,time:previous});ctx.drawImage(v,0,0,80,45);frames.add(c.toDataURL());}
   return{samples:115,wraps,errors,source:v.currentSrc,distinctRenderedFrames:frames.size};
  },selector);
- Object.assign(report,result);assert.ok(result.source.endsWith('/video/gpt/idle-reviewed-oct29-v2.webm'));assert.ok(result.wraps>=2);assert.deepEqual(result.errors,[]);
+ Object.assign(report,result);assert.ok(result.source.endsWith('/video/gpt/idle-subject-s1-restored-v2.webm'));assert.ok(result.wraps>=2);assert.deepEqual(result.errors,[]);
  assert.ok(result.distinctRenderedFrames>5,'standing room idle must visibly change pixels, not merely advance a timer');
  await main.locator(selector+' video.cast-idle-video').evaluate(v=>v.pause());
  await main.waitForFunction(s=>{const v=document.querySelector(s)?.querySelector('video.cast-idle-video');return v&&!v.paused;},selector);

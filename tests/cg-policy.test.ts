@@ -44,8 +44,8 @@ test('turning event clips off cancels pending invitations and active automatic p
   if(active)assert.equal(e.state.cgLastReceipt?.outcome,'cancelled');
  }
 });
-test('GPT idle is the historical reviewed bytes and alternate candidates are not published',()=>{
+test('GPT idle is the accepted S1 bytes and alternate candidates are not published',()=>{
  const p='public/'+idleVideos.gpt.replace(/^\.\//,'');
- assert.equal(crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'),'57fb864e8f6b9ac6ec6ab447da8f6cc992f6c6f94399f6fa282dd05b177bda19');
- assert.deepEqual(fs.readdirSync('public/video/gpt').filter(f=>f.endsWith('.webm')).sort(),['idle-reviewed-oct29-v2.webm','pat-pixverse-p1.webm']);
+ assert.equal(crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'),'98190d86c7307693348f40a5e617e81c982ac1e387d35d4892dfe540005d3604');
+ assert.deepEqual(fs.readdirSync('public/video/gpt').filter(f=>f.endsWith('.webm')).sort(),['idle-subject-s1-restored-v2.webm','pat-pixverse-p1.webm']);
 });

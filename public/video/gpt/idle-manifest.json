@@ -1,14 +1,18 @@
 {
   "productionApproved": true,
-  "status": "restored-historical-reviewed-idle",
+  "status": "restored-accepted-s1-idle",
   "character": "gpt",
   "action": "idle",
-  "asset": "idle-reviewed-oct29-v2.webm",
-  "assetSha256": "57fb864e8f6b9ac6ec6ab447da8f6cc992f6c6f94399f6fa282dd05b177bda19",
-  "date": "2026-11-14",
+  "asset": "idle-subject-s1-restored-v2.webm",
+  "sourceSha256": "2fe3995894b0a81b95ff0edfa34d4fdc569d8d703cc085c806da3604be8f28c2",
   "frames": 225,
   "duration": 9.375,
   "alpha": true,
   "idlePingPong": true,
-  "scope": "Byte-identical to historical Oct29 approved backup. New URL avoids reused candidate/cache URLs. P1 pat unchanged."
+  "subject": "GPT白龙Q版v1",
+  "model": "Seedance 2.0 mini",
+  "scope": "Idle with Jimeng subject GPT白龙Q版v1; user-downloaded source jimeng-2026-11-07-1414. Restored S1 after mistaken Oct29 rollback; playback seam and pause recovery fixes retained.",
+  "previousAsset": "idle-jimeng-v1.webm",
+  "labFolder": "test-results/animation-lab/gpt/jimeng-idle-subject-s1",
+  "date": "2026-11-15"
 }

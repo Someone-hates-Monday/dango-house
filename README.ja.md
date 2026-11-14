@@ -15,7 +15,7 @@ Dock に伏せて寄り添い、マウスが近づくと立ち上がる——な
 <sub>実際のアプリの Dock モード</sub>
 
 [![Windows](https://img.shields.io/badge/Windows-x64-f4a7bc)](https://github.com/Someone-hates-Monday/dango-house/releases)
-[![Source version](https://img.shields.io/badge/source_alpha-0.4.0--alpha.1-bca7e8)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source_alpha-0.4.0--alpha.2-bca7e8)](CHANGELOG.md)
 [![Checks](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml/badge.svg)](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml)
 [![Code license](https://img.shields.io/badge/code-MIT-a4cdb8)](LICENSE)
 [![Asset terms](https://img.shields.io/badge/art-noncommercial-f0cf8d)](THIRD_PARTY_NOTICES.md)
@@ -28,7 +28,7 @@ Dock に伏せて寄り添い、マウスが近づくと立ち上がる——な
 
 団子小屋は Windows 向けの寄り添いアプリです。コミュニティ発の AI 娘たちが同じ小屋で暮らし、おしゃべりしたり、なでなでしてもらったり、少しだけ争寵したりします。
 
-> **ソースは v0.4.0-alpha.1、公開ポータブル Release は v0.3.7 です。** オフラインデモでも遊べます。本番チャットには自分の API が必要です。「接続と設定」で **简体中文 / English / 日本語** を切り替えられます。
+> **ソースは v0.4.0-alpha.2、公開ポータブル Release は v0.3.7 です。** オフラインデモでも遊べます。本番チャットには自分の API が必要です。「接続と設定」で **简体中文 / English / 日本語** を切り替えられます。
 
 一つの API Key で全員のキャラクターを演じられます。DeepSeek の 109 動画、短いペア劇、任意の MCP/REST 接続を統合しました。現在の人数設定は発言を制限しますが、休憩中の姿は非表示になりません。継続的な共有記憶と豊かな交流は[次の段階](docs/CURSOR-COMPANIONSHIP-NEXT.en.md)で実装する予定です。
 

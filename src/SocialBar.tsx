@@ -1,90 +1,27 @@
-import { useMemo, useState } from 'react';
-import { byId, characters } from './shared/characters';
-import { socialProfiles, socialScenes, relationshipKey } from './shared/social';
-import { yuriScenes, yuriScenesForBond } from './shared/social-yuri';
+import { byId } from './shared/characters';
+import { socialProfiles, relationshipKey } from './shared/social';
 import { bondTier } from './shared/bonds';
-import { speakingCast } from './shared/cast';
-import type { AppState, CharacterId } from './shared/types';
+import type { AppState } from './shared/types';
 import { useI18n } from './useI18n';
-import { localizedProfile, localizedScene } from './shared/dialogue/pack';
+import { localizedProfile } from './shared/dialogue/pack';
 
+/** Relationship feedback; stories start through companion interactions and autonomy. */
 export function SocialBar({ state }: { state: AppState }) {
   const { t, locale } = useI18n(state);
-  const [scene, setScene] = useState('bookmark');
-  const [yuriId, setYuriId] = useState(yuriScenes[0]?.id ?? 'rin-xia-seat');
   const targetId = socialProfiles[state.selected].target;
   const profile = localizedProfile(locale, state.selected);
-  const story = localizedScene(locale, scene);
-  const origin = story?.origin ?? socialScenes.find(s => s.id === scene)?.origin ?? '';
   const bond = state.bonds[relationshipKey(state.selected, targetId)] ?? 0;
   const tier = bondTier(bond);
-  const excluded = useMemo(() => {
-    const speak = speakingCast(state);
-    return characters.map(c => c.id as CharacterId).filter(id => !speak.includes(id));
-  }, [state.presentIds, state.muted]);
-  const availableYuri = useMemo(() => yuriScenesForBond(state.bonds, excluded), [state.bonds, excluded]);
-
+  const memory = state.companionEvents?.at(-1);
   return (
     <section className="social-bar">
       <div>
         <strong>
           {byId[state.selected].name} → {byId[targetId].name}{' '}
-          <span>
-            {t('social.bond', { n: bond })} · {t('social.bondTier', { tier: t(`social.tier.${tier}`) })}
-          </span>
+          <span>{t('social.bond', { n: bond })} · {t('social.bondTier', { tier: t('social.tier.' + tier) })}</span>
         </strong>
         <p>{profile.feeling}</p>
-        <small>{profile.origin}</small>
-      </div>
-      <div>
-        <label htmlFor="social-scene">{t('social.daily')}</label>
-        <select id="social-scene" value={scene} onChange={e => setScene(e.target.value)}>
-          {socialScenes.map(s => {
-            const loc = localizedScene(locale, s.id);
-            return (
-              <option value={s.id} key={s.id}>
-                {(loc?.title ?? s.title)} · {s.cast.map(id => byId[id].name).join(' / ')}
-              </option>
-            );
-          })}
-        </select>
-        <button onClick={() => void window.garden.dispatch({ type: 'social-scene', id: scene })}>{t('social.play')}</button>
-        <small>{t('social.syncHint', { origin })}</small>
-      </div>
-      <div>
-        <label htmlFor="yuri-scene">{t('social.yuriDaily')}</label>
-        <select id="yuri-scene" value={yuriId} onChange={e => setYuriId(e.target.value as typeof yuriId)}>
-          {yuriScenes.map(s => (
-            <option value={s.id} key={s.id} disabled={!availableYuri.some(a => a.id === s.id)}>
-              {t(s.titleKey)} · {s.pair.map(id => byId[id].name).join(' / ')}
-              {!availableYuri.some(a => a.id === s.id) ? ` (≥${s.minBond})` : ''}
-            </option>
-          ))}
-        </select>
-        <button
-          disabled={!availableYuri.some(a => a.id === yuriId)}
-          onClick={() => void window.garden.dispatch({ type: 'yuri-scene', id: yuriId })}
-        >
-          {t('social.playYuri')}
-        </button>
-      </div>
-      <div className="tryplay-strip" data-tryplay="true">
-        <strong>{t('tryplay.title')}</strong>
-        <button type="button" onClick={() => { void window.garden.dispatch({ type: 'select', id: 'rin' }); window.garden.openPrivate('rin'); }}>{t('tryplay.chose')}</button>
-        <button type="button" onClick={() => void window.garden.dispatch({ type: 'companion-story', id: 'seat-share' })}>{t('tryplay.seat')}</button>
-        <button type="button" onClick={() => void window.garden.dispatch({ type: 'companion-story', id: 'star-fox' })}>{t('tryplay.star')}</button>
-        <button type="button" onClick={() => void window.garden.dispatch({ type: 'presentation', patch: { desktopMode: 'dock' } })}>{t('tryplay.rest')}</button>
-        <small>
-          {t('tryplay.memory')}:{' '}
-          {state.companionEvents?.length
-            ? state.companionEvents.at(-1)!.recall
-            : t('tryplay.memoryEmpty')}
-        </small>
-        {!!state.companionEvents?.length && (
-          <button type="button" onClick={() => void window.garden.dispatch({ type: 'clear-companion-events' })}>
-            {t('tryplay.clearMemory')}
-          </button>
-        )}
+        {memory && <small>{memory.recall}</small>}
       </div>
     </section>
   );
