@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.3 · 2026-11-15 · Idle identity guard / 待机形象切换防护
+
+- 修正待机遇到残留互动特效时短暂切换备用图的条件；不删帧、不回滚 S1。Keep standing idle active while leftover interaction effects finish; preserve S1.
+- 固定 GPT 备用图版本地址与白龙图集散列，增加运行中媒体/纹理来源标记。Pin reviewed fallback identity and expose local source diagnostics.
+- 新增循环边界与备用动作的打包验收脚本。Add packaged loop-boundary and fallback-action verification.
+- 用户截图中的灰发龙女尚未在当前源码与打包进程中复现；不将防护修复写成已定位该截图的完整根因。The reported grey-haired identity has not been reproduced; these guards are not proof of the screenshot's root cause.
+
 ## 0.4.0-alpha.2 · 2026-11-15 · Natural encounters / 自然相遇
 
 - 恢复 GPT 已接入的主体 S1 待机，撤销误退 Oct29 的整段回滚，保留循环与暂停修复。Restore accepted S1 idle while retaining playback fixes.

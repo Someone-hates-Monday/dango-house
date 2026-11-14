@@ -49,3 +49,6 @@ test('GPT idle is the accepted S1 bytes and alternate candidates are not publish
  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'),'98190d86c7307693348f40a5e617e81c982ac1e387d35d4892dfe540005d3604');
  assert.deepEqual(fs.readdirSync('public/video/gpt').filter(f=>f.endsWith('.webm')).sort(),['idle-subject-s1-restored-v2.webm','pat-pixverse-p1.webm']);
 });
+test('GPT fallback atlas is the reviewed white-dragon identity',()=>{
+ assert.equal(crypto.createHash('sha256').update(fs.readFileSync('public/animated/gpt.webp')).digest('hex'),'6d7cd4d4a33f2babda645dc1cb8b6b719530029b511e126ac6611fa1142a718f');
+});

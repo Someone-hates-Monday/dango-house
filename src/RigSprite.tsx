@@ -2,6 +2,7 @@ import {useEffect,useRef} from 'react';
 import type {Pose} from './shared/types';
 import {animationFrames,type AtlasFrame} from './shared/animation';
 import {profiles,interactionEnvelope,smooth,type Interaction} from './shared/motion';
+import {rigTextureSource} from './shared/rig-assets';
 const textures=new Map<string,Promise<HTMLCanvasElement>>();
 // Preserve the 216×240 foot/pose coordinates while giving transforms paint room.
 const paintPadding=48;
@@ -13,7 +14,7 @@ const generatedRest:Record<string,{bottom:number;bodyHeight:number}>={claude:{bo
 function restTexture(file:string){return new Promise<HTMLCanvasElement>((resolve,reject)=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=216;c.height=240;const m=generatedRest[file],scale=Math.min(192/img.width,108/m.bodyHeight);c.getContext('2d')!.drawImage(img,(216-img.width*scale)/2,220-m.bottom*scale,img.width*scale,img.height*scale);resolve(c);};img.onerror=reject;img.src=`./repaired/dock-${file}-v1.png`;});}
 function texture(file:string,pose:Pose,index:number,staticArt:boolean,override?:AtlasFrame){
   const frames=animationFrames(file,pose);const frame=override??frames[index%frames.length];
-  const src=staticArt?`./community/${file}/idle.webp`:frame.asset?`./${frame.asset}`:`./animated/${file}.webp`;
+  const src=rigTextureSource(file,staticArt,frame.asset);
   const key=`${src}:${staticArt?'all':`${frame.row}:${frame.column}:${!!frame.mirror}`}`;
   if(!textures.has(key))textures.set(key,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>{
     const c=document.createElement('canvas');c.width=216;c.height=240;const ctx=c.getContext('2d')!;
@@ -38,7 +39,7 @@ export function RigSprite({file,pose,cue,interaction,perch=0,staticArt=false}:{f
       const recent=p.interaction&&Date.now()-p.interaction.startedAt<4200;
       const selected=recent&&(p.interaction?.kind==='pat'||p.interaction?.kind==='feed')?'idle':p.pose;
       const requested=`${p.file}:${selected}:${p.staticArt}`;
-      if(requested!==key){key=requested;const requestKey=key;const count=p.staticArt?1:animationFrames(p.file,selected).length;
+      if(requested!==key){key=requested;canvas.dataset.textureSrc=rigTextureSource(p.file,p.staticArt,animationFrames(p.file,selected)[0]?.asset);const requestKey=key;const count=p.staticArt?1:animationFrames(p.file,selected).length;
         Promise.all(Array.from({length:count},(_,i)=>texture(p.file,selected,i,p.staticArt))).then(images=>{if(alive&&key===requestKey){previous=shown;frames=images;changedAt=performance.now();}}).catch(()=>{canvas.dataset.error='texture';});
       }
       if(!frames.length)return;

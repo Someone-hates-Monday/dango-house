@@ -44,7 +44,9 @@ export function ReactionVideoSprite({src,idleSrc,file,pose='idle',cue=0,interact
       if(playing)return;
       // Latch idleReady: loop seams often drop readyState briefly; demoting to atlas flashes the wrong GPT look.
       if(!idleReady&&idle.readyState>=2)idleReady=true;
-      const fresh=event&&age>=0&&age<=4200,idleWanted=(p.pose==='idle'&&!fresh)||(p.cue===completedCue&&(!fresh||event.kind==='pat'));
+      // A leftover interaction envelope is only an overlay, not a reason to replace
+      // a standing idle with the atlas (e.g. feeding ends before its FX envelope).
+      const fresh=event&&age>=0&&age<=4200,idleWanted=p.pose==='idle'||(p.cue===completedCue&&(!fresh||event.kind==='pat'));
       if(idleSrc&&!idleFailed&&idleWanted)show(idleReady?'idle':'loading');
       else show('fallback');
       // A browser/media pause must not leave a standing idle stuck on one decoded frame.
@@ -53,7 +55,7 @@ export function ReactionVideoSprite({src,idleSrc,file,pose='idle',cue=0,interact
     raf=requestAnimationFrame(tick);
     return()=>{alive=false;cancelAnimationFrame(raf);v.removeEventListener('playing',reveal);v.removeEventListener('ended',finish);v.removeEventListener('error',fail);idle.removeEventListener('error',idleFail);idle.removeEventListener('loadeddata',markIdleReady);idle.removeEventListener('canplay',markIdleReady);idle.removeEventListener('playing',markIdleReady);v.pause();idle.pause();latest.current.onPlayingChange?.(false);};
   },[src,idleSrc]);
-  return <span ref={surface} className="reaction-video-sprite" data-clip={idleSrc?'loading':'fallback'} data-motion-phase={idleSrc?'loading':'fallback'}>
+  return <span ref={surface} className="reaction-video-sprite" data-character-file={file} data-idle-src={idleSrc} data-clip={idleSrc?'loading':'fallback'} data-motion-phase={idleSrc?'loading':'fallback'}>
     <span className="reaction-fallback">{children}</span>
     <video ref={video} className="reaction-video" src={src} muted playsInline preload="auto"/>
     <video ref={idleVideo} className="cast-idle-video" src={idleSrc} muted playsInline preload="auto" loop/>
