@@ -7,6 +7,9 @@ export function ReactionVideoSprite({src,idleSrc,file,pose='idle',cue=0,interact
   const video=useRef<HTMLVideoElement>(null),idleVideo=useRef<HTMLVideoElement>(null),surface=useRef<HTMLSpanElement>(null);
   const latest=useRef({interaction,stoppedAt,onPlayingChange,pose,cue,frozen});latest.current={interaction,stoppedAt,onPlayingChange,pose,cue,frozen};
   const [active,setActive]=useState<Interaction>();
+  // GPT has an approved idle and pat video. Do not mount or reveal unrelated
+  // atlas art for unsupported cues, loading, loop seams or media failures.
+  const videoOnly=file==='gpt'&&!!idleSrc;
   useEffect(()=>{
     const v=video.current!,idle=idleVideo.current!,el=surface.current!;
     let seen=0,lastStop=stoppedAt,lastCue=cue,pending:Interaction|undefined,playing=false,alive=true,raf=0,paused=frozen,lastFrozen=frozen;
@@ -23,8 +26,8 @@ export function ReactionVideoSprite({src,idleSrc,file,pose='idle',cue=0,interact
       playing=true;paused=false;latest.current.onPlayingChange?.(true);el.dataset.motionPhase='loading';
       setActive({...event,startedAt:Date.now()});v.currentTime=0;void v.play().catch(fail);
     };
-    const fail=()=>{if(!alive)return;reactionFailed=true;playing=false;pending=undefined;latest.current.onPlayingChange?.(false);setActive(undefined);el.dataset.error='reaction-playback';show('fallback');};
-    const idleFail=()=>{idleFailed=true;idleReady=false;el.dataset.error='idle-playback';if(mode==='idle'||mode==='loading')show('fallback');};
+    const fail=()=>{if(!alive)return;reactionFailed=true;playing=false;pending=undefined;latest.current.onPlayingChange?.(false);setActive(undefined);el.dataset.error='reaction-playback';show(videoOnly?'idle':'fallback');};
+    const idleFail=()=>{idleFailed=true;el.dataset.error='idle-playback';if(!videoOnly)idleReady=false;if(mode==='idle'||mode==='loading')show(videoOnly?'idle':'fallback');};
     const markIdleReady=()=>{if(!alive||idleFailed)return;idleReady=true;};
     const reveal=()=>{if(alive&&playing)show('pat');};
     const finish=()=>{if(!alive)return;const next=pending;pending=undefined;if(next)start(next);else{playing=false;completedCue=latest.current.cue;latest.current.onPlayingChange?.(false);setActive(undefined);}};
@@ -47,16 +50,16 @@ export function ReactionVideoSprite({src,idleSrc,file,pose='idle',cue=0,interact
       // A leftover interaction envelope is only an overlay, not a reason to replace
       // a standing idle with the atlas (e.g. feeding ends before its FX envelope).
       const fresh=event&&age>=0&&age<=4200,idleWanted=p.pose==='idle'||(p.cue===completedCue&&(!fresh||event.kind==='pat'));
-      if(idleSrc&&!idleFailed&&idleWanted)show(idleReady?'idle':'loading');
+      if(videoOnly||idleSrc&&!idleFailed&&idleWanted)show(idleReady?'idle':'loading');
       else show('fallback');
       // A browser/media pause must not leave a standing idle stuck on one decoded frame.
       if(mode==='idle'&&!paused&&!p.frozen&&idle.paused&&Date.now()>=nextIdleResumeAt){nextIdleResumeAt=Date.now()+1000;void idle.play().catch(()=>{});}
     };
     raf=requestAnimationFrame(tick);
     return()=>{alive=false;cancelAnimationFrame(raf);v.removeEventListener('playing',reveal);v.removeEventListener('ended',finish);v.removeEventListener('error',fail);idle.removeEventListener('error',idleFail);idle.removeEventListener('loadeddata',markIdleReady);idle.removeEventListener('canplay',markIdleReady);idle.removeEventListener('playing',markIdleReady);v.pause();idle.pause();latest.current.onPlayingChange?.(false);};
-  },[src,idleSrc]);
-  return <span ref={surface} className="reaction-video-sprite" data-character-file={file} data-idle-src={idleSrc} data-clip={idleSrc?'loading':'fallback'} data-motion-phase={idleSrc?'loading':'fallback'}>
-    <span className="reaction-fallback">{children}</span>
+  },[src,idleSrc,videoOnly]);
+  return <span ref={surface} className="reaction-video-sprite" data-video-only={videoOnly||undefined} data-character-file={file} data-idle-src={idleSrc} data-clip={idleSrc?'loading':'fallback'} data-motion-phase={idleSrc?'loading':'fallback'}>
+    {!videoOnly&&<span className="reaction-fallback">{children}</span>}
     <video ref={video} className="reaction-video" src={src} muted playsInline preload="auto"/>
     <video ref={idleVideo} className="cast-idle-video" src={idleSrc} muted playsInline preload="auto" loop/>
     <InteractionFx file={file} interaction={active??interaction}/>

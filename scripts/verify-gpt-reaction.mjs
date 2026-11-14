@@ -31,7 +31,7 @@ try{
  await main.waitForFunction(s=>{const e=document.querySelector(s),v=e?.querySelector('video');return e?.dataset.motionPhase==='gesture'&&v.currentTime<1;},selector);
  await main.waitForFunction(s=>document.querySelector(s)?.dataset.clip==='idle',selector);
  await main.evaluate(()=>window.garden.dispatch({type:'feed',id:'shiori',food:'rice'}));await main.waitForTimeout(250);
- assert.equal(await reaction.getAttribute('data-clip'),'fallback','feeding keeps its own existing animation');
+ assert.equal(await reaction.getAttribute('data-clip'),'idle','feeding effects keep the approved video identity');
  await main.evaluate(()=>window.garden.dispatch({type:'presentation',patch:{desktopMode:'dock',chatForm:'chibi'}}));
  const pet=overlay.locator('.dock-pet[data-character=shiori]');await pet.waitFor();
  const box=await pet.locator('.pet-body').boundingBox();assert.ok(box);await overlay.mouse.move(box.x+box.width/2,box.y+box.height-12);
@@ -44,6 +44,6 @@ try{
  assert.equal(await pet.getAttribute('data-awake'),'true','moving pointer away must not perch before the full video ends');
  await main.evaluate(()=>window.garden.dispatch({type:'settings',patch:{dnd:true}}));await main.waitForTimeout(250);
  assert.ok(await video.evaluate(v=>v.paused));assert.deepEqual(errors,[]);
- fs.writeFileSync(path.join(out,packaged?'packaged-verification.json':'verification.json'),JSON.stringify({packaged,media,fullDuration:true,queuedPat:true,dockStanding:true,otherActionsPreserved:true,dndStops:true,errors},null,2));
- console.log('PASS GPT P1: full 5s, transparent, queued pats, fallback, dock standing, DND.',media);
+ fs.writeFileSync(path.join(out,packaged?'packaged-verification.json':'verification.json'),JSON.stringify({packaged,media,fullDuration:true,queuedPat:true,dockStanding:true,feedingKeepsVideoIdentity:true,dndStops:true,errors},null,2));
+ console.log('PASS GPT P1: full 5s, transparent, queued pats, feeding video identity, dock standing, DND.',media);
 }finally{await app.close();}

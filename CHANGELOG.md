@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.4 · 2026-11-15 · GPT video-only / GPT 独立视频呈现
+
+- 根据用户复测，alpha.3 仍闪变，撤销“调整备用图切换即可解决”的假设。User retest still found identity flashes in alpha.3.
+- GPT 站立形态只挂载最新已接受的即梦 S1 待机与 P1 摸头视频，不再挂载任何备用立绘/动作图集；未补齐的动作继续使用视频和互动特效，不混入其他形象。GPT standing form mounts approved videos only; unsupported cues retain that identity and interaction effects.
+- 媒体等待、循环和错误不再切到备用人物。Dock 趴姿及小头像仍是独立展示用途。No alternate character on waiting, loop boundaries or media errors; Dock resting art and small avatars remain separate presentations.
+
 ## 0.4.0-alpha.3 · 2026-11-15 · Idle identity guard / 待机形象切换防护
 
 - 修正待机遇到残留互动特效时短暂切换备用图的条件；不删帧、不回滚 S1。Keep standing idle active while leftover interaction effects finish; preserve S1.
