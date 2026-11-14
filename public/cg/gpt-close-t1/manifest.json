@@ -1,0 +1,29 @@
+{
+  "id": "gpt-close-t1",
+  "participants": ["gpt"],
+  "mode": "watch-installed",
+  "workOrder": "POV-003",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-13",
+  "art_review": "User accepted the GPT close POV short trial for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "06bb005101dee06a9f49759c9732e7fb50ba1494987ebe25f8c12fa7a90e2586",
+      "bytes": 9301078
+    },
+    "poster.png": {
+      "sha256": "0abb68ca0e24e15e459133dab7f6db7528d5b73c22ec831fa7208f76ac5e8bde",
+      "bytes": 3079360
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

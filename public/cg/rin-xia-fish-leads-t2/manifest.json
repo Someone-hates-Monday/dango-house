@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-fish-leads-t2",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "CP-005",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-13",
+  "art_review": "User accepted the second fish-leads short trial (t2) for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward. t1 remains rejected.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "fdda6bf7c92c76502a9fae64125777138055844c2710c9b79d3b40b251aa7827",
+      "bytes": 7056973
+    },
+    "poster.png": {
+      "sha256": "70dd45d4d97888bf957a7d455a7d8e99621981a77559b114e9343ab899bc1d3c",
+      "bytes": 3351681
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

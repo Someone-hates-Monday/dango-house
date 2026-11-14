@@ -1,0 +1,61 @@
+{
+  "recordType": "planning-template-not-runtime-manifest",
+  "version": 1,
+  "id": "CP-002",
+  "title": "窗边并肩留座",
+  "stage": "video-short-trial",
+  "generationAuthorized": true,
+  "participants": ["rin", "xia"],
+  "audience": "character-pair",
+  "activityMode": "WATCH",
+  "singleVisibleGoal": "窗边邀请两人并坐，书从左手移到 Claude 膝上再合起；本批不带碗",
+  "visibleDiffFrom": ["CP-001"],
+  "visibleDiff": "座位与肩距，不是手触发饰",
+  "shots": [
+    {
+      "id": "S1",
+      "goal": "Claude 右手邀请窗边空位",
+      "still": "两人站在同一沙发前，Claude 左手持打开的书；鱼双手在围裙前；无碗",
+      "status": "still-accepted"
+    },
+    {
+      "id": "S2",
+      "goal": "两人并坐",
+      "still": "鱼左 Claude 右；Claude 左手托膝上打开的书，右手留自身裙上；鱼双手留围裙",
+      "status": "still-accepted"
+    },
+    {
+      "id": "S3",
+      "goal": "合书与肩距缩短",
+      "still": "同一本书在 Claude 膝上合起；两人视线温和，鲸尾低位；无新增道具",
+      "status": "still-accepted"
+    }
+  ],
+  "promptFile": "CP-002-GPT-STILLS.md",
+  "reward": { "enabled": false },
+  "automaticPlaybackApproved": false,
+  "generationAuthorizationScope": "reference-stills + short video trials; user 2026-11-08",
+  "videoGenerationAuthorized": true,
+  "videoTrialOrder": ["CP-002", "CP-005", "CP-004", "CP-003"],
+  "videoTrialNote": "普通队列短试。2026-11-12 用户选定三条重复提交里的第一条，并确认可手动试映。不覆盖 CP-001，不自动播放。",
+  "videoTake": {
+    "status": "installed-watch",
+    "selected": "first-of-three",
+    "archive": "test-results/cg-lab/jimeng-cp002-window-seat-t1/raw.mp4",
+    "publicAsset": "public/cg/rin-xia-window-seat-t1/",
+    "at": "2026-11-12"
+  },
+  "jimengJob": "test-results/animation-lab/jimeng-jobs/cp002-window-seat-t1/",
+  "referenceStills": {
+    "status": "user-accepted-pose-reference",
+    "manifest": "test-results/cg-lab/cp-002-window-seat/stills-manifest.json",
+    "reviewPage": "test-results/cg-lab/cp-002-window-seat/review.html",
+    "images": [
+      "test-results/cg-lab/cp-002-window-seat/stills/S1-offer.png",
+      "test-results/cg-lab/cp-002-window-seat/stills/S2-sit-close.png",
+      "test-results/cg-lab/cp-002-window-seat/stills/S3-book-close.png"
+    ],
+    "reviewDocument": "docs/cg-production/CG-STILLS-REVIEW-2026-11-08.zh-CN.md"
+  },
+  "stagingRevision": "2026-11-08 user accepted stills; video short trial authorized"
+}

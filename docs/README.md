@@ -6,6 +6,23 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [11 月 14 日 Cursor 验收与体验修复：GPT 待机、CG 场景与独立偏好](REVIEW-CURSOR-2026-11-14.zh-CN.md) · [English](REVIEW-CURSOR-2026-11-14.en.md)
+
+- [11 月 13 日首发定位复核：竞品变化、45 秒宣传片、最后调试与公开测试版](LAUNCH-DECISION-2026-11-13.zh-CN.md) · [English](LAUNCH-DECISION-2026-11-13.en.md)
+
+- [亲密 CG：贴贴、单人用户向与双人共同喜欢用户](cg-production/AFFECTION-NEXT-2026-11-12.zh-CN.md) · [English](cg-production/AFFECTION-NEXT-2026-11-12.en.md) · [四张关键图提示词](cg-production/affection-2026-11-12.prompts.json)
+
+- [11 月 8 日 CG 计划复核与 12 张参考图交接](cg-production/CG-STILLS-REVIEW-2026-11-08.zh-CN.md) · [English](cg-production/CG-STILLS-REVIEW-2026-11-08.en.md) · [实际提示词与输入](cg-production/reference-stills-2026-11-08.records.json)
+
+- [三人组首发推广与 60 秒分镜](LAUNCH-TRIO.zh-CN.md) · [English](LAUNCH-TRIO.en.md)
+- [11 月 7 日当前工作区验收与 GPT／CG 下一步：有运行回归待修](PROGRESS-ACCEPTANCE-2026-11-07.zh-CN.md) · [English](PROGRESS-ACCEPTANCE-2026-11-07.en.md)
+- [11 月 4 日历史提交三项修复验收：当时通过](ACCEPTANCE-CURSOR-REPAIR-2026-11-04.zh-CN.md) · [English](ACCEPTANCE-CURSOR-REPAIR-2026-11-04.en.md)
+- [CG 制作契约：身份依据、工具边界、回执、验收与两张工单](CG-PRODUCTION-CONTRACT.zh-CN.md) · [English](CG-PRODUCTION-CONTRACT.en.md) · [工单模板](cg-production/work-order.template.json)
+- [同人表演调研：双人关系与用户女友向](CG-ACTING-AND-POV-RESEARCH.zh-CN.md) · [English](CG-ACTING-AND-POV-RESEARCH.en.md)
+- [补充：百合／女友向手法 · Comfy／即梦控制](CG-YURI-AND-CONTROL-SUPPLEMENT.zh-CN.md) · [English](CG-YURI-AND-CONTROL-SUPPLEMENT.en.md)
+- [制作手册：人设锁定 · 互动 · 分镜 · 活动方式](CG-PERSONA-SHOT-INTERACTION-PLAYBOOK.zh-CN.md) · [English](CG-PERSONA-SHOT-INTERACTION-PLAYBOOK.en.md)
+- [同人搜集：统一人设 · CG／日常分流](FANWORK-PERSONA-AND-CG-CATALOG.zh-CN.md) · [English](FANWORK-PERSONA-AND-CG-CATALOG.en.md)
+- [身份卡草稿（七人·四层依据）](cg-production/identity/README.zh-CN.md) · [证据台账](cg-production/evidence-ledger.json) · [工单 CP-001](cg-production/work-orders/CP-001.json) · [POV-001](cg-production/work-orders/POV-001.json)
 - [Cursor 本轮验收与修正](REVIEW-CURSOR-COMPANIONSHIP.zh-CN.md) · [English](REVIEW-CURSOR-COMPANIONSHIP.en.md) · [修正提示词](CURSOR-REPAIR-PROMPT.md)
 - [关系瞬间 CG 设计](CG-MOMENTS.zh-CN.md) · [English](CG-MOMENTS.en.md)
 - [下一阶段：共同生活与社交闭环](CURSOR-COMPANIONSHIP-NEXT.zh-CN.md) · [English](CURSOR-COMPANIONSHIP-NEXT.en.md) · [给 Cursor 的提示词](CURSOR-NEXT-PROMPT.md)
@@ -30,5 +47,5 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 其余日期/版本命名的文档记录当时的调研与实现，不一定反映最新应用行为，主要为中文。请以当前 README、更新记录和代码为准。  
 Other dated/versioned documents preserve historical research and implementation notes, mainly in Chinese. They may be outdated; prefer the current README, changelog, and code.
 
-动画实验见 [animation-lab](animation-lab/README.md)。本地原始试片与环境不在公开仓库，历史文档中的本机路径仅供当时复现，不是可下载链接。  
+动画实验见 [animation-lab](animation-lab/README.md)。GPT Q 即梦交接（尾巴根尖避坑 + 成片 curl 下载）：[gpt-jimeng-q-handoff.zh-CN.md](animation-lab/gpt-jimeng-q-handoff.zh-CN.md)；Claude 动作补全交接：[CLAUDE-ACTION-HANDOFF.zh-CN.md](animation-lab/CLAUDE-ACTION-HANDOFF.zh-CN.md) · [22 条提示词](animation-lab/claude-action-pack-v1/INDEX.md) · [GPT 审查（已进应用）](animation-lab/CLAUDE-PACK-GPT-REVIEW.en.md)；网页人在环：[jimeng-human-in-loop.md](cg-production/jimeng-human-in-loop.md)。本地原始试片与环境不在公开仓库，历史文档中的本机路径仅供当时复现，不是可下载链接。  
 See animation-lab for experiments. Raw trials/environments are excluded; local paths in historical notes are not download links.

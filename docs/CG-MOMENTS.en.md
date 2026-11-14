@@ -2,6 +2,8 @@
 
 [简体中文 — detailed contract](CG-MOMENTS.zh-CN.md)
 
+**Latest status (2026-11-04):** generation is paused at the user's request. V2's end frame failed arm-anatomy review and its video job was cancelled without replacing V1. See [acting/POV research](CG-ACTING-AND-POV-RESEARCH.en.md) for the new head-anchored film-bubble direction. Await the user's instruction before resuming generation; the corner-card implementation below describes V1.
+
 2026-11-04. This separately authorized CG experiment follows the marketing handoff; it does not replace or expand Cursor's completed companionship A/B/C implementation.
 
 Daily life stays chibi. A short CG highlights a meaningful relationship event: Claude gently fixes DeepSeek's hair ornament, DeepSeek responds with a small affectionate tilt and smile. Keep the existing normal-proportion character designs, modest clothing and gentle tone.

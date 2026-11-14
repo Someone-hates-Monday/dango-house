@@ -1,5 +1,7 @@
 # Cursor lifecycle repair re-review
 
+Follow-up: `a28dc00` fixes all three P2 findings; independent acceptance passes. See [current acceptance](ACCEPTANCE-CURSOR-REPAIR-2026-11-04.en.md). The following is the historical pre-fix review.
+
 [中文](REVIEW-CURSOR-REPAIR.zh-CN.md)
 
 Date: 2026-11-04. Reviewed HEAD: `447795a982a925fdc26a0859e6b3003e723352bb`; range `e63c9a9..447795a`. Runtime code was not changed. No media generation, push or release.

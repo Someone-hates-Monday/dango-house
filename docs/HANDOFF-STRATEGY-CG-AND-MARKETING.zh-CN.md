@@ -37,6 +37,8 @@
 
 配法：豆包打样 → 即梦定稿；会员晚于「产能计划」，避免空转订阅。
 
+控制细节（首尾帧模型兼容、Seedance `@` 全能参考、Wan Animate／Fun Control／LivePortrait 分层、百合与女友向创作手法）已补进 [CG-YURI-AND-CONTROL-SUPPLEMENT.zh-CN.md](CG-YURI-AND-CONTROL-SUPPLEMENT.zh-CN.md)；勿与本备忘的「本轮不做生视频」冲突。
+
 ## 5. 与本轮实现的边界（务必遵守）
 
 - 本文件 **不修订**「在场 / 静音分离」等代码规格；冲突时以 NEXT 为准。

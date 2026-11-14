@@ -1,16 +1,14 @@
 {
   "productionApproved": true,
-  "status": "accepted-and-integrated-idle",
+  "status": "restored-historical-reviewed-idle",
   "character": "gpt",
   "action": "idle",
-  "sourceSha256": "0577d60f45fae0085db54b0c6e113232120059081cc3587c43d291abe65e60b8",
+  "asset": "idle-reviewed-oct29-v2.webm",
+  "assetSha256": "57fb864e8f6b9ac6ec6ab447da8f6cc992f6c6f94399f6fa282dd05b177bda19",
+  "date": "2026-11-14",
   "frames": 225,
   "duration": 9.375,
   "alpha": true,
   "idlePingPong": true,
-  "scope": "Idle only; no narrative gesture is reversed.",
-  "basis": "Existing light/dark contact sheets, source boundary audit and in-app loop/decode verification.",
-  "limits": "AI-generated idle has minor line/expression variations; not a full locomotion or interaction pack.",
-  "date": "2026-10-30",
-  "asset": "idle-jimeng-v1.webm"
+  "scope": "Byte-identical to historical Oct29 approved backup. New URL avoids reused candidate/cache URLs. P1 pat unchanged."
 }

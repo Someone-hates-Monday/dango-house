@@ -9,3 +9,9 @@ DeepSeek 原角色「溟月」来自上善无形，女仆二次设计来自 ZipZ
 These are generated fan derivatives of existing character designs, not official vendor assets or newly owned original characters. DeepSeek's original design is credited to 上善无形, with the maid derivative by ZipZipPipe; Claude follows ZipZipPipe's fan design. Follow the linked per-file provenance and applicable noncommercial/share-alike or author sharing terms. Do not infer commercial permission from the code's MIT license or the model license.
 
 The initial illustration uses built-in imagegen with existing portrait references; video inference runs locally with ComfyUI and Wan2.2 I2V A14B FP8. Each asset manifest records generation and review status. Trial status does not mean automatic production playback is enabled.
+
+`rin-xia-window-seat-t1`、`rin-xia-bookmark-t1`、`rin-xia-share-bowl-t1` 是 2026-11-12 用户点名可手动试映的即梦短试，各自单独目录，不覆盖 `rin-xia-hair-v1`。海报用对应静帧，成片为普通队列 5 秒 720P。仍不自动播放。
+
+`rin-xia-cheek-t1`、`xia-reach-t1`、`gpt-close-t1`、`rin-xia-welcome-t1` 是 2026-11-13 用户点名可手动试映的即梦短试，各自单独目录，不覆盖 `rin-xia-hair-v1`。海报用对应静帧，成片为普通队列 5 秒 720P。仍不自动播放。
+
+`rin-xia-fish-leads-t2` 是 2026-11-13 用户点名可手动试映的 CP-005 第二条短试，单独目录，不覆盖 `rin-xia-hair-v1`。海报用 S1 静帧，成片为普通队列 5 秒 720P。仍不自动播放。

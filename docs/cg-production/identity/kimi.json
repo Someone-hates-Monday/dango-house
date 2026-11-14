@@ -1,0 +1,70 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "kimi",
+  "displayName": "Kimi",
+  "nickname": "月影",
+  "stage": "draft",
+  "approved": false,
+  "form": "split-anchors",
+  "selectedVisual": {
+    "adultAnchor": {
+      "value": "public/portraits/kimi.jpg",
+      "evidence": "manifest.json#kimi sha256 a13fda41…e3285 ZipZipPipe",
+      "scope": "adult-cg-if-used",
+      "status": "anchored"
+    },
+    "qProduction": {
+      "value": "fywdy 月影娘图集（桌宠生产资源）",
+      "evidence": "characters.ts source；consistency：勿另发明书本造型",
+      "scope": "q-daily-runtime",
+      "status": "anchored"
+    },
+    "mappingNote": {
+      "value": "成年体 ZipZipPipe 与 Q 版 fywdy 并存；默认日常以 Q 生产资源为准，CG 若用成年体须单独过身份关",
+      "evidence": "FANWORK 2.6 + consistency kimi",
+      "scope": "form-split",
+      "status": "needs-view-check"
+    },
+    "immutableFeatures": {
+      "value": ["当前版本非对称服装与头饰（以所用锚为准）", "安静陪读气质不靠每帧新书"],
+      "evidence": "consistency + characters",
+      "scope": "recognition",
+      "status": "anchored"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "安静温柔、爱读长篇、观察细致；短句；本应用演绎非官方",
+      "evidence": "characters.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "rin（陪读）",
+      "evidence": "social.ts；origin 小屋原创陪读",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["变主气氛组吵闹役", "换成无关物种", "每条待机强制新画书"],
+      "evidence": "FANWORK + consistency",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "ZipZipPipe 合集含 Kimi；戏份少于 DS／Claude／GPT",
+      "evidence": "BV1tE9XBbErS 简介角色列表；FANWORK §5",
+      "url": "https://www.bilibili.com/video/BV1tE9XBbErS/",
+      "viewsAtCheck": 424253,
+      "checkedAt": "2026-11-04",
+      "scope": "visual-index",
+      "status": "title-meta-only",
+      "bindsTo": "adultAnchor"
+    }
+  ],
+  "sceneActing": { "status": "empty", "boundWorkOrders": [], "note": "优先陪读短节拍，不硬凑百合长剧" },
+  "relationsExpress": { "toRin": "共读、留书签", "toGroup": "观察小心思" },
+  "openQuestions": ["CG 是否启用成年体 kimi 锚", "银笛等 ZipZipPipe 道具是否纳入本仓"]
+}

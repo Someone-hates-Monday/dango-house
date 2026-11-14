@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-welcome-t1",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "TRIO-001",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-13",
+  "art_review": "User accepted the empty-middle welcome short trial for manual WATCH. Fin ears visible and rounded. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "e6a0ac838d538050c67a32f4779a44fa74ec8d0be18530cfda5774ca5409ebc6",
+      "bytes": 10576707
+    },
+    "poster.png": {
+      "sha256": "6c143ccf47458d801ed028b08cc72b4f70f9c2fa432566a5483b6c5edf6b0b80",
+      "bytes": 3275689
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

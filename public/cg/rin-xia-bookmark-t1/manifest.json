@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-bookmark-t1",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "CP-004",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-12",
+  "art_review": "User accepted the single open-book bookmark submit for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "e2ab37f3d908834bfb6f35eb093c9e402933c314f6cf3ae38a72dafb1070af04",
+      "bytes": 9230204
+    },
+    "poster.png": {
+      "sha256": "9cf88d0e18a824ae8d1d8d106c02bbd4b0a335634e0865d027efdf6557be699d",
+      "bytes": 2922769
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

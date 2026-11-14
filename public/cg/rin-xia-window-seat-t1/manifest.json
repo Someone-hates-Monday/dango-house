@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-window-seat-t1",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "CP-002",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-12",
+  "art_review": "User accepted the first of three duplicate submits for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "5bda122798cf3e382f3e22e475fa14ca5d599c0394bd6bd3683861280bc111ce",
+      "bytes": 9609925
+    },
+    "poster.png": {
+      "sha256": "b201657a12728fd563d20f3567605d4f015831eaee64739f51ef8ae992aba5ed",
+      "bytes": 2755042
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

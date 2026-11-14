@@ -1,5 +1,13 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.1 · 2026-11-15 · Relationship scenes / 关系演出
+
+- 接入九段关系与用户向 CG，支持前置对话、单人/双人/多人共用一个头顶播放器和结束/取消回执。Nine relationship/POV clips, dialogue preludes, shared overhead playback and completion/cancellation receipts.
+- 增加独立百合与事件短片偏好；用户恋爱 CG 跟随恋人模式，事件片带冷却。Independent pair-affection/event-clip preferences, Lover-mode POV scenes and cooldowns.
+- 恢复已确认的 GPT 多帧待机，移除运行候选，修复暂停后动作恢复与意外停帧。Restore reviewed GPT idle and repair paused playback without removing normal animation.
+- 完善角色在场、剧情结算、私聊返回、Claude 动作和播放边界；保留离线演示与可选 API/Agent Bridge。Improve cast/story lifecycle, Claude actions and playback while retaining offline demo and optional API/Agent Bridge.
+- 公开测试版本；原生多屏混合 DPI 和真实 API 组合的完整覆盖仍待持续验证。Public alpha; mixed-DPI and real-provider combinations remain subject to ongoing testing.
+
 ## 0.3.9 · 2026-11-04 · Source Alpha / 源码 Alpha
 
 - 修复 MCP stdio 消息格式及打包脚本路径；官方 MCP SDK 对真实开发版与打包版完成端到端验收。Fix MCP stdio framing and packaged entry paths; verify both development and packaged apps with the official MCP SDK.

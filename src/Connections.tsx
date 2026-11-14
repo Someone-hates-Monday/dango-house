@@ -138,6 +138,15 @@ export function Connections({ state }: { state: AppState }) {
           {t('settings.pairTone')}
         </h2>
         <div className="relationship-options">
+          <button aria-pressed={state.settings.pairRomance!==false} className={state.settings.pairRomance!==false?'selected':''} onClick={()=>void send({type:'settings',patch:{pairRomance:state.settings.pairRomance===false}})}>
+            {locale==='en'?'Girl–girl affection':locale==='ja'?'女の子同士の親密さ':'女孩之间的贴贴'} · {state.settings.pairRomance===false?(locale==='en'?'Off':locale==='ja'?'オフ':'关闭'):(locale==='en'?'On':locale==='ja'?'オン':'开启')}
+          </button>
+          <button aria-pressed={state.settings.cgAutoplay!==false} className={state.settings.cgAutoplay!==false?'selected':''} onClick={()=>void send({type:'settings',patch:{cgAutoplay:state.settings.cgAutoplay===false}})}>
+            {locale==='en'?'Scene clips after interactions':locale==='ja'?'交流後のシーン再生':'互动后的剧情短片'} · {state.settings.cgAutoplay===false?(locale==='en'?'Off':locale==='ja'?'オフ':'关闭'):(locale==='en'?'On':locale==='ja'?'オン':'开启')}
+          </button>
+        </div>
+        <p className="helper">{locale==='en'?'Girl–girl affection is independent of your role. Romantic scenes toward you follow Lover mode. Manual previews remain available.':locale==='ja'?'女の子同士の親密さはあなたとの関係と別設定です。あなたへの恋愛シーンは恋人モードに従います。手動プレビューはいつでも利用できます。':'女孩之间的贴贴与你的身份分开设置；面向你的恋爱短片只在恋人模式下随互动出现。手动预览仍可查看全部片段。'}</p>
+        <div className="relationship-options">
           {(
             [
               { id: 'soft' as const, name: t('settings.toneSoft') },

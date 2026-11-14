@@ -1,0 +1,716 @@
+{
+  "date": "2026-11-05",
+  "scope": "prompt-package-only",
+  "references": [
+    {
+      "id": "Q0",
+      "path": "test-results/animation-lab/jimeng-jobs/gpt-rice-c1/paste/03-anchor-greenscreen.png",
+      "available": true,
+      "sha256": "75a2a396dd09cc58f3969728745d37f7496f4882e95db653dbe930efe8f16be3"
+    },
+    {
+      "id": "Q1",
+      "path": "test-results/animation-lab/jimeng-jobs/gpt-rice-c1/paste/01-idle-canonical.png",
+      "available": true,
+      "sha256": "e3a126878199e210776ed7105184c6fac147709cd58f1a015013c863bfcd2e8d"
+    },
+    {
+      "id": "QS",
+      "path": "test-results/animation-lab/jimeng-jobs/gpt-rice-c1/paste/05-tail-structure-34.png",
+      "available": true,
+      "sha256": "4358b8cda1ac3ce1027d07cbef147532cc2638ab447ba970ac1bb8d82d0fc062"
+    },
+    {
+      "id": "QT",
+      "path": "test-results/animation-lab/jimeng-jobs/gpt-rice-c1/paste/02-thinking-pose.png",
+      "available": true,
+      "sha256": "a534534f6e8113dca045f4d2dbbd1c1a531fa506049dd4b6da1b377634c82597"
+    },
+    {
+      "id": "P1",
+      "path": "public/video/gpt/pat-pixverse-p1.webm",
+      "available": true,
+      "sha256": "1d7481d819923abb4f22387db3933cb0e3cbb3cfdeda9cea662e43b5f6a67524"
+    },
+    {
+      "id": "CG",
+      "path": "public/portraits/gpt.jpg",
+      "available": true,
+      "sha256": "2ad17c3c08c1b9eaed948c4d4ed53246a6c91e8240621c46c35f8d04e210905a"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "affection",
+      "name": "收到喜爱",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "affection.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "private-chat",
+      "name": "被选私聊",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "private-chat.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "rice",
+      "name": "投喂白饭",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "需先验收持碗首帧；Q0不是持碗图，不可假装现成",
+      "promptFile": "rice.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "pat-alt",
+      "name": "摸头轻回应",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "pat-alt.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "greeting",
+      "name": "鼠标靠近问候",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "greeting.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "listen",
+      "name": "认真倾听",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "listen.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "rivalry",
+      "name": "轻微吃醋",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "rivalry.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "relieved",
+      "name": "被重新选中",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "relieved.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "return",
+      "name": "私聊返回",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "return.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "think",
+      "name": "冷静思考",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "think.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "success",
+      "name": "完成后的认可",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "success.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "tired",
+      "name": "疲惫休息",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "tired.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "yawn",
+      "name": "困倦哈欠",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "yawn.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "sleep-enter",
+      "name": "入睡",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "需先验收坐姿目标帧；结尾不回站立",
+      "promptFile": "sleep-enter.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "sleep-loop",
+      "name": "安静小憩",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "使用sleep-enter验收末帧；不要Q0站姿首帧",
+      "promptFile": "sleep-loop.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "wake",
+      "name": "醒来起身",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "使用sleep-loop姿态首帧；不得瞬切站姿",
+      "promptFile": "wake.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "walk-left",
+      "name": "向左短走",
+      "priority": "P2",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "walk-left.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "walk-in-place",
+      "name": "原地行走循环",
+      "priority": "P2",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "walk-in-place.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "dock-down",
+      "name": "Dock趴下",
+      "priority": "P2",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "需独立Dock姿态钉板；不在视频里画真实系统Dock",
+      "promptFile": "dock-down.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "dock-up",
+      "name": "Dock站起",
+      "priority": "P2",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "起点用dock-down验收末帧；统一支撑线",
+      "promptFile": "dock-up.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "idle-look",
+      "name": "偶尔看看你",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "idle-look.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "comfort",
+      "name": "安静安慰",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "comfort.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "pair-look-ds",
+      "name": "看向大鱼",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "pair-look-ds.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "pair-look-claude",
+      "name": "看向Claude",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "pair-look-claude.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "pair-bystander",
+      "name": "旁观她们靠近",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "pair-bystander.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "reserved-seat",
+      "name": "嘴硬留座",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "reserved-seat.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "praise-denial",
+      "name": "被夸却不承认",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "praise-denial.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "quiet-wait",
+      "name": "陪你忙自己的事",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "quiet-wait.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "fish-tease",
+      "name": "被大鱼逗到",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "fanwork-topic-original-choreography",
+        "url": "https://www.bilibili.com/video/BV1WUhE63En4/",
+        "scope": "title/description verified; shot reference pending"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": "题材来自戛然而纸女同事篇；细节为原创演法，非已看过的镜头复刻",
+      "promptFile": "fish-tease.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "help-ack",
+      "name": "替你处理好了",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "help-ack.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "soft-goodnight",
+      "name": "晚安前多看一眼",
+      "priority": "P1",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "soft-goodnight.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    },
+    {
+      "id": "reunion",
+      "name": "等到你回来",
+      "priority": "P0",
+      "designBasis": {
+        "kind": "project-persona-and-user-brief",
+        "source": "src/shared/characters.ts",
+        "scope": "original choreography, not community canon"
+      },
+      "refs": [
+        "Q0",
+        "Q1",
+        "QS"
+      ],
+      "requiredPreparation": null,
+      "promptFile": "reunion.zh.txt",
+      "productionApproved": false,
+      "replacePublic": false,
+      "status": "prompt-ready-not-generated",
+      "runtimeAction": "proposed-not-wired"
+    }
+  ]
+}

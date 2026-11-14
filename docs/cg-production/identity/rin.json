@@ -1,0 +1,99 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "rin",
+  "displayName": "Claude",
+  "nickname": "大小姐",
+  "stage": "draft",
+  "approved": false,
+  "form": "adult-normal-proportion",
+  "selectedVisual": {
+    "anchorFile": {
+      "value": "public/portraits/claude.jpg",
+      "evidence": "manifest.json#claude sha256 29f51c0b…bf89",
+      "scope": "adult-cg-anchor",
+      "status": "anchored"
+    },
+    "alphaVariant": {
+      "value": "public/portraits/claude-alpha-v1.png",
+      "evidence": "local alpha",
+      "scope": "compositing-aid",
+      "status": "anchored"
+    },
+    "sourcePage": {
+      "value": "https://www.pixiv.net/artworks/148186519",
+      "evidence": "ZipZipPipe《AI娘化》",
+      "scope": "visual-origin",
+      "status": "anchored"
+    },
+    "immutableFeatures": {
+      "value": ["橙发", "太阳花系发饰", "抱书／书本道具主权", "层叠裙轮廓"],
+      "evidence": "manifest + characters.ts + FANWORK 2.2",
+      "scope": "recognition",
+      "status": "anchored"
+    },
+    "openVisualChecks": {
+      "value": ["角色自身右手触鱼发饰时四臂归属草图", "书在左手的连续性", "正面／3/4 侧"],
+      "evidence": "CP-001 需求",
+      "scope": "contact-structure",
+      "status": "needs-view-check"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "温柔认真、规矩多、自省；对鱼有笨拙的主动关心；害羞时拿书掩饰",
+      "evidence": "characters.ts id=rin",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "xia；默认熟悉度 65",
+      "evidence": "social.ts socialProfiles.rin + defaultBonds",
+      "scope": "runtime-bond-default",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["吵闹抢戏", "无书乱扑", "默认赶客怼脸", "金发无花饰泛用脸"],
+      "evidence": "FANWORK 1.3 / 2.2",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "对 DeepSeek 表白／留座／整理发丝为高频甜向节拍",
+      "evidence": "BV1PTHB6BEbA；黑猫勇者合集标题；本仓 seat-share／bookmark 场景",
+      "url": "https://www.bilibili.com/video/BV1PTHB6BEbA/",
+      "viewsAtCheck": 154719,
+      "checkedAt": "2026-11-04",
+      "scope": "beat-reference-only",
+      "status": "title-meta-only",
+      "bindsTo": "socialTarget"
+    },
+    {
+      "claim": "CrossPet：抱物发呆、被纠正时顺从梗（产品可弱化英文）",
+      "evidence": "CrossPet 公开行为描述",
+      "url": "https://github.com/lokicorvus/crosspet",
+      "scope": "daily-enrichment",
+      "status": "title-meta-only",
+      "bindsTo": "projectPersonality"
+    },
+    {
+      "claim": "传播层「圣女／黄金牢笼」脑补",
+      "evidence": "凤凰网转述文",
+      "url": "https://tech.ifeng.com/c/8xQkhbcfTfN",
+      "scope": "atmosphere-only-not-default-product",
+      "status": "title-meta-only",
+      "bindsTo": "antiDrift"
+    }
+  ],
+  "sceneActing": {
+    "status": "empty",
+    "boundWorkOrders": ["CP-001"],
+    "note": "CP-001：从容整理发饰、鱼反应更害羞——仅本场，不倒写「Claude 永不害羞」"
+  },
+  "relationsExpress": {
+    "toUser": "合书提醒、认真听、留书签",
+    "toXia": "主 CP：留座、整理发饰、表白级靠近"
+  },
+  "openQuestions": ["发饰触点几何", "是否允许极短旁白「赶客」梗而不进默认 CG"]
+}

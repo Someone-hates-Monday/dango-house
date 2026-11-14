@@ -1,0 +1,70 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "gemini",
+  "displayName": "Gemini",
+  "nickname": "星猫",
+  "stage": "draft",
+  "approved": false,
+  "form": "adult-normal-proportion",
+  "selectedVisual": {
+    "anchorFile": {
+      "value": "public/portraits/gemini.jpg",
+      "evidence": "manifest.json#gemini sha256 f24e4ba9…368c",
+      "scope": "adult-cg-anchor",
+      "status": "anchored"
+    },
+    "immutableFeatures": {
+      "value": ["蓝紫发", "猫耳", "异瞳", "四芒星饰", "单猫尾"],
+      "evidence": "manifest + consistency#otherCharacters.gemini",
+      "scope": "recognition",
+      "status": "anchored"
+    },
+    "openVisualChecks": {
+      "value": ["勿发明第二尾／额外星饰／双对耳", "与 GLM 拥抱四臂结构"],
+      "evidence": "consistency + FANWORK CG-B",
+      "scope": "structure",
+      "status": "needs-view-check"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "活泼好奇，爱提新点子，偶尔轻喵不过度",
+      "evidence": "characters.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "glm（小屋原创搭档）",
+      "evidence": "social.ts；origin 标明小屋原创",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["整段只喵", "彩虹双色默认貌"],
+      "evidence": "FANWORK 2.4",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "ZipZipPipe 星辉猫耳立绘为貌锚",
+      "evidence": "Pixiv 148186519 合集；GenderSwapAI",
+      "url": "https://genderswapai.com/zh-CN/ai-gijinka/gemini",
+      "scope": "visual",
+      "status": "title-meta-only",
+      "bindsTo": "selectedVisual"
+    },
+    {
+      "claim": "与黑狐友情价／拆账本为产品原创戏，非社区统一 CP",
+      "evidence": "social.ts origin；star-fox companion story",
+      "url": null,
+      "scope": "project-original",
+      "status": "in-code",
+      "bindsTo": "socialTarget"
+    }
+  ],
+  "sceneActing": { "status": "empty", "boundWorkOrders": [], "note": "真正拥抱＝结构高风险；可降为无接触视线戏" },
+  "relationsExpress": { "toGlm": "拆账本、点子、轻抱付账（剧情）" },
+  "openQuestions": ["成年体四芒星是否与 Q 版同件"]
+}

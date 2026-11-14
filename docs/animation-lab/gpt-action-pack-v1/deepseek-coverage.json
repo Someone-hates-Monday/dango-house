@@ -1,0 +1,656 @@
+[
+  {
+    "sourceId": "extra-a76228cb5f42",
+    "title": "三球抛接",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-63295b32e6a0",
+    "title": "下五子棋",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-3ba4edb2cc64",
+    "title": "东张西望",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-48beff57ddc5",
+    "title": "中秋赏月吃月饼",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-390c504dfb0b",
+    "title": "优雅女仆舞",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-013b69906a5c",
+    "title": "余额-分文不剩",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-6c1dac8e3edd",
+    "title": "余额-数金皱眉",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-a85eb2206596",
+    "title": "余额-袋空如洗",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-1bbe074a0bef",
+    "title": "余额-金袋叮当",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-a52b686a7a3d",
+    "title": "余额-钱袋如常",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-34212594a3b9",
+    "title": "余额-钱袋满溢",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-9f50ed6c3ba1",
+    "title": "偷吃零食被抓住",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-47902f235c11",
+    "title": "写代码",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-b7aa9ce458b6",
+    "title": "写福字",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-085fe6d74ddf",
+    "title": "凭空生花",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-44722e0afb7e",
+    "title": "动物环绕",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-d2730f4c17e8",
+    "title": "原地专心玩魔方",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-9b258545a841",
+    "title": "原地小憩沉眠",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "walk",
+    "title": "原地左转奔跑",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-c7e55e6f83c1",
+    "title": "原地敲击桌面互动",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-d700e4fdd38e",
+    "title": "原地漂浮踏步",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-b45cdcb57340",
+    "title": "原地跳跃抓碎头顶物品",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-9a4ba01b33e6",
+    "title": "原地蹲下玩玩具汽车",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-67acb52f7e7c",
+    "title": "原地重力下蹲压缩",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-150abd9011b3",
+    "title": "变鸽子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-0b96ac0de6fa",
+    "title": "可爱宅舞",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-619722b50ea7",
+    "title": "吃Token",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-c696cf2f6136",
+    "title": "吃冰淇淋融化",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-83618038d3d4",
+    "title": "吃午餐",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-f8e0774d6b4b",
+    "title": "吃大闸蟹",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-7b4473435dfa",
+    "title": "吃年糕",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-6691dc43900e",
+    "title": "吃早餐",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-14f9eee2a361",
+    "title": "吃晚餐",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-eac65950006c",
+    "title": "吃汤圆",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "rice",
+    "title": "吃白饭",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-6ad057c473cb",
+    "title": "吃粽子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-def3fa70022f",
+    "title": "吃糖葫芦",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-c20156c0de08",
+    "title": "吃腊八粥",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ffa2c36e86e9",
+    "title": "吃西瓜",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-cc54c1f82bb5",
+    "title": "吃重阳糕",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ac71008a0768",
+    "title": "吃长寿面",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-00031236d476",
+    "title": "吃青团",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-2dee24954bae",
+    "title": "吃饺子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-3a632cd91c40",
+    "title": "吹气球",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-fd57f820116b",
+    "title": "吹笛子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-63da356fa373",
+    "title": "哈欠连天",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ce8e8be3b7e5",
+    "title": "堆雪人",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ab57e48e28d0",
+    "title": "大口吃零食",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-0bcac6ada85e",
+    "title": "女仆屈膝礼仪",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-915feb453f11",
+    "title": "小幅度原地360度旋转展示",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-2de1533cd0f2",
+    "title": "小提琴演奏",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-7b9459a1efdf",
+    "title": "工作状态-原地踱步张望",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-653ef82b71d5",
+    "title": "工作状态-垂头叹气冒汗",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-32bc6dbf65a7",
+    "title": "工作状态-忙碌点按",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "think",
+    "title": "工作状态-思考冒泡",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "read",
+    "title": "工作状态-清点归档",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-edd6645a8ee9",
+    "title": "工作状态-雀跃庆祝",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "idle",
+    "title": "待机呼吸休闲",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-01bd5c202583",
+    "title": "悠闲哼歌",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-2e33efead726",
+    "title": "扑克魔术",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-e5c575989527",
+    "title": "打瞌睡被惊醒",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-1a0cd6a9447c",
+    "title": "抽陀螺",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-01445f708db3",
+    "title": "拆礼物",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-7e2976e00317",
+    "title": "插茱萸赏菊",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-bbb9b8344e6c",
+    "title": "摇扇纳凉",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-466044675ea2",
+    "title": "撸猫",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ca07f8792572",
+    "title": "收红包",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-ca554c0df5fb",
+    "title": "放孔明灯",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-2827fd308393",
+    "title": "放河灯",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-3a1bcd38b00b",
+    "title": "放烟花",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-000eba2f49a1",
+    "title": "放风筝",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-abd198a8d1e4",
+    "title": "整体换装试色",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-e347b7574b4d",
+    "title": "是啊，吃什么",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-66581dbd88c7",
+    "title": "晨间刷牙",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-d3e99cf6d869",
+    "title": "涮火锅",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-5a40d5bfdfa8",
+    "title": "深度思考碎碎念",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "sad",
+    "title": "点击回应-傲娇生气",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "wave",
+    "title": "点击回应-元气挥手",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "shy",
+    "title": "点击回应-害羞惊讶",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "happy",
+    "title": "点击回应-开心跃动",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "pat",
+    "title": "点击回应-挠痒咯咯笑",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-f9ead4a5e1ab",
+    "title": "照镜子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-70cabac39a03",
+    "title": "玩水枪",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-a3375c298063",
+    "title": "玩游戏气急败坏",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-822a7c41f795",
+    "title": "用鲸鱼尾巴拍打地面",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-cd3c9e42d140",
+    "title": "睡觉-开始",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-e91b946423a1",
+    "title": "睡觉-循环",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-dcea582e5293",
+    "title": "睡觉-起来",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-4afcaf7459e3",
+    "title": "碎碎念-发呆碎碎念",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-8b7b357f01a9",
+    "title": "碎碎念-对屏碎碎念",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-343513cf0d55",
+    "title": "碎碎念-擦桌碎碎念",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-f78881f4e996",
+    "title": "穿针乞巧",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-b16d549ec257",
+    "title": "舞狮头",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-41c614294051",
+    "title": "荡秋千",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-cae5ebbca863",
+    "title": "萌化小幽灵",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-eb62a155d056",
+    "title": "蓝鲸现世",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-6f39bb90fd83",
+    "title": "蝴蝶蜜蜂环绕头顶开花",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-6ff801362957",
+    "title": "螃蟹走路",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-a7afe71ed729",
+    "title": "被吓一跳",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-1e35fff171fb",
+    "title": "被落叶淹没",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-728f04b2997a",
+    "title": "被鼠标拖拽悬空反馈",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-1217c9625c3a",
+    "title": "装点圣诞树",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-3a17ac14fba4",
+    "title": "讨糖南瓜灯",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-689e04f120f9",
+    "title": "超大伸懒腰",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-1a0586564e58",
+    "title": "踢毽子",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-596558b14cac",
+    "title": "轻快摇摆舞",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-d0c1bc670b74",
+    "title": "轻快记录",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-b578f4c951a1",
+    "title": "骑木马",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  },
+  {
+    "sourceId": "extra-4848e28f2c4f",
+    "title": "鲸鱼吐泡泡特效",
+    "decision": "coverage-reference-only-not-a-GPT-production-order",
+    "mappedJobs": []
+  }
+]

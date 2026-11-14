@@ -21,6 +21,14 @@ Local State
 *.p12
 *.pfx
 *.mp4
+!public/cg/rin-xia-window-seat-t1/clip.mp4
+!public/cg/rin-xia-bookmark-t1/clip.mp4
+!public/cg/rin-xia-share-bowl-t1/clip.mp4
+!public/cg/rin-xia-fish-leads-t2/clip.mp4
+!public/cg/rin-xia-cheek-t1/clip.mp4
+!public/cg/xia-reach-t1/clip.mp4
+!public/cg/gpt-close-t1/clip.mp4
+!public/cg/rin-xia-welcome-t1/clip.mp4
 .DS_Store
 Thumbs.db
 .vscode/
@@ -28,3 +36,4 @@ Thumbs.db
 coverage/
 __pycache__/
 *.pyc
+scripts/animation-lab/_tmp-*

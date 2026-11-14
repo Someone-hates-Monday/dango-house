@@ -26,7 +26,7 @@ export function initialState(now = Date.now()): AppState {
     relationship:{mode:'friend',userName:'你',address:'你'},desktopMoves:{},
     bonds:defaultBonds(),favor:{focusId:null,streak:0},
     reminders:[{id:'water',text:'喝点水，活动一下吧。',intervalMinutes:30,nextAt:now+30*60000,enabled:false}],
-    settings: { dnd: false, autonomous: true, intimacy: 55, petsVisible: true, provider: 'glm', model: '', mode: 'demo', locale: defaultLocale, pairTone: 'warm', agentBridge: false, castPreset: 'all' },
+    settings: { dnd: false, autonomous: true, intimacy: 55, petsVisible: true, provider: 'glm', model: '', mode: 'demo', locale: defaultLocale, pairTone: 'warm', pairRomance: true, cgAutoplay: true, agentBridge: false, castPreset: 'all' },
     memories: [], focus: null, agent: emptyAgentUi(), activity: '大家都在庭院里', busy: false,
     messages: [
       { id: 'welcome', speaker: 'system', text: '欢迎回到团子小屋！先去「互动小屋」看看大家在做什么吧。', at: now },
@@ -61,7 +61,7 @@ export function restoreState(value: unknown, now = Date.now()): AppState {
   base.messages = Array.isArray(saved.messages) ? saved.messages.filter(m => m && typeof m.text === 'string' && typeof m.id === 'string' && ['user', 'system', ...ids].includes(m.speaker)).slice(-500) : base.messages;
   base.memories = Array.isArray(saved.memories) ? saved.memories.filter(m => m && typeof m.text === 'string' && typeof m.id === 'string').slice(-100) : [];
   if (saved.settings && typeof saved.settings === 'object') {
-    for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge'] as const) if (typeof saved.settings[key] === 'boolean') base.settings[key] = saved.settings[key];
+    for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay'] as const) if (typeof saved.settings[key] === 'boolean') base.settings[key] = saved.settings[key];
     if (Number.isFinite(saved.settings.intimacy)) base.settings.intimacy = Math.max(0, Math.min(100, saved.settings.intimacy));
     if (typeof saved.settings.provider === 'string') base.settings.provider = saved.settings.provider;
     if (typeof saved.settings.model === 'string') base.settings.model = saved.settings.model.slice(0, 120);

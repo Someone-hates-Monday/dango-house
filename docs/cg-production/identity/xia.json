@@ -1,0 +1,123 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "xia",
+  "displayName": "DeepSeek",
+  "nickname": "大肥鱼",
+  "stage": "draft",
+  "approved": false,
+  "form": "adult-normal-proportion",
+  "qDailyNote": "桌宠／109 段／fywdy 链属日常层，不作 CG 首尾帧",
+  "selectedVisual": {
+    "anchorFile": {
+      "value": "public/portraits/deepseek.jpg",
+      "evidence": "public/portraits/manifest.json#deepseek sha256 abf8fff5…a9a",
+      "scope": "adult-cg-anchor",
+      "status": "anchored"
+    },
+    "alphaVariant": {
+      "value": "public/portraits/deepseek-alpha-v1.png",
+      "evidence": "local alpha cut; not a new design",
+      "scope": "compositing-aid",
+      "status": "anchored"
+    },
+    "sourcePage": {
+      "value": "https://www.pixiv.net/artworks/148186519",
+      "evidence": "ZipZipPipe《AI娘化》; DS 页为合集内页",
+      "scope": "visual-origin",
+      "status": "anchored"
+    },
+    "creators": {
+      "value": ["上善无形（原型）", "ZipZipPipe（女仆二次设计）"],
+      "evidence": "BV1tE9XBbErS 简介 CC BY-NC-SA 4.0 链",
+      "scope": "attribution",
+      "status": "anchored"
+    },
+    "immutableFeatures": {
+      "value": ["蓝发", "双叶鲸尾（非龙尾）", "黑白女仆轮廓", "可识别的鱼／鲸元素"],
+      "evidence": "manifest + FANWORK 2.1 + 群像文档",
+      "scope": "cg-and-daily-recognition",
+      "status": "anchored"
+    },
+    "propsOwnership": {
+      "value": "碗／米饭为主道具主权；不凭空消失",
+      "evidence": "characters.ts + POV-001 工单需求",
+      "scope": "prop-continuity",
+      "status": "anchored"
+    },
+    "openVisualChecks": {
+      "value": ["发饰具体形状与 Claude 触点几何", "三视图左右／背", "持碗手臂遮挡"],
+      "evidence": null,
+      "scope": "needs-storyboard",
+      "status": "needs-view-check"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "聪明却爱摸鱼；贪吃；嘴硬无恶意；认真时用下潜比喻",
+      "evidence": "src/shared/characters.ts id=xia",
+      "scope": "runtime-dialogue",
+      "status": "in-code"
+    },
+    "greeting": {
+      "value": "DeepSeek 来啦！聊完可以一起吃饭吗？",
+      "evidence": "characters.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "rin（亲近 Claude，也爱拉 GPT 干饭）",
+      "evidence": "src/shared/social.ts socialProfiles.xia",
+      "scope": "runtime-bond-default",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["每句提胖", "换成龙尾", "无动机不停横摆尾", "真外包甩锅攻击用户"],
+      "evidence": "FANWORK 2.1 + characters.ts",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "女仆鲸形象与米饭／摸鱼梗可交叉出现",
+      "evidence": "CrossPet README／行为；ZipZipPipe 合集；GenderSwapAI 角色页",
+      "url": "https://github.com/lokicorvus/crosspet",
+      "scope": "behavior-reference-not-official",
+      "status": "title-meta-only",
+      "bindsTo": "projectPersonality.personality"
+    },
+    {
+      "claim": "女友向：留饭、等归、讨摸头题材常见",
+      "evidence": "ACTING／FANWORK 索引；邦多利素世等合集标题（未逐帧）",
+      "url": "https://genderswapai.com/zh-CN/ai-gijinka/fanworks",
+      "scope": "beat-library-only",
+      "status": "title-meta-only",
+      "bindsTo": "sceneActing.povLeaveRice"
+    },
+    {
+      "claim": "与 Claude 甜向／表白向短片多作者重复",
+      "evidence": "戛然而纸 BV1PTHB6BEbA 标题+简介；黑猫勇者索引页；凤凰网转述（传播层）",
+      "url": "https://www.bilibili.com/video/BV1PTHB6BEbA/",
+      "viewsAtCheck": 154719,
+      "checkedAt": "2026-11-04",
+      "scope": "relationship-beat-reference",
+      "status": "title-meta-only",
+      "bindsTo": "socialTarget"
+    }
+  ],
+  "sceneActing": {
+    "status": "empty",
+    "boundWorkOrders": [],
+    "note": "例如 CP-001 中「察觉后偷看轻红」只绑定该工单，不写成永远被动"
+  },
+  "relationsExpress": {
+    "toUser": "留饭、等你、讨摸头；不责备",
+    "toRin": "亲近、被照顾也凑近",
+    "toShiori": "饭搭子／暧昧同事旁支"
+  },
+  "openQuestions": [
+    "成年体发饰与 Q 版是否逐件映射",
+    "持碗左右手默认习惯（POV-001）",
+    "社区「圣女／逃出」虐恋脑补不进默认产品——已记 SKIP，无需再采信"
+  ]
+}

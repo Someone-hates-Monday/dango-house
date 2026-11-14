@@ -14,8 +14,8 @@
 @keyframes offerBite{0%,15%{opacity:0;translate:-15px 8px}35%,65%{opacity:1;translate:0 -4px}85%,100%{opacity:0;translate:-15px 8px}}
 .reaction-video-sprite,.reaction-fallback{position:absolute;inset:0;display:block;pointer-events:none}
 .reaction-video-sprite .reaction-video,.reaction-video-sprite .cast-idle-video{position:absolute;left:50%;top:-26.666667%;height:133.333333%;width:auto;max-width:none;transform:translateX(-50%);opacity:0;pointer-events:none}
-.reaction-video-sprite[data-clip=pat] .reaction-video,.reaction-video-sprite[data-clip=idle] .cast-idle-video{opacity:1}
-.reaction-video-sprite[data-clip=pat] .reaction-fallback,.reaction-video-sprite[data-clip=idle] .reaction-fallback{visibility:hidden}
+.reaction-video-sprite[data-clip=pat] .reaction-video,.reaction-video-sprite[data-clip=idle] .cast-idle-video,.reaction-video-sprite[data-clip=loading] .cast-idle-video{opacity:1}
+.reaction-video-sprite[data-clip=pat] .reaction-fallback,.reaction-video-sprite[data-clip=idle] .reaction-fallback,.reaction-video-sprite[data-clip=loading] .reaction-fallback{visibility:hidden}
 .video-snapshot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .22s ease}
 .dock-cast{position:absolute;inset:0;pointer-events:none}
 .dock-pet.desktop-pet{pointer-events:none;transition:none;overflow:visible}

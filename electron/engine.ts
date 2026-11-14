@@ -6,7 +6,7 @@ import type {Interaction} from '../src/shared/motion';
 import { byId, providers } from '../src/shared/characters';
 import { socialScenes, relationshipKey } from '../src/shared/social';
 import { chooseSpeakers, demoReply, initialState, praiseLines, ids } from '../src/shared/director';
-import type { Action, AppState, CharacterId, Message, AvatarIntent, Emotion } from '../src/shared/types';
+import type { Action, AppState, CharacterId, CgAssetId, Message, AvatarIntent, Emotion } from '../src/shared/types';
 import { boundedPoint, defaultFurniture, inferredIntent, poseForAction, restingBody, residentPosition, targetDescription, validatedIntent } from '../src/shared/world';
 import { emptyAgentUi } from '../src/shared/agent';
 import { isAppLocale, translate } from '../src/shared/i18n';
@@ -17,6 +17,8 @@ import {
 import { AgentRuntime, defaultBrowseGrants, defaultWatchGrants } from './agent/runtime';
 import { applyFavor, rivalryEscalationBubbles, rivalryEscalationCast, shouldEscalateRivalry } from '../src/shared/favor';
 import { pickYuriScene, shareSnackBubble, yuriScenes } from '../src/shared/social-yuri';
+import { cgAssetForCompletedJob, cgClip, isCgAssetId } from '../src/shared/cg-catalog';
+import {allowsEventCg,affectionCgFor} from '../src/shared/cg-policy';
 import { bondOf, bumpBond, cpPartner } from '../src/shared/bonds';
 import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent, isSpeaking, normalizePresentIds } from '../src/shared/cast';
 import { SceneDirector, type SceneJob, type ScenePriority, type SceneReward } from '../src/shared/scene-director';
@@ -40,6 +42,9 @@ export class GardenEngine {
   private director = new SceneDirector();
   private storyAbort?: AbortController;
   private storyJobId: string | null = null;
+  /** Meet+talk beat queued before overhead CG playback. */
+  private pendingCg: { asset: CgAssetId; host: 'room' | 'desktop'; automatic:boolean } | null = null;
+  private lastEventCgAt=0;
   /** Active private visit per character — return settles once; leave cancels. */
   private privateVisits = new Map<CharacterId, { visitId: string; settled: boolean; cancelled: boolean; openedAt: number }>();
   private privateOpened: {id:CharacterId;at:number}|null=null;
@@ -129,8 +134,78 @@ export class GardenEngine {
     this.storyAbort?.abort();
     this.storyAbort = undefined;
     this.storyJobId = null;
+    this.pendingCg = null;
     this.director.clear();
   }
+  private cgCastPresent(asset: CgAssetId) {
+    return cgClip(asset).participants.every(id => isPresent(this.state, id));
+  }
+  /** Start overhead CG once cast is ready. Does not grant bond/events. */
+  private startCgSession(asset: CgAssetId, host: 'room' | 'desktop', replace = false,automatic=false) {
+    if (!['room', 'desktop'].includes(host) || this.state.settings.dnd || this.state.focus || !this.cgCastPresent(asset)) return false;
+    if (host === 'desktop' && !this.state.settings.petsVisible) return false;
+    if (this.state.cgSession?.outcome === 'playing') {
+      if (!replace) return false;
+      this.sealCg(this.state.cgSession.id, 'cancelled');
+    }
+    const clip = cgClip(asset);
+    const now = Date.now();
+    const id = crypto.randomUUID();
+    this.state.cgSession = {
+      id,
+      asset,
+      host,
+      startedAt: now,
+      expiresAt: now + 90_000,
+      outcome: 'playing',
+      automatic,
+      jobId: `cg-watch-${id}`,
+      segmentId: clip.segmentId,
+    };
+    return true;
+  }
+  /** Pair/group clips: approach + short dialogue, then startCgSession on settle. */
+  private beginCgMeetThenPlay(asset: CgAssetId, host: 'room' | 'desktop',automatic=false,delay=0) {
+    const clip = cgClip(asset);
+    if (this.state.cgSession?.outcome === 'playing') this.sealCg(this.state.cgSession.id, 'cancelled');
+    const a=clip.initiator??clip.participants[0],b=clip.participants.find(id=>id!==a);
+    const locale = this.locale();
+    const lines = clip.intro?.[locale] ?? clip.intro?.['zh-CN'] ?? (['过来。', '……我在。'] as const);
+    const now = Date.now();
+    this.pendingCg = { asset, host,automatic };
+    const job = this.queueJob(
+      { id: `cg-intro-${asset}-${now}`, source: `cg-intro:${asset}`, priority: 'user', cast: [...clip.participants] },
+      b?[
+        { at: now+delay, actor: a, intent: { action: 'approach', target: b, emotion: 'happy', bubble: lines[0], duration: 4 }, speech: lines[0] },
+        { at: now+delay+2400, actor: b, intent: { action: 'shy', emotion: 'shy', bubble: lines[1], duration: 4 }, speech: lines[1] },
+      ]:[{at:now+delay,actor:a,intent:{action:'wave',emotion:'happy',bubble:lines[0],duration:3},speech:lines[0]}],
+      now,
+    );
+    if (!job) {
+      this.pendingCg = null;
+      return;
+    }
+    this.tick(now);
+  }
+  private maybeStartEventCg(job: SceneJob) {
+    if (job.source.startsWith('cg-intro:')) {
+      const asset = job.source.slice('cg-intro:'.length);
+      if (isCgAssetId(asset) && this.pendingCg?.asset === asset) {
+        const host = this.pendingCg.host;
+        const automatic=this.pendingCg.automatic;
+        this.pendingCg = null;
+        if(!automatic||this.eventCgReady(asset)){
+          if(this.startCgSession(asset, host,false,automatic)&&automatic)this.lastEventCgAt=Date.now();
+        }
+      } else {
+        this.pendingCg = null;
+      }
+      return;
+    }
+    const asset = cgAssetForCompletedJob(job);
+    if (asset&&this.eventCgReady(asset)&&this.startCgSession(asset, 'room',false,true))this.lastEventCgAt=Date.now();
+  }
+  private eventCgReady(asset:CgAssetId){return allowsEventCg(this.state,asset)&&this.cgCastPresent(asset)&&Date.now()-this.lastEventCgAt>=120000&&!this.state.cgSession;}
   private cancelPrivateVisit(id: CharacterId) {
     const visit = this.privateVisits.get(id);
     if (!visit || visit.settled) return;
@@ -138,6 +213,23 @@ export class GardenEngine {
     visit.settled = true;
     this.privateVisits.set(id, visit);
     if (this.privateOpened?.id === id) this.privateOpened = null;
+  }
+  /** Seal WATCH receipt without bond/companion rewards. Stale session ids are ignored. */
+  private sealCg(sessionId: string, outcome: 'ended' | 'cancelled' | 'failed') {
+    const session = this.state.cgSession;
+    if (!session || session.id !== sessionId || session.outcome !== 'playing') return false;
+    const at = Date.now();
+    this.state.cgLastReceipt = {
+      sessionId: session.id,
+      asset: session.asset,
+      host: session.host,
+      outcome,
+      jobId: session.jobId,
+      segmentId: session.segmentId,
+      at,
+    };
+    this.state.cgSession = undefined;
+    return true;
   }
   private ownedEndFor(id: CharacterId): number {
     const bodyUntil = this.state.bodies[id]?.until ?? 0;
@@ -187,6 +279,7 @@ export class GardenEngine {
     this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;
   }
   private playYuri(id:string,now=Date.now()) {
+    if(this.state.settings.pairRomance===false)return;
     const story = yuriScenes.find(s => s.id === id);
     if (!story || story.pair.some(actor => !speakingCast(this.state).includes(actor))) return;
     const tone = this.state.settings.pairTone ?? 'warm';
@@ -268,13 +361,25 @@ export class GardenEngine {
     this.lastInteraction = Date.now();
     switch (action.type) {
       case 'cg-preview': {
-        if (!['room', 'desktop'].includes(action.host) || this.state.settings.dnd || this.state.focus || !isPresent(this.state,'rin') || !isPresent(this.state,'xia')) return;
+        if (!['room', 'desktop'].includes(action.host) || this.state.settings.dnd || this.state.focus) return;
         if (action.host === 'desktop' && !this.state.settings.petsVisible) return;
-        const now=Date.now();
-        this.state.cgSession={id:crypto.randomUUID(),asset:'rin-xia-hair-v1',host:action.host,startedAt:now,expiresAt:now+15000};
+        const asset = action.asset ?? 'rin-xia-hair-v1';
+        if (!isCgAssetId(asset) || !this.cgCastPresent(asset)) return;
+        const clip = cgClip(asset);
+        if (clip.participants.length >= 2) {
+          this.beginCgMeetThenPlay(asset, action.host);
+          this.publish();
+          return;
+        }
+        this.beginCgMeetThenPlay(asset, action.host);
         break;
       }
-      case 'cg-dismiss': if(this.state.cgSession?.id===action.sessionId)this.state.cgSession=undefined; break;
+      case 'cg-dismiss': this.sealCg(action.sessionId,'cancelled'); break;
+      case 'cg-complete': {
+        if(action.outcome!=='ended'&&action.outcome!=='failed')return;
+        this.sealCg(action.sessionId,action.outcome);
+        break;
+      }
       case 'send': {
         if (typeof action.text !== 'string' || !action.text.trim()) return;
         const text = action.text.trim().slice(0, 4000); this.stop(); this.add('user', text);
@@ -310,7 +415,7 @@ export class GardenEngine {
       }
       case 'hover': {if(!ids.includes(action.id)||this.state.settings.dnd||!this.state.settings.autonomous)return;const now=Date.now();if(now-(this.hovered[action.id]??0)<90000||now-this.lastGreeting<15000)return;this.hovered[action.id]=now;this.lastGreeting=now;this.perform(action.id,{action:'wave',emotion:'happy',bubble:hoverLine(this.locale(),this.state.relationship.address,byId[action.id].name),duration:6});return;}
       case 'reminder': {if(action.operation==='remove')this.state.reminders=this.state.reminders.filter(r=>r.id!==action.id);else if(action.operation==='toggle'){const r=this.state.reminders.find(r=>r.id===action.id);if(r){r.enabled=!r.enabled;r.nextAt=Date.now()+r.intervalMinutes*60000;}}else if(typeof action.text==='string'&&action.text.trim()&&Number.isFinite(action.intervalMinutes)&&action.intervalMinutes!>=1&&action.intervalMinutes!<=1440&&this.state.reminders.length<12)this.state.reminders.push({id:crypto.randomUUID(),text:action.text.trim().slice(0,120),intervalMinutes:action.intervalMinutes!,nextAt:Date.now()+action.intervalMinutes!*60000,enabled:true});break;}
-      case 'relationship': {if(!['friend','pet','romance'].includes(action.mode))return;this.state.relationship={mode:action.mode,userName:String(action.userName).slice(0,30),address:String(action.address).slice(0,30)};break;}
+      case 'relationship': {if(!['friend','pet','romance'].includes(action.mode))return;this.state.relationship={mode:action.mode,userName:String(action.userName).slice(0,30),address:String(action.address).slice(0,30)};if(this.pendingCg?.automatic&&!allowsEventCg(this.state,this.pendingCg.asset))this.cancelScenes('relationship-change');break;}
       case 'private-open': {
         this.stop();
         if(!ids.includes(action.id))return;
@@ -483,7 +588,7 @@ export class GardenEngine {
         this.add('user', praiseUserLine(this.locale(), byId[action.id].name));
         {const round=this.epoch;await this.sequence(praiseLines(action.id, this.state.settings.intimacy, this.locale()));
         // sequence starts and finishes one round; a newer request cancels this reaction.
-        if(this.epoch===round+2){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});this.queueRivalryEscalation(action.id,now);}}return;
+        if(this.epoch===round+2){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});this.queueRivalryEscalation(action.id,now);const asset=affectionCgFor(action.id);if(asset&&this.eventCgReady(asset))this.beginCgMeetThenPlay(asset,'room',true,7000);}}return;
       }
       case 'mute':
         if (!ids.includes(action.id) || !isPresent(this.state, action.id)) break;
@@ -540,13 +645,14 @@ export class GardenEngine {
       case 'settings': {
         const p = action.patch;
         if (!p || typeof p !== 'object') return;
-        for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge'] as const) if (typeof p[key] === 'boolean') this.state.settings[key] = p[key];
+        for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay'] as const) if (typeof p[key] === 'boolean') this.state.settings[key] = p[key];
         if (Number.isFinite(p.intimacy)) this.state.settings.intimacy = Math.max(0, Math.min(100, p.intimacy!));
         if (typeof p.model === 'string') this.state.settings.model = p.model.trim().slice(0, 120);
         if (providers.some(v => v.id === p.provider)) this.state.settings.provider = p.provider!;
         if (p.mode === 'demo' || p.mode === 'api') this.state.settings.mode = p.mode;
         if (isAppLocale(p.locale)) this.state.settings.locale = p.locale;
         if (p.pairTone === 'soft' || p.pairTone === 'warm' || p.pairTone === 'vivid') this.state.settings.pairTone = p.pairTone;
+        if(this.pendingCg?.automatic&&!allowsEventCg(this.state,this.pendingCg.asset))this.cancelScenes('cg-preference');
         if (p.castPreset === 'all' || p.castPreset === 'core' || p.castPreset === 'custom') this.state.settings.castPreset = p.castPreset;
         if (p.mode || p.model !== undefined || p.provider || p.dnd === true || p.autonomous === false) this.stop();
         if(p.dnd===true)this.freezeRoom();
@@ -569,7 +675,10 @@ export class GardenEngine {
       case 'banter':
         if (this.state.focus) { this.add('system', this.t('sys.focusQuiet')); return; }
         this.stop();this.playSocial(socialScenes[this.socialIndex++%socialScenes.length].id);this.tick();return;
-      case 'stop': this.state.cgSession=undefined;this.stop();this.freezeRoom(); return;
+      case 'stop': {
+        if(this.state.cgSession)this.sealCg(this.state.cgSession.id,'cancelled');
+        this.stop();this.freezeRoom(); return;
+      }
       case 'watch-start': {
         if (!this.agent) { this.add('system', this.t('sys.watchNotReady'), 'error'); return; }
         if (typeof action.path !== 'string' || !action.path.trim()) { this.add('system', this.t('sys.watchNeedFile'), 'error'); return; }
@@ -634,7 +743,14 @@ export class GardenEngine {
   tick(now = Date.now()) {
     if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
     let changed=false;
-    if(this.state.cgSession&&(now>=this.state.cgSession.expiresAt||this.state.settings.dnd||this.state.focus||!isPresent(this.state,'rin')||!isPresent(this.state,'xia')||(this.state.cgSession.host==='desktop'&&!this.state.settings.petsVisible))){this.state.cgSession=undefined;changed=true;}
+    if(this.state.cgSession){
+      const live=this.state.cgSession;
+      const castMissing=!this.cgCastPresent(live.asset);
+      if(now>=live.expiresAt||this.state.settings.dnd||this.state.focus||castMissing||(live.automatic&&!allowsEventCg(this.state,live.asset))||(live.host==='desktop'&&!this.state.settings.petsVisible)){
+        this.sealCg(live.id,'cancelled');
+        changed=true;
+      }
+    }
     this.director.dropMissing(presentCast(this.state));
     let {steps:due,completed}=this.director.due(now);
     for(const item of due){
@@ -649,7 +765,7 @@ export class GardenEngine {
     }
     this.director.sealSettle(now);
     if(!completed){({completed}=this.director.due(now));}
-    if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;changed=true;}
+    if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;this.maybeStartEventCg(completed);changed=true;}
     for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}
     if(changed)this.publish();

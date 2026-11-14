@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-cheek-t1",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "CP-006",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-13",
+  "art_review": "User accepted the cheek-cuddle short trial for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "9e6a7679a1e81e3ca40d5c926099e2529e5ac5a6a0f9a5e204d43eca9c87fa8f",
+      "bytes": 10295866
+    },
+    "poster.png": {
+      "sha256": "8a523ee8d68e9052f4793bdf2a4602021a18aaccc878fbb71dd87df73b3c34f6",
+      "bytes": 3162416
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

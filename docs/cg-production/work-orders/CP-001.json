@@ -1,0 +1,77 @@
+{
+  "recordType": "planning-template-not-runtime-manifest",
+  "version": 1,
+  "id": "CP-001",
+  "title": "Claude 给大鱼整理发饰",
+  "stage": "runtime-accepted-watch",
+  "generationAuthorized": false,
+  "participants": ["rin", "xia"],
+  "audience": "character-pair",
+  "activityMode": "WATCH",
+  "personaVersion": "identity-draft-2026-11-04",
+  "identitySheets": ["identity/rin.json", "identity/xia.json"],
+  "references": [
+    { "kind": "beat", "ledgerId": "paper-claude-confess", "use": "甜向靠近动机，不抄镜头" },
+    { "kind": "beat", "ledgerId": "blackcat-index", "use": "整理发丝类标题候选，待补 BV" },
+    { "kind": "product", "id": "seat-share", "use": "关系取向对齐，非分镜复用" },
+    { "kind": "runtime-asset", "id": "rin-xia-hair-v1", "use": "用户确认效果可实装的 WATCH 成片" }
+  ],
+  "singleVisibleGoal": "Claude 角色自身右手整理已确认的鱼发饰；唯一触点；用户旁观",
+  "shots": [
+    {
+      "id": "S1",
+      "goal": "靠近与察觉",
+      "still": "Claude 略前倾看鱼；鱼察觉；四臂可追溯肩肘",
+      "status": "covered-by-runtime-clip"
+    },
+    {
+      "id": "S2",
+      "goal": "触点",
+      "still": "Claude 右手触发饰，左手留书；鱼双手身侧；左右为角色自身非屏幕",
+      "status": "covered-by-runtime-clip",
+      "structureRisk": "high-contact"
+    },
+    {
+      "id": "S3",
+      "goal": "反应停稳",
+      "still": "Claude 从容笑；鱼视线移开后偷看轻红；鲸尾小幅收后停；双臂／书／尾根连续",
+      "status": "covered-by-runtime-clip"
+    }
+  ],
+  "segments": [
+    {
+      "id": "rin-xia-hair-v1-main",
+      "asset": "public/cg/rin-xia-hair-v1/clip.webm",
+      "poster": "public/cg/rin-xia-hair-v1/poster.png",
+      "manifest": "public/cg/rin-xia-hair-v1/manifest.json",
+      "mode": "WATCH",
+      "reward": false
+    }
+  ],
+  "userChoices": [],
+  "noResponsePolicy": "n/a-WATCH",
+  "reward": { "enabled": false, "kind": null, "successBoundary": "preview-watch-no-reward-until-director-binding" },
+  "host": { "mode": "room-or-desktop", "anchor": "midpoint-above-pair", "fallback": "memory-chip" },
+  "pipeline": { "status": "installed-watch", "note": "2026-11-08 用户确认现片可实装；沿用 public rin-xia-hair-v1；不自动奖励" },
+  "attempts": [],
+  "budget": { "maxSameFailureAttempts": 2, "creditCeiling": null, "actualCredits": null, "inferenceSeconds": null },
+  "acceptance": {
+    "identity": { "status": "pass-user", "reviewer": "user", "at": "2026-11-08", "evidence": ["public/cg/rin-xia-hair-v1"] },
+    "storyboard": { "status": "pass-user", "reviewer": "user", "at": "2026-11-08", "evidence": ["runtime clip covers S1-S3 intent"] },
+    "art": { "status": "pass-user", "reviewer": "user", "at": "2026-11-08", "evidence": ["user: 效果可以"] },
+    "runtime": { "status": "pass", "reviewer": "cursor", "at": "2026-11-08", "evidence": ["overhead+fallback chip expand", "ended/cancel/fail receipts", "verify-cg-moment success"] }
+  },
+  "playbackReceipt": {
+    "required": true,
+    "note": "cg-complete ended／cg-dismiss cancelled／decode failed；不可用 body.until 冒充成功"
+  },
+  "distribution": { "approved": false, "licenseEvidence": ["public/cg/NOTICE.md"], "credits": [], "conditions": ["manual WATCH only"] },
+  "automaticPlaybackApproved": false,
+  "files": ["public/cg/rin-xia-hair-v1/clip.webm", "public/cg/rin-xia-hair-v1/poster.png"],
+  "replaces": null,
+  "rollback": "keep-v1-manual-card",
+  "openQuestions": [
+    "自动关系事件绑定仍待回执稳定后另开",
+    "Jimeng take 在 test-results/cg-lab/jimeng-cp001-rin-xia-hair-v1 仅归档，未替换 public"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "recordType": "planning-template-not-runtime-manifest",
+  "version": 1,
+  "id": "POV-001",
+  "title": "大鱼给用户留饭",
+  "stage": "draft",
+  "generationAuthorized": false,
+  "participants": ["xia"],
+  "audience": "user-pov",
+  "activityMode": "BEAT_WAIT",
+  "personaVersion": "identity-draft-2026-11-04",
+  "identitySheets": ["identity/xia.json"],
+  "references": [
+    { "kind": "beat", "ledgerId": "dongbing-apartment", "use": "干饭日常氛围，不抄合租镜头" },
+    { "kind": "product", "id": "deepseek-109-rice-clips", "use": "Q 日常已有吃饭段，CG 不重复做咀嚼循环" }
+  ],
+  "singleVisibleGoal": "同一只碗朝向用户镜头；邀请→等待→二选一回应；无第二人手入画",
+  "shots": [
+    {
+      "id": "P1-invite",
+      "goal": "发现／邀请",
+      "still": "眼平看镜头；碗轻推向前，不凭空易手",
+      "status": "spec-only",
+      "difficulty": "CG-A"
+    },
+    {
+      "id": "P2-hold",
+      "goal": "持碗等待",
+      "still": "合格稳定末帧；按钮「谢谢，我接过啦」／「先放着，我一会儿来」",
+      "status": "spec-only",
+      "difficulty": "CG-A"
+    },
+    {
+      "id": "P3a-accept",
+      "goal": "接过分支",
+      "still": "若无验收通过的离手过程：碗仍在鱼侧，语义「我先替你放好」+开心；禁台词掩盖瞬移消失",
+      "status": "spec-only",
+      "difficulty": "CG-B-if-handoff"
+    },
+    {
+      "id": "P3b-later",
+      "goal": "稍后分支",
+      "still": "温和放松；回 Q 安静陪伴；不扣分",
+      "status": "spec-only",
+      "difficulty": "CG-A-or-q-fallback"
+    }
+  ],
+  "segments": [],
+  "userChoices": [
+    { "id": "accept", "label": "谢谢，我接过啦", "next": "P3a-accept" },
+    { "id": "later", "label": "先放着，我一会儿来", "next": "P3b-later" }
+  ],
+  "noResponsePolicy": "quiet-cancel-without-penalty",
+  "reward": {
+    "enabled": false,
+    "kind": null,
+    "successBoundary": "only-after-real-choice-and-segment-success-when-wired"
+  },
+  "host": { "mode": "room-or-desktop", "anchor": "single-xia", "fallback": "q-only" },
+  "pipeline": {
+    "status": "not-run",
+    "note": "LivePortrait 只做头脸候选；递碗身体／道具走动作控制或静帧差分"
+  },
+  "attempts": [],
+  "budget": { "maxSameFailureAttempts": 2, "creditCeiling": null, "actualCredits": null, "inferenceSeconds": null },
+  "acceptance": {
+    "identity": { "status": "not-run", "reviewer": null, "at": null, "evidence": [] },
+    "storyboard": { "status": "not-run", "reviewer": null, "at": null, "evidence": [] },
+    "art": { "status": "not-run", "reviewer": null, "at": null, "evidence": [] },
+    "runtime": { "status": "not-run", "reviewer": null, "at": null, "evidence": [] }
+  },
+  "playbackReceipt": {
+    "required": true,
+    "states": ["requested", "preparing", "playing", "holding", "awaiting-choice", "playing-response", "completed", "failed", "cancelled"],
+    "note": "等待选择与失败／跳过／取消分路径；引擎动作结束≠本片成功"
+  },
+  "distribution": { "approved": false, "licenseEvidence": [], "credits": [], "conditions": [] },
+  "automaticPlaybackApproved": false,
+  "files": [],
+  "replaces": null,
+  "rollback": "keep-v1-manual-card",
+  "openQuestions": [
+    "持碗默认左右手",
+    "审片页手动切分镜是否先于状态机",
+    "记忆是否只记真实选择文案"
+  ]
+}

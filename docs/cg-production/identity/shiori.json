@@ -1,0 +1,90 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "shiori",
+  "displayName": "GPT",
+  "nickname": "小龙娘",
+  "stage": "draft",
+  "approved": false,
+  "form": "adult-normal-proportion",
+  "selectedVisual": {
+    "anchorFile": {
+      "value": "public/portraits/gpt.jpg",
+      "evidence": "manifest.json#gpt sha256 2ad17c3c…905a",
+      "scope": "adult-cg-anchor",
+      "status": "anchored"
+    },
+    "qDailyReference": {
+      "value": "public/community/gpt/idle.webp",
+      "evidence": "docs/animation-lab/character-consistency.json",
+      "scope": "q-daily-not-cg-first-frame",
+      "status": "anchored"
+    },
+    "tailRule": {
+      "value": "尾根靠身体侧（右上）向下沿右侧再向左收尖；不增独立尾尖饰物；根尖不可对调；正面贴身首帧易把粗端误读为尖——须结构图消歧+膝下包络+前几帧验收",
+      "evidence": "character-consistency.json#gpt.tail; docs/animation-lab/gpt-jimeng-q-handoff.zh-CN.md",
+      "scope": "all-generation",
+      "status": "anchored"
+    },
+    "immutableFeatures": {
+      "value": ["银白发", "紫瞳", "龙角龙翼", "单一西方龙尾（非鲸尾）"],
+      "evidence": "manifest + consistency",
+      "scope": "recognition",
+      "status": "anchored"
+    },
+    "openVisualChecks": {
+      "value": ["proud.webp 皇冠勿作中性参考", "缠尾特写属 CG-B 结构专项", "即梦 Q 互动 C1 待目视：根尖／无末端鳍／勿替 idle·pat"],
+      "evidence": "consistency excludeFromNeutralReferences; gpt-jimeng-q-handoff.zh-CN.md",
+      "scope": "reference-hygiene",
+      "status": "needs-view-check"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "外冷内热、简练、前辈感、轻微傲娇；关心靠具体帮助",
+      "evidence": "characters.ts id=shiori",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "xia（嘴硬留座）",
+      "evidence": "social.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["降智龙崽默认", "每句「才没有」", "真贪婪收费恐吓", "与鲸尾混用"],
+      "evidence": "FANWORK 2.3 + consistency",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "与大鱼女同事／饭搭子日常",
+      "evidence": "BV1WUhE63En4 标题+简介",
+      "url": "https://www.bilibili.com/video/BV1WUhE63En4/",
+      "viewsAtCheck": 180789,
+      "checkedAt": "2026-11-04",
+      "scope": "beat-reference",
+      "status": "title-meta-only",
+      "bindsTo": "socialTarget"
+    },
+    {
+      "claim": "被 Grok 逗、接梗对象",
+      "evidence": "BV1EMpK6rEsN；socialProfiles.grok",
+      "url": "https://www.bilibili.com/video/BV1EMpK6rEsN/",
+      "viewsAtCheck": 29860,
+      "checkedAt": "2026-11-04",
+      "scope": "beat-reference",
+      "status": "title-meta-only",
+      "bindsTo": "relationsExpress"
+    }
+  ],
+  "sceneActing": { "status": "empty", "boundWorkOrders": [], "note": "吃醋旁观只作 REACT_SIDE，不改主 CP" },
+  "relationsExpress": {
+    "toUser": "别站着，过来坐",
+    "toXia": "嘴硬留座",
+    "fromGrok": "被逗的前辈"
+  },
+  "openQuestions": ["成年体礼服 vs Q 版裙装映射", "尾部害羞缠腿仅 Q／一致性试验，未进 CG"]
+}

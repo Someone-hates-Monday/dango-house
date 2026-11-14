@@ -4,7 +4,7 @@
     "reference":"public/community/gpt/idle.webp",
     "compatibleSecondary":"public/community/gpt/thinking.webp",
     "excludeFromNeutralReferences":"public/community/gpt/proud.webp adds a crown",
-    "tail":"Root direction is upper right next to the body, partly occluded by hair and clothing. From that thick root the tail curves down along the right side, then left along the bottom. The lower inward-pointing tapered end is the true terminal tip. NEVER reverse root and tip or treat the upper body-side section as the tip. Preserve original edge scales; do not append any separate tip, leaf, fin, plume, tuft, arrow or ornament.",
+    "tail":"Root direction is upper right next to the body, partly occluded by hair and clothing. From that thick root the tail curves down along the right side, then left along the bottom. The lower inward-pointing tapered end is the true terminal tip. NEVER reverse root and tip or treat the upper body-side section as the tip. Preserve original edge scales; do not append any separate tip, leaf, fin, plume, tuft, arrow or ornament. First-frame pitfall: frontal idle/greenscreen often shows a thick body-side segment that models misread as the tip; add a structure ref that makes pelvic root→low tip unambiguous, keep tip below the knee near the feet, and reject clips that invert in the first 1–2s. See docs/animation-lab/gpt-jimeng-q-handoff.zh-CN.md.",
     "tailBodyLanguage":{
       "required":true,
       "idle":"Occasional small relaxed sway with a soft pause; do not freeze or wag continuously at a constant speed.",
@@ -14,6 +14,17 @@
       "reject":["static pasted tail during expressive action","constant mechanical wagging","motion only at an added tip","teleporting coil","tail passing through legs or dress","disconnected root","new spikes or tip ornaments"]
     },
     "otherChecks":["same horns and wings","same head ornament and clothes","two arms only","full body and tail in frame","neutral start and complete recovery","no generated human hand","emotion-linked continuous tail motion"]
+  },
+  "claude":{
+    "reference":"test-results/animation-lab/claude/interactions-v1/anchor-green.png",
+    "sha256":"eedf87a100ab85dbc47d56d3ee140bfff30e54b9b12201f498de031e83ff753e",
+    "compatibleProductionIdle":"public/video/claude/idle.webm",
+    "excludeAsQFirstFrame":"public/portraits/claude.jpg is normal-proportion CG identity only; never mix as Q first frame",
+    "bookAndHands":"One brown patterned book always present with clear left/right grip ownership. Two arms only. Do not dissolve the book like a temporary prop; do not teleport it into the other hand; do not let pages or spine pass through wrists or face. Before video, still-check shoulder–elbow–wrist–book on both sides.",
+    "hairAndSilhouette":"Keep flower ornament + black ribbon, full orange hair silhouette, shoes and fingers inside frame. Reject cropped hair tips, floating ribbon, or swapped flower side.",
+    "personaTone":"Gentle, earnest, slightly reserved; warmer eye contact and smile than GPT. No exaggerated jumping, no constant blush-only acting, no horns/wings/tail.",
+    "neutralPoseN":"Shared book-holding standing pose N for ordinary clips: start and end on N. Sleep/Dock/walk need dedicated bridge states; do not hard-cut S→N or hide mismatch with long crossfades. See docs/animation-lab/CLAUDE-ACTION-HANDOFF.zh-CN.md and DSH-PROMPT-LESSONS-FOR-CLAUDE.zh-CN.md.",
+    "otherChecks":["same amber eyes and flower ribbon","same white-orange-gold dress","book cover pattern and thickness stable","no second character in solo clips","no generated user hand","complete prepare–act–recover"]
   },
   "otherCharacters":{
     "gemini":"Preserve existing cat ears, eyes, star ornament and tail; do not invent extra stars, a second tail or extra ear pairs.",

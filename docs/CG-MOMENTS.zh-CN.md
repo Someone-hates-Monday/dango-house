@@ -2,6 +2,8 @@
 
 [English](CG-MOMENTS.en.md) · [传播策略交接](HANDOFF-STRATEGY-CG-AND-MARKETING.zh-CN.md)
 
+**最新状态（2026-11-04）**：用户要求暂停生图/视频，先研究百合与面向用户的女友互动经验。V2 尾帧肢体结构不合格，对应任务已取消，未替换 V1。最新表演和头顶影片气泡规格见 [调研文档](CG-ACTING-AND-POV-RESEARCH.zh-CN.md)；手法与 Comfy／即梦控制补充见 [CG-YURI-AND-CONTROL-SUPPLEMENT.zh-CN.md](CG-YURI-AND-CONTROL-SUPPLEMENT.zh-CN.md)。恢复生成须等用户后续指示。下文固定角落卡片是 V1 已实现状态，不是最新默认展示方向。
+
 2026-11-04。用户此次明确新增了“本地高级模型试片与 CG 展示设计”任务；它独立于 Cursor 已完成的陪伴 A/B/C，不将旧规格中的“本轮不生视频”理解为本次任务禁令。
 
 ## 定位

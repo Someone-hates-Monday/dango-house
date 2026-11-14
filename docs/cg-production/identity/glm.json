@@ -1,0 +1,62 @@
+{
+  "recordType": "identity-sheet-draft",
+  "characterId": "glm",
+  "displayName": "GLM",
+  "nickname": "黑狐",
+  "stage": "draft",
+  "approved": false,
+  "form": "adult-normal-proportion",
+  "selectedVisual": {
+    "anchorFile": {
+      "value": "public/portraits/glm.jpg",
+      "evidence": "manifest.json#glm sha256 109fd151…4c95",
+      "scope": "adult-cg-anchor",
+      "status": "anchored"
+    },
+    "immutableFeatures": {
+      "value": ["黑发狐耳", "笑眯眯底色", "以当前锚图为准的配件"],
+      "evidence": "manifest + consistency：勿按口头人设加减饰物",
+      "scope": "recognition",
+      "status": "anchored"
+    },
+    "accessories": {
+      "value": "眼罩／铃铛是否同屏——必须对照锚图像素，不得凭 CrossPet 文案补画",
+      "evidence": "character-consistency.json#otherCharacters.glm",
+      "scope": "visual-strict",
+      "status": "needs-view-check"
+    }
+  },
+  "projectPersonality": {
+    "personality": {
+      "value": "从容、玩笑涨价／友情价、轻腹黑；不索真实金钱",
+      "evidence": "characters.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "socialTarget": {
+      "value": "gemini",
+      "evidence": "social.ts",
+      "scope": "runtime",
+      "status": "in-code"
+    },
+    "antiDrift": {
+      "value": ["真实索费", "纯反派虐猫", "与锚图冲突的加饰"],
+      "evidence": "FANWORK 2.5 + consistency",
+      "scope": "product-default",
+      "status": "in-code"
+    }
+  },
+  "community": [
+    {
+      "claim": "CrossPet 黑狐改价签／眼罩揭晓等为日常灵感",
+      "evidence": "CrossPet；characters source 字段",
+      "url": "https://github.com/lokicorvus/crosspet",
+      "scope": "daily-enrichment",
+      "status": "title-meta-only",
+      "bindsTo": "projectPersonality"
+    }
+  ],
+  "sceneActing": { "status": "empty", "boundWorkOrders": [], "note": "友情价抱抱＝CG-B" },
+  "relationsExpress": { "toGemini": "逗猫、友情赠送" },
+  "openQuestions": ["锚图是否含铃铛／眼罩同帧", "Q 版 atlas:false 与成年体映射"]
+}

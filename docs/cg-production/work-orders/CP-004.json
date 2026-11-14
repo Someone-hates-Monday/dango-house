@@ -1,0 +1,68 @@
+{
+  "recordType": "planning-template-not-runtime-manifest",
+  "version": 1,
+  "id": "CP-004",
+  "title": "共读书签夹页",
+  "stage": "draft",
+  "generationAuthorized": true,
+  "participants": [
+    "rin",
+    "xia"
+  ],
+  "audience": "character-pair",
+  "activityMode": "WATCH",
+  "singleVisibleGoal": "书／书签＝Claude 主权；并排看页；鱼凑近被书挡住一瞬；无手臂缠绕",
+  "visibleDiffFrom": [
+    "CP-001",
+    "CP-002",
+    "CP-003"
+  ],
+  "visibleDiff": "书页与书签，不是发饰／座位／饭碗",
+  "shots": [
+    {
+      "id": "S1",
+      "goal": "Claude 开书指页",
+      "still": "书打开；鱼侧身看",
+      "status": "spec-only"
+    },
+    {
+      "id": "S2",
+      "goal": "鱼凑近被书挡一瞬",
+      "still": "书挡视线喜剧节拍；无拥抱",
+      "status": "spec-only"
+    },
+    {
+      "id": "S3",
+      "goal": "夹书签并肩停稳",
+      "still": "书签可见；两人肩距稳定",
+      "status": "spec-only"
+    }
+  ],
+  "promptFile": "CP-002-GPT-STILLS.md",
+  "reward": {
+    "enabled": false
+  },
+  "automaticPlaybackApproved": false,
+  "videoTrialNote": "2026-11-12 只交了一次。用户确认可手动试映。不覆盖 CP-001，不自动播放。",
+  "videoTake": {
+    "status": "installed-watch",
+    "selected": "only-submit",
+    "archive": "test-results/cg-lab/jimeng-cp004-bookmark-t1/raw.mp4",
+    "publicAsset": "public/cg/rin-xia-bookmark-t1/",
+    "at": "2026-11-12"
+  },
+  "jimengJob": "test-results/animation-lab/jimeng-jobs/cp004-bookmark-t1/",
+  "generationAuthorizationScope": "reference-stills-only; user 2026-11-08",
+  "videoGenerationAuthorized": false,
+  "referenceStills": {
+    "status": "generated-static-review-only",
+    "manifest": "test-results/cg-lab/cp-004-bookmark/stills-manifest.json",
+    "reviewPage": "test-results/cg-lab/cp-004-bookmark/review.html",
+    "images": [
+      "test-results/cg-lab/cp-004-bookmark/stills/S1-open-book.png",
+      "test-results/cg-lab/cp-004-bookmark/stills/S2-blocked-peek.png",
+      "test-results/cg-lab/cp-004-bookmark/stills/S3-bookmark.png"
+    ],
+    "reviewDocument": "docs/cg-production/CG-STILLS-REVIEW-2026-11-08.zh-CN.md"
+  }
+}

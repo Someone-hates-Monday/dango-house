@@ -38,9 +38,45 @@ export type PairTone = 'soft' | 'warm' | 'vivid';
 export type CastPreset = 'all' | 'core' | 'custom';
 export interface ConnectionProfile { model: string; endpoint: string; tools: boolean; }
 export interface FavorState { focusId: CharacterId | null; streak: number; }
+/** WATCH trial outcomes — never grant bond/events from these alone. */
+export type CgOutcome = 'playing' | 'ended' | 'cancelled' | 'failed';
+export type CgAssetId =
+  | 'rin-xia-hair-v1'
+  | 'rin-xia-window-seat-t1'
+  | 'rin-xia-bookmark-t1'
+  | 'rin-xia-share-bowl-t1'
+  | 'rin-xia-fish-leads-t2'
+  | 'rin-xia-cheek-t1'
+  | 'xia-reach-t1'
+  | 'gpt-close-t1'
+  | 'rin-xia-welcome-t1';
+export interface CgSession {
+  automatic?:boolean;
+  id: string;
+  asset: CgAssetId;
+  host: 'room' | 'desktop';
+  startedAt: number;
+  /** Safety ceiling only — expiry cancels; never counts as playback success. */
+  expiresAt: number;
+  outcome: CgOutcome;
+  jobId: string;
+  segmentId: string;
+  receiptAt?: number;
+}
+export interface CgReceipt {
+  sessionId: string;
+  asset: CgAssetId;
+  host: 'room' | 'desktop';
+  outcome: Exclude<CgOutcome, 'playing'>;
+  jobId: string;
+  segmentId: string;
+  at: number;
+}
 export interface AppState {
   /** Manual experimental CG session; process-local, never restored from disk. */
-  cgSession?: { id: string; asset: 'rin-xia-hair-v1'; host: 'room' | 'desktop'; startedAt: number; expiresAt: number };
+  cgSession?: CgSession;
+  /** Last sealed CG receipt for tests / UI; never restored; never auto-rewards. */
+  cgLastReceipt?: CgReceipt;
   version: 1; messages: Message[]; selected: CharacterId;
   /** Who is living on stage today (room / Dock / free pets). Empty = gentle empty house. */
   presentIds: CharacterId[];
@@ -70,6 +106,9 @@ export interface AppState {
     mode: 'demo' | 'api';
     locale: AppLocale;
     pairTone: PairTone;
+    /** Independent of the user's friend/pet/romance relationship. */
+    pairRomance?: boolean;
+    cgAutoplay?: boolean;
     /** Optional localhost Agent Bridge for Cursor/Claude/Codex plugins; app remains the primary product. */
     agentBridge: boolean;
     /** Today’s cast size preset; inferred from presentIds (not muted). */
@@ -82,8 +121,9 @@ export interface AppState {
   activity: string; busy: boolean; revision: number;
 }
 export type Action =
-  | { type: 'cg-preview'; host: 'room' | 'desktop' }
+  | { type: 'cg-preview'; host: 'room' | 'desktop'; asset?: CgAssetId }
   | { type: 'cg-dismiss'; sessionId: string }
+  | { type: 'cg-complete'; sessionId: string; outcome: 'ended' | 'failed' }
   | {type:'play-clip';id:CharacterId;clipId?:string;group?:string}
   | {type:'companion-visit';id:CharacterId;target:CharacterId}
   | {type:'presentation';patch:Partial<AppState['presentation']>}

@@ -1,0 +1,29 @@
+{
+  "id": "rin-xia-share-bowl-t1",
+  "participants": ["rin", "xia"],
+  "mode": "watch-installed",
+  "workOrder": "CP-003",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-12",
+  "art_review": "User accepted the single standing bowl handoff for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": ["../../portraits/manifest.json", "../NOTICE.md"],
+  "files": {
+    "clip.mp4": {
+      "sha256": "0a824ab6895f104252a2ded3cd18a0f208ecf36faf19ed44817925178a287f16",
+      "bytes": 6711962
+    },
+    "poster.png": {
+      "sha256": "19b20e2c13b17247258a27e9d088bb6f056106b2e76e2b2e51988086e4a85258",
+      "bytes": 2732094
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true
+}

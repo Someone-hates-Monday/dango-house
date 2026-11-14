@@ -6,6 +6,10 @@
 
 试验免费本地模型能否改善 AI 娘待机、转头和步态。生产程序 v0.3.0 没有替换为这些试片。浏览预览页不代表质量验收通过。
 
+GPT 西方龙娘 Q · 即梦网页交接（根尖颠倒避坑、已跑通 CDN curl 下载、生产红线）：见 [gpt-jimeng-q-handoff.zh-CN.md](gpt-jimeng-q-handoff.zh-CN.md)。一致性检查字段：`character-consistency.json#gpt`。
+
+Claude 动作补全（Codex 交接 + 22 条提示词；先人设动作、暂缓 GPT 尾巴盲批）：见 [CLAUDE-ACTION-HANDOFF.zh-CN.md](CLAUDE-ACTION-HANDOFF.zh-CN.md)、[claude-action-pack-v1/INDEX.md](claude-action-pack-v1/INDEX.md)、[dsh-pet 配方衔接](DSH-PROMPT-LESSONS-FOR-CLAUDE.zh-CN.md)。**已进应用、供 GPT 审查**：[CLAUDE-PACK-GPT-REVIEW.en.md](CLAUDE-PACK-GPT-REVIEW.en.md) · [中文摘要](CLAUDE-PACK-GPT-REVIEW.zh-CN.md)。一致性检查字段：`character-consistency.json#claude`。
+
 环境与模型放在项目 `.animation-lab/`，已加入 `.gitignore`，不会打进应用。运行库和模型均已实际下载，Wan 权重共约34.2GB，每个模型文件按 ModelScope 原仓库 SHA256 校验。代码固定版本和许可见 `sources.json`，模型校验见 `model-file-checksums.json`，Python 版本锁见 `../animation-lab-requirements-lock.txt`。
 
 ## 已完成试验

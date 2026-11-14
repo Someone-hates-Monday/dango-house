@@ -5,6 +5,7 @@ export const patVideos:Readonly<Record<string,string>>={
   glm:'./video/glm/pat-doubao-a1.webm',
 };
 
-export const idleVideos:Readonly<Record<string,string>>=Object.fromEntries(
-  ['gpt','gemini','glm','kimi','grok'].map(file=>[file,'./video/'+file+'/idle-jimeng-v1.webm']),
-);
+export const idleVideos:Readonly<Record<string,string>>={
+  gpt:'./video/gpt/idle-reviewed-oct29-v2.webm',
+  ...Object.fromEntries(['gemini','glm','kimi','grok'].map(file=>[file,'./video/'+file+'/idle-jimeng-v1.webm'])),
+};

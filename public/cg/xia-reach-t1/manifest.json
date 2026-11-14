@@ -1,0 +1,35 @@
+{
+  "id": "xia-reach-t1",
+  "participants": [
+    "rin"
+  ],
+  "mode": "watch-installed",
+  "workOrder": "POV-002",
+  "approved_for_automatic_playback": false,
+  "userAcceptedForWatchInstall": true,
+  "userAcceptedAt": "2026-11-13",
+  "art_review": "User accepted the Claude reach POV short trial for manual WATCH. Does not replace rin-xia-hair-v1. No auto reward.",
+  "source_model": "Jimeng Seedance 2.0 mini",
+  "mode_name": "全能参考",
+  "queue": "normal-no-boost",
+  "width": 1280,
+  "height": 720,
+  "seconds": 5.088,
+  "references": [
+    "../../portraits/manifest.json",
+    "../NOTICE.md"
+  ],
+  "files": {
+    "clip.mp4": {
+      "sha256": "4594de12b4aeb40308ff80f65a3f3c45fc0c103fa00bec099f34aafc5323e125",
+      "bytes": 7703064
+    },
+    "poster.png": {
+      "sha256": "a4c8a19f1bc21310e724b1b5bf7cbebf147632c7c2e9934f5c1c64e59a4e6f03",
+      "bytes": 3160757
+    }
+  },
+  "approved": false,
+  "manual_trial_accepted": true,
+  "assetIdNote": "Legacy asset ID xia-reach-t1 retained for compatibility; depicted character and runtime participant are Claude/rin."
+}

@@ -1,0 +1,68 @@
+{
+  "recordType": "planning-template-not-runtime-manifest",
+  "version": 1,
+  "id": "CP-003",
+  "title": "干饭搭子递半碗",
+  "stage": "draft",
+  "generationAuthorized": true,
+  "participants": [
+    "rin",
+    "xia"
+  ],
+  "audience": "character-pair",
+  "activityMode": "WATCH",
+  "singleVisibleGoal": "鱼递出唯一饭碗，Claude 右手接稳；书始终在 Claude 左侧；只做接过，不混婉拒或吃饭",
+  "visibleDiffFrom": [
+    "CP-001",
+    "CP-002"
+  ],
+  "visibleDiff": "饭碗主权在鱼；道具传递，不是发饰触点或座位",
+  "shots": [
+    {
+      "id": "S1",
+      "goal": "鱼双手端碗邀请",
+      "still": "唯一蓝花白瓷饭碗，鱼两手托住；Claude 左侧抱闭合的书，右手尚未接触",
+      "status": "spec-only"
+    },
+    {
+      "id": "S2",
+      "goal": "三手短暂共托",
+      "still": "鱼两手加 Claude 右手共托一碗，Claude 左臂保留书；双人四臂可追溯",
+      "status": "spec-only"
+    },
+    {
+      "id": "S3",
+      "goal": "接稳与收手",
+      "still": "碗只在 Claude 右手，书留左侧；鱼两手收回自身围裙前；双方没有进食",
+      "status": "spec-only"
+    }
+  ],
+  "promptFile": "CP-002-GPT-STILLS.md",
+  "reward": {
+    "enabled": false
+  },
+  "automaticPlaybackApproved": false,
+  "videoTrialNote": "2026-11-12 只交了一次。用户确认可手动试映。不覆盖 CP-001，不自动播放。",
+  "videoTake": {
+    "status": "installed-watch",
+    "selected": "only-submit",
+    "archive": "test-results/cg-lab/jimeng-cp003-share-bowl-t1/raw.mp4",
+    "publicAsset": "public/cg/rin-xia-share-bowl-t1/",
+    "at": "2026-11-12"
+  },
+  "jimengJob": "test-results/animation-lab/jimeng-jobs/cp003-share-bowl-t1/",
+  "generationAuthorizationScope": "reference-stills-only; user 2026-11-08",
+  "videoGenerationAuthorized": false,
+  "referenceStills": {
+    "status": "generated-static-review-only",
+    "manifest": "test-results/cg-lab/cp-003-share-bowl/stills-manifest.json",
+    "reviewPage": "test-results/cg-lab/cp-003-share-bowl/review.html",
+    "images": [
+      "test-results/cg-lab/cp-003-share-bowl/stills/S1-offer-bowl.png",
+      "test-results/cg-lab/cp-003-share-bowl/stills/S2-hand-bowl.png",
+      "test-results/cg-lab/cp-003-share-bowl/stills/S3-settle.png"
+    ],
+    "reviewDocument": "docs/cg-production/CG-STILLS-REVIEW-2026-11-08.zh-CN.md"
+  },
+  "stagingRevision": "2026-11-08 reviewed still branch; see referenceStills manifest"
+}

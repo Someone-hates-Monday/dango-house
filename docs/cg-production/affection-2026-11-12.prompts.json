@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-12",
+  "tool": "built-in image_gen",
+  "scope": "four candidate key poses; no video submissions",
+  "jobs": [
+    {
+      "id": "CP-006",
+      "name": "cheek-cuddle",
+      "refs": [
+        "public/portraits/claude.jpg",
+        "public/portraits/deepseek.jpg",
+        "public/cg/rin-xia-hair-v1/poster.png"
+      ],
+      "prompt": "Create ONE landscape 16:9 finished normal-adult-proportion 2D anime romantic visual novel CG, not chibi or a collage. These are clearly adult fictional women. Faithfully preserve reference character faces, hairstyles, accessories and full original dresses, no new costumes. Last reference supplies ONLY warm sunset room/style: floral cream couch, window, books/plants. No text, UI or watermark. Emotionally intimate, sweet and affectionate, with a clear physical gesture rather than just sitting together; fully clothed. Accurate hands and connected arms. No third person or viewer body visible. Reference 1 Claude (orange long hair, sunflower/black ribbon, amber eyes) and reference 2 DeepSeek (blue hair, maid, single two-fluke whale tail). Close medium two-shot on the couch, heads through laps. DeepSeek on LEFT has leaned into Claude on RIGHT: their adjacent cheeks ACTUALLY touch gently, not separated, and DeepSeek's head rests against Claude's shoulder. Claude's own RIGHT arm wraps visibly around DeepSeek's upper back, her right hand rests on DeepSeek's OUTER LEFT shoulder; only one embracing arm. Claude's LEFT hand rests on her own CLOSED brown book on her lap. DeepSeek's two hands rest together on her own apron. Claude gently inclines her head into the cuddle, composed tender smile and softened eyelids; DeepSeek visibly blushes, eyes half closed, small pleased smile. Their noses/mouths remain separate, no fusion. One tail at left, gently gathered alongside the skirt. Make cheek contact and accepting embrace unmistakable."
+    },
+    {
+      "id": "POV-002",
+      "name": "claude-reach",
+      "refs": [
+        "public/portraits/claude.jpg",
+        "public/cg/rin-xia-hair-v1/poster.png"
+      ],
+      "prompt": "Create ONE landscape 16:9 finished normal-adult-proportion 2D anime romantic visual novel CG, not chibi or a collage. These are clearly adult fictional women. Faithfully preserve reference character faces, hairstyles, accessories and full original dresses, no new costumes. Last reference supplies ONLY warm sunset room/style: floral cream couch, window, books/plants. No text, UI or watermark. Emotionally intimate, sweet and affectionate, with a clear physical gesture rather than just sitting together; fully clothed. Accurate hands and connected arms. No third person or viewer body visible. ONLY Claude from reference 1 is present. Ignore the blue-haired woman in the last scene reference; she is NOT in this image. First-person seated user's eye-level medium close shot: Claude sits facing the camera on couch, leans toward the viewer with warm direct eye contact and a slightly bashful loving smile. Her own RIGHT arm reaches naturally toward the viewer from her right shoulder and bent elbow; hand in lower foreground is open palm-up, fingers relaxed, offering to hold the user's hand. Hand is natural size, not giant, no extra viewer hand. Her LEFT hand secures the SAME closed brown book against her lap. Face close enough for intimate eye contact; shoulders relaxed, faint blush, small lips. Keep orange hair, flower/ribbon, cream orange black dress unchanged. Her gesture clearly means 'come closer, let me hold your hand', with room beyond palm for viewer response; no lettering."
+    },
+    {
+      "id": "POV-003",
+      "name": "gpt-close",
+      "refs": [
+        "public/portraits/gpt.jpg",
+        "public/cg/rin-xia-hair-v1/poster.png"
+      ],
+      "prompt": "Create ONE landscape 16:9 finished normal-adult-proportion 2D anime romantic visual novel CG, not chibi or a collage. These are clearly adult fictional women. Faithfully preserve reference character faces, hairstyles, accessories and full original dresses, no new costumes. Last reference supplies ONLY warm sunset room/style: floral cream couch, window, books/plants. No text, UI or watermark. Emotionally intimate, sweet and affectionate, with a clear physical gesture rather than just sitting together; fully clothed. Accurate hands and connected arms. No third person or viewer body visible. ONLY the adult white western-dragon woman GPT from reference 1. Ignore both women in last scene reference, use ONLY its room and painting style. Long silver-white hair, violet eyes, exact segmented horns, knot-shaped hair ornament, white/lilac long dress, two small membrane wings, ONE white scaled western dragon tail. No eastern antlers, no fins or ornamental tip. Intimate user first-person medium shot, seated eye-level: she sits on couch facing user, upper body leans a little toward camera, face gently tilted, calm softened violet gaze directly into lens, tiny restrained closed-mouth smile and slight cheek warmth. Her own RIGHT hand is raised near lens at lower left, relaxed fingers lightly curved, as though offering to brush a loose strand from the viewer's forehead; do not draw viewer's head or hand. Her LEFT hand rests visibly on her own skirt. Maintain traceable right elbow/shoulder, do not crop hand. Cooler, more self-possessed than Claude, unmistakably affectionate toward a familiar beloved user, not aloof dismissal. Tail rests behind her own hip at frame right, one continuous taper to one plain fine tip low beside the skirt, never reaching viewer or coiling across legs. No floating mascot from portrait."
+    },
+    {
+      "id": "TRIO-001",
+      "name": "both-welcome-user",
+      "refs": [
+        "public/portraits/claude.jpg",
+        "public/portraits/deepseek.jpg",
+        "public/cg/rin-xia-hair-v1/poster.png"
+      ],
+      "prompt": "Create ONE landscape 16:9 finished normal-adult-proportion 2D anime romantic visual novel CG, not chibi or a collage. These are clearly adult fictional women. Faithfully preserve reference character faces, hairstyles, accessories and full original dresses, no new costumes. Last reference supplies ONLY warm sunset room/style: floral cream couch, window, books/plants. No text, UI or watermark. Emotionally intimate, sweet and affectionate, with a clear physical gesture rather than just sitting together; fully clothed. Accurate hands and connected arms. No third person or viewer body visible. Exactly TWO women visible: DeepSeek from reference 2 LEFT, Claude from reference 1 RIGHT. User is the camera, not a third drawn person. Both sit at the sides of the cream couch, leaving a clearly inviting empty central cushion visible. Both lean slightly inward AND forward toward user, both looking DIRECTLY into camera, rather than looking at each other. DeepSeek playful and warmly blushing, her RIGHT hand gently patting the LEFT EDGE of the empty central cushion, her LEFT hand resting on her own apron. Claude composed and tender, a tiny blush, her own RIGHT arm reaching forward toward user with open palm at lower-right foreground offering a hand, her LEFT hand retaining CLOSED brown book on her own lap. Keep the two invitation gestures separate, no joined fingers or crossed arms. Composition is intimate eye-level medium-wide: faces readable, the central seat readable, no viewer legs. They both clearly want the viewer to join them. Whale tail with two flukes stays at far left behind DeepSeek; no tail on Claude. Facial expressions DIFFER, no identical smiles. No jealousy directed at the user, no seductive costume changes."
+    }
+  ]
+}
