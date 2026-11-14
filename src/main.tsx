@@ -1,4 +1,5 @@
 import {PortraitSprite} from './PortraitSprite';
+import {appVersion} from './shared/version';
 import {CGMoment} from './CGMoment';
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -66,7 +67,7 @@ function App() {
       <div className="sidebar-bottom">
         <div className="little-note"><Leaf size={16} /><p>{t('brand.note').split('\n').map((line, i) => <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>)}</p></div>
         <button className={`settings-nav ${page === 'settings' ? 'active' : ''}`} onClick={() => setPage('settings')}><Settings2 size={18} />{t('nav.settings')}<ChevronRight size={15} /></button>
-        <div className="profile"><span>{t('chat.me')}</span><div><strong>{t('brand.owner')}</strong><small>{t('brand.welcomeHome')}</small></div><span className="version">v0.3.9</span></div>
+        <div className="profile"><span>{t('chat.me')}</span><div><strong>{t('brand.owner')}</strong><small>{t('brand.welcomeHome')}</small></div><span className="version">v{appVersion}</span></div>
       </div>
     </aside>
     <div className="main-column">

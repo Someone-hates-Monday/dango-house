@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.5 · 2026-11-15 · Remove contaminated tail / 清理污染尾帧
+
+- 复现并确认：S1 文件实际 241 帧，末尾 16 帧是导出目录残留的另一名龙女，清单误记为 225 帧。Confirmed 16 stale PNG frames of a different character were appended to the 225-frame S1 export.
+- 无损移除错误尾帧，全部正常 225 帧的解码 RGBA 哈希不变；摸头视频不变。Stream-copy repair preserves every correct frame and alpha; P1 unchanged.
+- 修复导出脚本的残留帧处理、输出帧数限制与编码后帧数校验；运行验收检查实际时长与完整解码循环。Fix stale-frame isolation, encoder frame caps and actual-count/full-loop verification.
+
 ## 0.4.0-alpha.4 · 2026-11-15 · GPT video-only / GPT 独立视频呈现
 
 - 根据用户复测，alpha.3 仍闪变，撤销“调整备用图切换即可解决”的假设。User retest still found identity flashes in alpha.3.

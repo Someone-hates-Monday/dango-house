@@ -1,6 +1,32 @@
 # GPT 闪变追查 / GPT identity flash investigation
 
-## 最新结论：alpha.4 / Current decision: alpha.4
+## 已确认根因与修复：alpha.5 / Confirmed cause and repair: alpha.5
+
+**alpha.2–4 的归因有误，不能继续将此问题解释为备用图或缓存。** 连续 `requestVideoFrameCallback` 捕获三轮实际播放，在每轮 9.375–10.000 秒抓到了与用户截图一致的灰发深色衣服龙女。视频文件实际为 241 帧 / 10.042 秒，旧清单却记录 225 帧 / 9.375 秒；之前按清单展开前 225 帧的检查漏掉了最后 16 帧，200ms 抽样“有不同画面”也没有检查人物身份。
+
+**The earlier fallback/cache explanation was wrong.** Continuous playback captured the reported grey/navy character in the actual video tail on three loops. The container held 241 frames / 10.042s; the manifest claimed 225 / 9.375s. Prior fixed-count contact sheets omitted the tail, and pixel-change counts were insufficient.
+
+生成目录 `jimeng-idle-subject-s1/normalized-rgba/` 实际有 241 张编号图片，第 `00000225.png` 已直接检查为错误龙女。`audit-jimeng.py` 只覆盖本次选中的 225 张，但没有清理更长旧批次的剩余帧；FFmpeg 又没有限制输出帧数，因此连尾部残留一起编码。来源证据保存在本地忽略的 `test-results/gpt-identity-audit/live-decode.json`、`live-decode-sheet.png` 和 `live-decode-worst.png`。
+
+The normalized PNG directory retained older frames 225–240. The exporter overwrote only the new sequence and encoded the entire numbered directory without a frame cap. Frame 225 matches the wrong character directly.
+
+修复为 `idle-subject-s1-clean-v3.webm`：使用 `-c:v copy -frames:v 225` 无损移除错误尾部，不生成新动画。用 libvpx 解码 RGBA 后逐帧哈希证明，保留下来的 225 帧与原文件的正常前缀完全一致，包含透明通道。新 SHA-256：`f2315c3aee7ddfc5975e3862eb37cd4f2a3eb6aede49b941ce9e1f2955314218`。原污染文件已撤出 public，存放本地 `.animation-lab/rejected/gpt-s1-stale-tail/`，并加入媒体边界拒收散列。P1 摸头没有改动。
+
+Stream-copy trimming removes only the 16 wrong tail frames. Decoded RGBA hashes prove all 225 retained frames are unchanged, including alpha. The contaminated bytes are quarantined and rejected by the boundary verifier; P1 is unchanged.
+
+流水线防回归：隔离超出本次帧数的旧编号 PNG，FFmpeg 明确 `-frames:v len(selected)`，编码后实际解码计数必须相等。运行验收必须核对文件真实时长，并覆盖完整播放循环的全部时间戳和实际解码画面；不得再信任清单帧数作为检查上限。
+
+Exporter guards archive stale numbered tail images, cap FFmpeg output and assert the decoded frame count. Runtime acceptance verifies actual duration and every decoded loop timestamp rather than using manifest counts as the inspection boundary.
+
+alpha.5 验收：114 项单元测试、构建和 public/dist 媒体边界检查通过；打包程序连续捕获 570 个解码回调，覆盖全部 225 个唯一帧时间戳和两个循环，已知错误形象的深色像素比例特征未再出现（正常最大 0.0549，污染帧约 0.2155）；暂停恢复通过。合成导出回归测试用 8 帧新素材加 1 张残留图片，实际成片仅 8 帧且残留已隔离。复现命令：`.animation-lab/venv/Scripts/python.exe scripts/animation-lab/verify-stale-frame-export.py`。像素比例只用于本次已知错误片的回归，不是通用人物身份识别器。
+
+Alpha.5 passes 114 tests/build/media checks. Packaged continuous capture covers all 225 timestamps, 570 callbacks and two wraps with no known dark-tail signature. An 8-frame exporter fixture with a stale ninth image outputs exactly eight frames and archives the extra image. The dark-pixel guard is a narrow regression check, not general identity recognition.
+
+下面是 alpha.2–4 历史尝试，保留用于解释排查失误，**不代表当前根因判断**。
+
+The remaining sections document unsuccessful earlier attempts, not the current root-cause conclusion.
+
+## 历史尝试：alpha.4（未解决） / Earlier unsuccessful attempt: alpha.4
 
 用户确认 alpha.3 仍会切到错误形象并出现更多闪变，下面 alpha.2/3 的证据只是历史排查，不能当作问题已经解决。alpha.4 从 GPT 站立 Sprite 路由和 ReactionVideoSprite 内同时删除备用图的挂载路径：不再用其他图集表达 think/wave/read/jump/sad 等未完成视频的提示，也不在媒体失败时降级为另一张人物图。普通动作提示继续使用 S1 视频，保留已有互动特效与已验证 P1 摸头完整播放。Dock 趴姿与侧边栏小头像不属于这个站立视频表面。
 

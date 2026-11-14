@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
 import { bridgeTools, type BridgeFile } from '../../src/shared/bridge';
+import {appVersion} from '../../src/shared/version';
 
 type JsonRpcId = string | number | null;
 
@@ -58,7 +59,7 @@ async function handleRequest(msg: { id?: JsonRpcId; method?: string; params?: Re
     return {
       protocolVersion: ['2024-11-05','2025-03-26','2025-06-18'].includes(String(msg.params?.protocolVersion)) ? String(msg.params?.protocolVersion) : '2025-06-18',
       capabilities: { tools: {} },
-      serverInfo: { name: 'dango-house', version: '0.3.9' },
+      serverInfo: { name: 'dango-house', version: appVersion },
       instructions:
         'Dango House companion stage plugin. The Electron app must be running with Agent Bridge enabled. Use tools to act through the seven AI companions; do not invent browser URLs or claim visual understanding the house did not report.',
     };

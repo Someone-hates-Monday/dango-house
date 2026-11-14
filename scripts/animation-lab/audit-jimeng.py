@@ -1,6 +1,6 @@
 """Deterministic matting/normalization of a user-approved video trial; no art generation."""
 from pathlib import Path
-import json, subprocess, hashlib, argparse
+import json, subprocess, hashlib, argparse, time, shutil
 import cv2, numpy as np, imageio_ffmpeg
 from PIL import Image, ImageDraw
 
@@ -85,6 +85,15 @@ if args.ping_pong:
     selected=selected+selected[-2::-1]
 raw_seam=difference(small[0],small[-1])
 rgba_dir=folder/'normalized-rgba';rgba_dir.mkdir(exist_ok=True)
+# A previous, longer trial may leave numbered images past the new sequence end.
+# Archive only those generated tail files; ffmpeg must never ingest them.
+stale=[p for p in rgba_dir.glob('????????.png') if p.stem.isdigit() and int(p.stem)>=len(selected)]
+if stale:
+    archive=folder/'stale-frame-archive'/str(time.time_ns());archive.mkdir(parents=True)
+    for p in stale:
+        assert p.resolve().parent==rgba_dir.resolve()
+        assert archive.resolve().is_relative_to(folder.resolve())
+        shutil.move(str(p),str(archive/p.name))
 for i,im in enumerate(selected): im.save(rgba_dir/f'{i:08}.png')
 
 # Contact sheets preserve full framing and inspect opacity over both backgrounds.
@@ -98,8 +107,15 @@ for row,bg in enumerate(['#f8eaf2','#282333']):
 sheet.save(folder/'contact-alpha.png')
 
 ffmpeg=imageio_ffmpeg.get_ffmpeg_exe()
-result=subprocess.run([ffmpeg,'-y','-framerate','24','-i',str(rgba_dir/'%08d.png'),'-vf','scale=640:360','-c:v','libvpx-vp9','-pix_fmt','yuva420p','-auto-alt-ref','0','-b:v','0','-crf','24','-an',str(folder/'draft.webm')],capture_output=True,text=True)
+result=subprocess.run([ffmpeg,'-y','-framerate','24','-i',str(rgba_dir/'%08d.png'),'-frames:v',str(len(selected)),'-vf','scale=640:360','-c:v','libvpx-vp9','-pix_fmt','yuva420p','-auto-alt-ref','0','-b:v','0','-crf','24','-an',str(folder/'draft.webm')],capture_output=True,text=True)
 assert result.returncode==0,result.stderr[-2000:]
+encoded=cv2.VideoCapture(str(folder/'draft.webm'));encoded_frames=0
+while True:
+    ok,_=encoded.read()
+    if not ok: break
+    encoded_frames+=1
+encoded.release()
+assert encoded_frames==len(selected),f'encoded {encoded_frames}, expected {len(selected)}'
 previews=[im.resize((640,360),Image.Resampling.LANCZOS) for im in selected]
 previews[0].save(folder/'draft.webp',save_all=True,append_images=previews[1:],duration=42,loop=0,lossless=True)
 report={

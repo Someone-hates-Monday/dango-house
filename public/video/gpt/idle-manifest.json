@@ -1,9 +1,9 @@
 {
   "productionApproved": true,
-  "status": "restored-accepted-s1-idle",
+  "status": "cleaned-confirmed-stale-tail",
   "character": "gpt",
   "action": "idle",
-  "asset": "idle-subject-s1-restored-v2.webm",
+  "asset": "idle-subject-s1-clean-v3.webm",
   "sourceSha256": "2fe3995894b0a81b95ff0edfa34d4fdc569d8d703cc085c806da3604be8f28c2",
   "frames": 225,
   "duration": 9.375,
@@ -11,8 +11,13 @@
   "idlePingPong": true,
   "subject": "GPT白龙Q版v1",
   "model": "Seedance 2.0 mini",
-  "scope": "Idle with Jimeng subject GPT白龙Q版v1; user-downloaded source jimeng-2026-11-07-1414. Restored S1 after mistaken Oct29 rollback; playback seam and pause recovery fixes retained.",
+  "scope": "Stream-copy first 225 verified S1 frames. Original export actually had 241 frames: stale numbered PNGs 225..240 appended a different character. All retained decoded RGBA frame hashes match the original prefix.",
   "previousAsset": "idle-jimeng-v1.webm",
   "labFolder": "test-results/animation-lab/gpt/jimeng-idle-subject-s1",
-  "date": "2026-11-15"
+  "date": "2026-11-15",
+  "assetSha256": "f2315c3aee7ddfc5975e3862eb37cd4f2a3eb6aede49b941ce9e1f2955314218",
+  "fps": 24,
+  "encodedFramesVerified": 225,
+  "removedStaleFrames": 16,
+  "normalRgbaPreserved": true
 }

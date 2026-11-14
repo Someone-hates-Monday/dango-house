@@ -6,6 +6,6 @@ export const patVideos:Readonly<Record<string,string>>={
 };
 
 export const idleVideos:Readonly<Record<string,string>>={
-  gpt:'./video/gpt/idle-subject-s1-restored-v2.webm',
+  gpt:'./video/gpt/idle-subject-s1-clean-v3.webm',
   ...Object.fromEntries(['gemini','glm','kimi','grok'].map(file=>[file,'./video/'+file+'/idle-jimeng-v1.webm'])),
 };

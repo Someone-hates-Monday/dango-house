@@ -6,6 +6,7 @@ import {idleVideos,patVideos} from '../src/reaction-pack.ts';
 
 // Media provenance check, not visual recognition or proof of what a prior window displayed.
 const rejected=new Set([
+  '98190d86c7307693348f40a5e617e81c982ac1e387d35d4892dfe540005d3604', // S1 with 16 stale identity frames appended
   'acb909b6868bde6b3dcb248eb8b5f2add42f147c6535cedf067e4d6dedc0697a',
   'acbf437c795d4db36552bc6e6434b69a2e562625347f62298f2997590973bf3b',
 ]);

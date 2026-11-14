@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [11 月 15 日阶段收尾与接手约束：0.4.0-alpha.5](PHASE-CLOSEOUT-2026-11-15.zh-CN.md) · [English](PHASE-CLOSEOUT-2026-11-15.en.md) · [GPT 错误尾帧根因](GPT-IDENTITY-INVESTIGATION-2026-11-15.md)
+
 - [11 月 14 日 Cursor 验收与体验修复：GPT 待机、CG 场景与独立偏好](REVIEW-CURSOR-2026-11-14.zh-CN.md) · [English](REVIEW-CURSOR-2026-11-14.en.md)
 
 - [11 月 13 日首发定位复核：竞品变化、45 秒宣传片、最后调试与公开测试版](LAUNCH-DECISION-2026-11-13.zh-CN.md) · [English](LAUNCH-DECISION-2026-11-13.en.md)
