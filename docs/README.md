@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [陪伴对白、人设参考与模型接管：0.5.0-alpha.8](COMPANION-DIALOGUE.zh-CN.md) · [English](COMPANION-DIALOGUE.en.md)
+
 - [用户互动优先、模型回复与同伴场景边界：0.5.0-alpha.7](HOUSE-ATTENTION.zh-CN.md) · [English](HOUSE-ATTENTION.en.md)
 
 - [窗口闪烁、免打扰后冻结与动作衔接：0.5.0-alpha.6](HOUSE-STABILITY.zh-CN.md) · [English](HOUSE-STABILITY.en.md)

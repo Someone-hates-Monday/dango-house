@@ -15,7 +15,7 @@
 <sub>真实应用 Dock 模式截图</sub>
 
 [![Windows](https://img.shields.io/badge/Windows-x64-f4a7bc)](https://github.com/Someone-hates-Monday/dango-house/releases)
-[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.7-bca7e8)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.8-bca7e8)](CHANGELOG.md)
 [![Checks](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml/badge.svg)](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml)
 [![Code license](https://img.shields.io/badge/code-MIT-a4cdb8)](LICENSE)
 [![Asset terms](https://img.shields.io/badge/art-noncommercial-f0cf8d)](THIRD_PARTY_NOTICES.md)
@@ -28,7 +28,7 @@
 
 团子小屋是一款 Windows 桌面陪伴应用：把社区里的 AI 娘请到同一个小屋，让她们聊天、串门、撒娇，偶尔为了你的关注小小吃醋。你可以当朋友、养桌宠，也可以开启自己喜欢的亲密陪伴日常。比起替你多做一份报表，我们更想让你看着她们时笑一下。
 
-> **源码 v0.5.0-alpha.7；公开 Windows 便携预发行版为 [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5)。** 截图来自隔离的离线存档，版本见截图说明；演示剧情是本地脚本，真实聊天需自行连接 API。应用内可切换 **简体中文 / English / 日本語**。
+> **源码 v0.5.0-alpha.8；公开 Windows 便携预发行版为 [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5)。** 截图来自隔离的离线存档，版本见截图说明；演示剧情是本地脚本，真实聊天需自行连接 API。应用内可切换 **简体中文 / English / 日本語**。
 
 当前源码默认打开紧凑的爱心小屋：沿屋檐布置按钮，下方展开群聊和私聊，上方播放共享 CG。一把 API Key 可演绎全员人设，API 模式下由小屋大脑生成多角色短回合与动作意图。DeepSeek 的 109 段动画、桌宠/Dock 和 MCP/REST 舞台桥继续可用。共享生活是一个模型有界编排，不能当成七位完全自主 Agent。详见[本轮实现与验收](docs/MINI-HOUSE-IMPLEMENTATION-DRAFT.zh-CN.md)。
 

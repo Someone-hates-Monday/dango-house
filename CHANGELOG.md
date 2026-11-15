@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.8 · 2026-11-15 · Companion voices / 自然陪伴对白
+
+- 七位角色共用结构化表达指引，普通善意互动不再默认以责怪、拒绝反转或收费收尾。Shared voice guidance favors natural responses to ordinary kindness without obligatory corrective endings.
+- 旧对白成为有限、标明虚构的语气参考；公共和私聊文字由模型生成，当前输入明确传递，生成器缺失不退回本地台词。Legacy dialogue becomes bounded style references; model output stays intact, current input is explicit, and missing generators report errors.
+- 提醒先准时通知，空闲时再由模型回应，不抢占正在进行的场景。Reminders notify on time, with model responses only when idle.
+- 144 项测试、隔离端到端检查与六项真实 DeepSeek 检查通过。144 tests, isolated end-to-end checks and six live DeepSeek interactions passed.
+
 ## 0.5.0-alpha.7 · 2026-11-15 · Attention belongs to the interaction / 区分用户与同伴互动
 
 - 摸头、投喂、喜爱和私聊优先回应用户，不再强制补第二人或自动走向同伴；明确的同伴交流仍保留多人接话与移动。User interactions accept solo responses; explicit social scenes retain exchanges and purposeful movement.

@@ -1,3 +1,4 @@
+import {characterVoiceReference,companionResponseGuide} from '../src/shared/companion-voice';
 import {housePrompt,parseHousePlan,needsHousePartner,modelContextMessages,type HouseEvent} from '../src/shared/house-events';
 import { byId, providers } from '../src/shared/characters';
 import type { AppState, CharacterId, AvatarIntent } from '../src/shared/types';
@@ -114,25 +115,20 @@ export async function generateReply(
   }
   const config = state.connections[provider] ?? state.connections[state.settings.provider];
   const model = config?.model || state.settings.model;
-  const baseCharacter = byId[id];
-  const character = {
-    ...baseCharacter,
-    personality:
-      baseCharacter.personality +
-      ` 现在是与用户的单独对话，优先回应用户本次的话语、动作和感受。不把用户的摸头或关心改写成对其他伙伴的亲密举动，不自行插入固定CP桥段或代替其他角色回答。`,
-  };
+  const character=byId[id];
   const via = providerLabel(provider);
   const impersonation = isImpersonating(id, provider)
     ? `后端实际是 ${via} 模型在代言同人角色「${character.name}」，不要声称自己是官方 ${character.name} API 或官方员工。`
     : `你是同人角色演绎，不是厂商官方人格。`;
-  const system = `最近真实共同事件（不含私聊正文）：${JSON.stringify(state.companionEvents.filter(e=>e.result==='model-interaction').slice(-4))}。当前在场：${JSON.stringify(state.presentIds)}。你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然${state.settings.locale==='en'?'英文':state.settings.locale==='ja'?'日文':'中文'}，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
-  const messages = modelContextMessages(state)
+  const system = `${companionResponseGuide}\n角色表达参考（不是已发生的对话）：${JSON.stringify(characterVoiceReference(id,state.settings.locale))}\n最近真实共同事件（不含私聊正文）：${JSON.stringify(state.companionEvents.filter(e=>e.result==='model-interaction').slice(-4))}。当前在场：${JSON.stringify(state.presentIds)}。你是团子小屋的${character.name}。${impersonation}当前是与用户的单独对话，请专注用户本次话语、动作和感受；角色参考中的伙伴关系是背景，不预定本轮剧情。\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然${state.settings.locale==='en'?'英文':state.settings.locale==='ja'?'日文':'中文'}，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
+  const context=modelContextMessages(state);
+  const messages = context
     .slice(-24)
     .map(m => ({
       role: m.speaker === id ? 'assistant' : 'user',
       content: `${m.speaker === 'user' ? '用户' : byId[m.speaker as CharacterId].name}：${m.text}`,
     }));
-  if (messages.at(-1)?.role === 'assistant') messages.push({ role: 'user', content: '请对当前话题作简短回应。' });
+  if (_input.trim() && !(context.at(-1)?.speaker==='user'&&context.at(-1)?.text.trim()===_input.trim())) messages.push({role:'user',content:'用户：'+_input.trim()});
   const text = await requestText(provider, model, key, system, messages, signal, update, {
     endpoint: config?.endpoint,
     act: config?.tools === false ? undefined : act,

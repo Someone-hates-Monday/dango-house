@@ -1,3 +1,4 @@
+import {characterVoiceReference,companionResponseGuide,interactionGuidance} from './companion-voice';
 import type {AppState,AvatarIntent,CharacterId,CgAssetId,ReplyOrigin} from './types';
 import {byId} from './characters';
 import {speakingCast} from './cast';
@@ -84,6 +85,8 @@ export function housePrompt(state:AppState,event:HouseEvent){
  const active=speakingCast(state),focus=houseFocus(event);
  return [
   'You direct a small shared home of fictional AI companions. Respond only with JSON using ALL these fields: {"gather":null,"beats":[{"actor":"exact_id","replyTo":null,"stay":false,"text":"short dialogue","intent":{"action":"idle","target":null,"emotion":"happy","duration":4}}],"cgAsset":null}. Replace exact_id with a valid cast ID, and fill movement targets instead of omitting them.',
+  companionResponseGuide,
+  `Current interaction guidance: ${interactionGuidance(event.kind)}`,
   focus==='user'
    ? 'Attention: USER. This is an interaction with the user, not a girl-girl scene. The selected/touched/fed resident responds FIRST directly to the user. One natural reply is sufficient; at most one relevant remark from another resident, or a silent gesture. Do not invent a partner exchange, food-sharing, romantic subplot or gathering. Never redirect the user’s headpat, praise or food into affection toward another girl. Respect the current topic and relationship mode.'
    : 'Attention: COMPANIONS. Plan a short connected scene: 2–5 short spoken turns involving 2–3 relevant residents. A reacts, B responds, A may answer. Autonomous life may stay silent. No requirement for the whole cast to speak. Up to 6 beats including silent reactions.',
@@ -96,7 +99,7 @@ export function housePrompt(state:AppState,event:HouseEvent){
   'Pat/feed events already have immediate physical feedback: the first response should keep that action playing and add a natural spoken reaction. A message event must address the user’s actual text.',
   'Only propose a CG when the conversation actually leads into that scene, all its actors speak in this plan and the preference allows it. Usually leave cgAsset null.',
   `Language: ${state.settings.locale}. Event: ${JSON.stringify(event)}. User relationship: ${JSON.stringify(state.relationship)}.`,
-  `Cast: ${JSON.stringify(active.map(id=>({id,name:byId[id].name,persona:byId[id].personality,position:residentPosition(state.room.residents[id]),affinity:focus==='companions'?{target:socialProfiles[id].target,feeling:socialProfiles[id].feeling}:undefined})))}`,
+  `Cast: ${JSON.stringify(active.map(id=>({...characterVoiceReference(id,state.settings.locale,event.kind),position:residentPosition(state.room.residents[id]),affinity:focus==='companions'?{target:socialProfiles[id].target,feeling:socialProfiles[id].feeling}:undefined})))}`,
   `Girl–girl affection enabled: ${state.settings.pairRomance!==false}. If disabled, interpret affinities as friendship. This is permission for appropriate companion scenes, never an instruction to turn user interactions into girl-girl affection.`,
   `Relationships: ${JSON.stringify(state.bonds)}. Recent public events: ${JSON.stringify(state.companionEvents.filter(e=>e.result==='model-interaction').slice(-4))}.`,
   `Available occasional CG scenes: ${JSON.stringify(cgClips.filter(c=>allowsHouseCg(state,event,c.id)&&c.participants.every(id=>active.includes(id))).map(c=>({id:c.id,participants:c.participants,title:c.copy[state.settings.locale].title})))}`,

@@ -374,7 +374,9 @@ export class GardenEngine {
     await new Promise<void>(resolve => { const done = () => { clearTimeout(timer); signal.removeEventListener('abort', done); resolve(); }; const timer = setTimeout(done, this.delay); signal.addEventListener('abort', done, { once: true }); });
   }
   private async sequence(lines: { speaker: CharacterId; text: string }[], useApi = false, input = '',channel?:CharacterId) {
-    this.stop(); const round = this.epoch; const controller = new AbortController(); this.abort = controller;
+    this.stop();
+    if(useApi&&!this.generate){const text=this.t('sys.needApi');if(channel)this.addPrivate(channel,'system',text);else this.add('system',text,'error');return;}
+    const round = this.epoch; const controller = new AbortController(); this.abort = controller;
     this.state.busy = true; this.publish();
     try {
       for (const line of lines) {
@@ -446,7 +448,7 @@ export class GardenEngine {
         if (/记住[：:，, ]|remember[:：, ]/i.test(text)) { const memory = text.split(/记住[：:，, ]|remember[:：, ]/i).slice(1).join('').trim(); if (memory) await this.dispatch({ type: 'remember', text: memory }); }
         if (this.state.settings.mode === 'api' && ((!this.generate&&!this.houseGenerate) || !this.state.settings.model)) { this.add('system', this.t('sys.needApi'), 'error'); return; }
         if(this.state.settings.mode==='api'&&this.houseGenerate){await this.reactHouse('message',action.target,{text});return;}
-        await this.sequence(selected.map((speaker, i) => ({ speaker, text: demoReply(speaker, text, this.state.settings.intimacy, i, this.locale()) })), this.state.settings.mode === 'api', text); return;
+        await this.sequence(selected.map((speaker, i) => ({ speaker, text: this.state.settings.mode==='api'?'':demoReply(speaker, text, this.state.settings.intimacy, i, this.locale()) })), this.state.settings.mode === 'api', text); return;
       }
       case 'presentation': {const p=action.patch;if(p.desktopMode==='dock'||p.desktopMode==='free'){this.freezeRoom();this.state.presentation.desktopMode=p.desktopMode;}if(p.chatForm==='portrait'||p.chatForm==='chibi')this.state.presentation.chatForm=p.chatForm;break;}
       case 'select': if (ids.includes(action.id)) this.state.selected = action.id; break;
@@ -574,7 +576,7 @@ export class GardenEngine {
       case 'clear-companion-events': this.state.companionEvents=clearCompanionEvents(); break;
       case 'private-send': {
         if(!ids.includes(action.id)||!isPresent(this.state,action.id)||typeof action.text!=='string'||!action.text.trim())return;this.stop();this.addPrivate(action.id,'user',action.text.trim().slice(0,4000));
-        await this.sequence([{speaker:action.id,text:demoReply(action.id,action.text,this.state.settings.intimacy,0,this.locale())}],this.state.settings.mode==='api',action.text,action.id);return;
+        await this.sequence([{speaker:action.id,text:this.state.settings.mode==='api'?'':demoReply(action.id,action.text,this.state.settings.intimacy,0,this.locale())}],this.state.settings.mode==='api',action.text,action.id);return;
       }
       case 'companion-visit': {
         if(!ids.includes(action.id)||!ids.includes(action.target)||action.id===action.target)throw new Error('Invalid companion');
@@ -804,7 +806,7 @@ export class GardenEngine {
     this.publish();
   }
   tick(now = Date.now()) {
-    if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}
+    if(!this.state.settings.dnd)for(const r of this.state.reminders)if(r.enabled&&now>=r.nextAt){r.nextAt=now+r.intervalMinutes*60000;const actor=speakingCast(this.state)[0];if(actor){if(this.state.settings.mode==='api'){this.add('system',r.text,'notice');if(!this.state.busy&&!this.director.hasActiveJob()&&!this.state.cgSession)void this.reactHouse('reminder',actor,{text:r.text});}else{this.perform(actor,{action:'wave',emotion:'happy',bubble:r.text,duration:10},'local',now);this.add(actor,`${this.state.relationship.address}，${r.text}`);}}}
     let changed=false;
     if(this.state.cgSession){
       const live=this.state.cgSession;

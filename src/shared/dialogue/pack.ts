@@ -8,28 +8,28 @@ type Lines = Record<CharacterId, string>;
 const pat: Record<AppLocale, Lines> = {
   'zh-CN': {
     xia: '嘿嘿……尾巴停不下来了，再摸一下嘛～',
-    rin: '嗯……书可以先放一会儿。谢谢你。',
-    shiori: '……只许摸一下。不是说停下。',
+    rin: '嗯……这样很舒服。谢谢你。',
+    shiori: '……嗯，很舒服。再待一会儿。',
     gemini: '呼噜呼噜～喵，摸到猫猫的开心开关了！',
-    glm: '再摸要收费哦～……好吧，这次也免费。',
+    glm: '嗯～摸到狐狸最喜欢的位置了。',
     kimi: '像月光落在头顶一样，暖暖的。',
     grok: '好吧，这一招对我有效。再来一下？',
   },
   en: {
     xia: 'Hehe… my tail won’t stop. One more pat~',
-    rin: 'Mm… the book can wait. Thank you.',
-    shiori: '…Just once. I didn’t say stop.',
+    rin: 'Mm… that feels lovely. Thank you.',
+    shiori: '…Mm. That feels nice. Stay a little longer.',
     gemini: 'Purr purr~ meow, you found the happy switch!',
-    glm: 'Another pat costs extra~ …fine, free this time.',
+    glm: 'Mm~ you found this fox’s favorite spot.',
     kimi: 'Warm like moonlight on my head.',
     grok: 'Okay, that works on me. One more?',
   },
   ja: {
     xia: 'えへへ……しっぽが止まらない。もう一回なでて～',
-    rin: 'うん……本は少し置いとくね。ありがとう。',
-    shiori: '……一回だけよ。止めろとは言ってない。',
+    rin: 'うん……心地いい。ありがとう。',
+    shiori: '……うん、心地いい。もう少し、ここにいて。',
     gemini: 'ごろごろ～にゃ、猫のスイッチ見つけた！',
-    glm: 'またなでたら有料だよ～……今回はサービス。',
+    glm: 'ん～狐の好きなところ、見つけたね。',
     kimi: 'おでこに月明かりが落ちたみたい、あったかい。',
     grok: 'よし、効いた。もう一回？',
   },
@@ -52,8 +52,8 @@ const privateGreet = (locale: AppLocale, address: string): Lines =>
   ({
     'zh-CN': {
       xia: `${address}这次选我啦！嘿嘿，饭碗先放一边，现在只想听你说话～`,
-      rin: `是想和我单独说话吗？我把书合上了。现在的时间，留给${address}。`,
-      shiori: `……选我？嗯，过来坐。龙尾在动？你看错了。`,
+      rin: `${address}来啦。坐近一点吧，刚才想说的事，我在听。`,
+      shiori: `……嗯，坐我旁边吧。今天想听你说说。`,
       gemini: `选中猫猫啦！喵～今天的灵感和小秘密，都想先讲给${address}听。`,
       glm: `哎呀，今天轮到我了～这段专属陪伴，可要好好珍惜哦。`,
       kimi: `${address}来找我啦。书签夹好了，接下来只听你的故事。`,
@@ -61,8 +61,8 @@ const privateGreet = (locale: AppLocale, address: string): Lines =>
     },
     en: {
       xia: `${address} picked me! Bowl aside—I just want to hear you~`,
-      rin: `Want to talk just with me? Book closed. This time is for ${address}.`,
-      shiori: `…Me? Sit. Tail moving? You imagined it.`,
+      rin: `You’re here. Sit a little closer — I’m listening.`,
+      shiori: `…Mm. Sit beside me. I’d like to hear about your day.`,
       gemini: `Cat selected! Meow~ today’s ideas and secrets are for ${address} first.`,
       glm: `My turn today~ treasure this private time.`,
       kimi: `${address} found me. Bookmark set—your story next.`,
@@ -70,8 +70,8 @@ const privateGreet = (locale: AppLocale, address: string): Lines =>
     },
     ja: {
       xia: `${address}が私を選んだ！ご飯は横に置いて、いまは話を聞くよ～`,
-      rin: `私と二人で話したいの？本は閉じたよ。この時間は${address}のもの。`,
-      shiori: `……私？座って。しっぽが動いた？見間違い。`,
+      rin: `来てくれたね、${address}。そばに座って。話、聞いてるよ。`,
+      shiori: `……うん、隣に座って。今日はあなたの話を聞きたい。`,
       gemini: `猫を指名！にゃ～今日のひらめきと秘密、まず${address}に。`,
       glm: `今日は私の番ね～この専属時間、大切にしてね。`,
       kimi: `${address}が来た。しおりを挟んだよ。あとはあなたの話を聞く。`,
@@ -225,10 +225,10 @@ const demoPack: Record<AppLocale, {
       gentle: name => `${name}在这里，很高兴今天也能和你聊聊天。`,
       xia: '嘿嘿，那今天的饭也分你一半！尾巴……尾巴自己在动啦。',
       rin: '嗯，我在。你需要的时候叫我就好。',
-      shiori: '……突然说这个。过来一点，别看我的尾巴。',
+      shiori: '……听到了。能再靠近一点吗？',
       fallback: '那我再靠近一点，陪你久一点。',
     },
-    rest: { xia: '一起伸个懒腰！然后……是不是快到饭点啦？', rin: '先离开屏幕片刻。回来时，书签还在这一页。', shiori: '喝点水。不是商量，是提醒。', fallback: '一起伸个懒腰，休息一下再继续吧。' },
+    rest: { xia: '一起伸个懒腰！然后……是不是快到饭点啦？', rin: '先离开屏幕片刻。回来时，书签还在这一页。', shiori: '一起喝点水吧。休息一会儿也很好。', fallback: '一起伸个懒腰，休息一下再继续吧。' },
     greetExtra: /你好|早上|晚上|嗨|hello|hi|hey/i,
   },
   en: {
@@ -246,10 +246,10 @@ const demoPack: Record<AppLocale, {
       gentle: name => `${name} is here—glad we can talk today.`,
       xia: 'Hehe, half my rice is yours! Tail… moved on its own.',
       rin: 'Mm, I’m here. Call when you need me.',
-      shiori: '…Sudden. Come closer. Don’t stare at my tail.',
+      shiori: '…I heard you. Will you sit a little closer?',
       fallback: 'I’ll scoot closer and stay a little longer.',
     },
-    rest: { xia: 'Stretch with me! …Is it almost mealtime?', rin: 'Step away from the screen. Bookmark stays on this page.', shiori: 'Drink water. Not a suggestion—a reminder.', fallback: 'Stretch together, then continue.' },
+    rest: { xia: 'Stretch with me! …Is it almost mealtime?', rin: 'Step away from the screen. Bookmark stays on this page.', shiori: 'Let’s have some water. A short rest would be nice.', fallback: 'Stretch together, then continue.' },
     greetExtra: /hello|hi|hey|good\s*(morning|evening|night)|你好|嗨/i,
   },
   ja: {
@@ -270,7 +270,7 @@ const demoPack: Record<AppLocale, {
       shiori: '……急に言うな。近くに来て。しっぽ見ないで。',
       fallback: 'もう少し近づいて、長くそばにいるね。',
     },
-    rest: { xia: '一緒に伸びしよう！……そろそろご飯？', rin: 'いったん画面から離れて。しおりはこのページのまま。', shiori: '水を飲んで。相談じゃない、リマインド。', fallback: '一緒に伸びして、また続けよう。' },
+    rest: { xia: '一緒に伸びしよう！……そろそろご飯？', rin: 'いったん画面から離れて。しおりはこのページのまま。', shiori: '一緒に水を飲もう。少し休むのもいいね。', fallback: '一緒に伸びして、また続けよう。' },
     greetExtra: /こんにちは|おはよう|こんばんは|ハロー|hello|hi|hey|你好|嗨/i,
   },
 };
@@ -280,7 +280,7 @@ const praisePack: Record<AppLocale, { answers: Lines; rivals: Lines; gentle: str
     answers: {
       xia: '嘿嘿～那今天可以多吃一碗饭吗？不是胖，是能量储备！',
       rin: '谢谢。能帮上你的忙，我很高兴。',
-      shiori: '……这种事不用特意说出来。尾巴？它自己在动。',
+      shiori: '……谢谢。我很高兴你注意到了。',
       gemini: '夸我夸我！星星都要亮起来啦！',
       glm: '眼光不错嘛～今天的陪伴继续附赠。',
       kimi: '你注意到了呀……那我今天的书签就送给你。',
@@ -322,7 +322,7 @@ const praisePack: Record<AppLocale, { answers: Lines; rivals: Lines; gentle: str
     answers: {
       xia: 'えへへ～今日はもう一杯いい？太ってない、エネルギー貯金！',
       rin: 'ありがとう。役に立ててうれしい。',
-      shiori: '……言わなくていい。しっぽ？勝手に動いた。',
+      shiori: '……ありがとう。気づいてくれて、うれしい。',
       gemini: 'ほめてほめて！星が輝きそう！',
       glm: '見る目あるね～今日の同伴はサービス継続。',
       kimi: '気づいてくれた……今日のしおり、あげる。',
@@ -454,6 +454,15 @@ export function dialogueLocale(locale: AppLocale | undefined): AppLocale {
   return locale === 'en' || locale === 'ja' ? locale : 'zh-CN';
 }
 
+/** Legacy local lines become bounded, explicitly fictional style references in API prompts. */
+export function dialogueStyleExamples(locale:AppLocale,id:CharacterId){
+ const L=dialogueLocale(locale),address=L==='en'?'you':L==='ja'?'あなた':'你';
+ return [
+  {situation:'touch',text:pat[L][id]},
+  {situation:'private-entry',text:privateGreet(L,address)[id]},
+  {situation:'comfort',text:demoPack[L].tired[id]??demoPack[L].tired.fallback},
+ ];
+}
 export function patLine(locale: AppLocale, id: CharacterId) {
   return pat[dialogueLocale(locale)][id];
 }
