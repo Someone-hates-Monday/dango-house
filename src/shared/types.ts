@@ -31,7 +31,7 @@ export interface Embodiment { target?:CharacterId; pose: Pose; emotion: Emotion;
 export interface RoomPoint { x: number; y: number; }
 export type FurnitureKind = 'sofa' | 'table' | 'bookshelf' | 'plant' | 'lamp' | 'cushion';
 export interface Furniture extends RoomPoint { id: string; kind: FurnitureKind; }
-export interface RoomResident extends RoomPoint { from: RoomPoint; startedAt: number; arrivesAt: number; after: Pose; destination: string; }
+export interface RoomResident extends RoomPoint { from: RoomPoint; path?:RoomPoint[]; startedAt: number; arrivesAt: number; after: Pose; destination: string; }
 export interface AvatarIntent { action: string; emotion?: Emotion; target?: string; x?: number; y?: number; duration?: number; bubble?: string; }
 export type Food = 'rice'|'cake'|'fish'|'tea';
 export type PairTone = 'soft' | 'warm' | 'vivid';

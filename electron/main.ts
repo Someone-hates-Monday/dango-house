@@ -66,7 +66,7 @@ function broadcast(state: AppState) {
   clearTimeout(saveTimer); saveTimer = setTimeout(persist, 300);
 }
 function showChat() {if(houseWindow)houseWindow.window.hide();if(engine){engine.state.presentation.surface='workbench';engine.publish();}if(mainWindow.isMinimized())mainWindow.restore();mainWindow.show();mainWindow.focus();}
-function showHouse(){if(!houseWindow)return;engine.state.presentation.surface='house';engine.state.settings.petsVisible=false;engine.state.room.wandering=false;engine.publish();mainWindow.hide();houseWindow.show();}
+function showHouse(){if(!houseWindow)return;engine.state.presentation.surface='house';engine.state.settings.petsVisible=false;engine.state.room.wandering=false;const layout=houseWindow.current();engine.setHouseGeometry(layout.width,layout.height);engine.publish();mainWindow.hide();houseWindow.show();}
 function showSettings(){showChat();const go=()=>mainWindow.webContents.send('garden:page','settings');if(mainWindow.webContents.isLoadingMainFrame())mainWindow.webContents.once('did-finish-load',go);else go();}
 function openPrivate(id:CharacterId){if(!ids.includes(id))return;void engine.dispatch({type:'private-open',id});const existing=privateWindows.get(id);if(existing&&!existing.isDestroyed()){existing.show();existing.focus();return;}const work=screen.getPrimaryDisplay().workArea;const win=new BrowserWindow({width:470,height:650,minWidth:400,minHeight:480,x:work.x+work.width-490,y:work.y+Math.max(10,work.height-690),frame:false,title:'团子小屋 · 专属聊天',backgroundColor:'#fff8fc',webPreferences:{preload,contextIsolation:true,nodeIntegration:false,sandbox:true}});secure(win);privateWindows.set(id,win);load(win,'private',undefined,id);win.on('closed',()=>{privateWindows.delete(id);void engine.dispatch({type:'private-return',id});});}
 function createOverlay(displayId: number) {
@@ -191,7 +191,7 @@ if (single) app.whenReady().then(async () => {
     // The handler returns immediately; the engine owns cancellable turn execution.
     void engine.dispatch(action).catch(() => engine.add('system', '操作没有完成，请重试。', 'error'));
   });
-  ipcMain.handle('garden:house-layout',(event,size)=>{if(event.sender!==houseWindow.window.webContents)throw Error('Invalid house window');return size?houseWindow.layout(size):houseWindow.current();});
+  ipcMain.handle('garden:house-layout',(event,size)=>{if(event.sender!==houseWindow.window.webContents)throw Error('Invalid house window');const layout=size?houseWindow.layout(size):houseWindow.current();engine.setHouseGeometry(layout.width,layout.height);return layout;});
   ipcMain.on('garden:house-drag',(event,phase,point)=>{if(event.sender===houseWindow.window.webContents&&['start','move','end'].includes(phase))houseWindow.drag(phase,point);});
   ipcMain.on('garden:window', (event, command: string) => {
     if (!known(event.sender)) return;

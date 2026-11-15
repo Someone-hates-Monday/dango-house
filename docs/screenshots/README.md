@@ -1,5 +1,11 @@
 # 运行截图 / Runtime screenshots
 
+## 2026-11-15 · 0.5.0-alpha.5 purposeful movement
+
+`house-gather-055.png`：`verify-house-movement.mjs --packaged` 中隔离存档与本地 SSE 模拟服务，展示两人走到窗边再开始对白。无真实 Key 或用户记录。
+
+This capture uses the real packaged app, an isolated profile and a local SSE fixture. It shows dialogue after two residents move to the window; no real credentials or personal chats. Existing artwork terms apply.
+
 ## 2026-11-15 · 0.5.0-alpha.2 settings and speech
 
 `mini-house-052.png`、`mini-house-speech-052.png`、`mini-house-settings-052.png`：`verify-mini-house.mjs --packaged` 的隔离离线存档，分别展示屋檐状态、角色气泡/私聊和完整全局设置，无用户资料或真实 API 请求。

@@ -11,7 +11,7 @@
 .house-window-art::before{content:'';position:absolute;left:45%;height:100%;border-left:3px solid #deb6bd}
 .house-rug{position:absolute;left:18%;right:18%;bottom:8%;height:36%;border:2px solid #d6b6cb;border-radius:50%;background:#ead1df}
 .house-sofa{position:absolute;left:4%;bottom:20%;width:84px;opacity:.85;pointer-events:none}.house-sofa svg{width:100%;display:block}
-.house-resident{position:absolute;transform:translate(-50%,-100%);transform-origin:center bottom;transition:left .8s ease; width:90px;height:128px;padding:0;background:transparent;border:0;overflow:visible}
+.house-resident{position:absolute;transform:translate(-50%,-100%);transform-origin:center bottom; width:90px;height:128px;padding:0;background:transparent;border:0;overflow:visible}
 .house-resident-art{position:absolute;left:0;bottom:18px;width:90px;height:110px;pointer-events:none}
 .house-resident .sprite{position:relative;width:90px;height:110px;display:block;overflow:visible}
 .house-resident-name{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:10px;line-height:16px;padding:0 5px;background:#fff8f5e8;border:1px solid #dcc1ce;border-radius:6px;white-space:nowrap;pointer-events:none}
@@ -90,3 +90,8 @@
 .house-chat>header strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .house-chat>header .house-chat-close{flex-shrink:0}
 .house-canopy:active{cursor:grabbing!important}
+
+.house-scene{z-index:1}
+.house-floor{top:clamp(56px,30%,72px)}
+.house-walk-soft{animation:house-soft-steps .48s ease-in-out infinite}
+@keyframes house-soft-steps{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}

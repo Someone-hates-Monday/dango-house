@@ -5,7 +5,12 @@ export const furnitureCatalog: {kind:FurnitureKind;name:string}[] = [{kind:'sofa
 export const defaultFurniture = ():Furniture[] => [{id:'sofa',kind:'sofa',x:22,y:59},{id:'tea',kind:'table',x:50,y:74},{id:'books',kind:'bookshelf',x:78,y:47},{id:'plant',kind:'plant',x:13,y:43},{id:'lamp',kind:'lamp',x:89,y:63},{id:'cushion',kind:'cushion',x:66,y:89}];
 export const restingBody = ():Embodiment => ({pose:'idle',emotion:'neutral',until:0,label:'发呆',bubble:''});
 export const defaultResidents = () => Object.fromEntries(characters.map((c,i)=>[c.id,{x:22+i*9,y:81+(i%2)*10,from:{x:22+i*9,y:81+(i%2)*10},startedAt:0,arrivesAt:0,after:'idle',destination:''}])) as Record<CharacterId,RoomResident>;
-export function residentPosition(r:RoomResident,now=Date.now()):RoomPoint { const t = r.arrivesAt>r.startedAt ? Math.max(0,Math.min(1,(now-r.startedAt)/(r.arrivesAt-r.startedAt))) : 1; return {x:r.from.x+(r.x-r.from.x)*t,y:r.from.y+(r.y-r.from.y)*t}; }
+export function residentPosition(r:RoomResident,now=Date.now()):RoomPoint {
+ const t=r.arrivesAt>r.startedAt?Math.max(0,Math.min(1,(now-r.startedAt)/(r.arrivesAt-r.startedAt))):1;
+ if(r.path&&r.path.length>1){const lengths=r.path.slice(1).map((p,i)=>Math.hypot(p.x-r.path![i].x,p.y-r.path![i].y)),total=lengths.reduce((a,b)=>a+b,0);let left=t*total;
+  for(let i=0;i<lengths.length;i++){if(left<=lengths[i]||i===lengths.length-1){const a=r.path[i],b=r.path[i+1],f=lengths[i]?Math.min(1,left/lengths[i]):1;return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f};}left-=lengths[i];}}
+ return{x:r.from.x+(r.x-r.from.x)*t,y:r.from.y+(r.y-r.from.y)*t};
+}
 export const boundedPoint = (x:number,y:number):RoomPoint => ({x:Math.max(8,Math.min(92,x)),y:Math.max(48,Math.min(94,y))});
 export function validatedIntent(value: unknown):AvatarIntent {
   if (!value || typeof value!=='object') throw new Error('动作参数必须是对象');

@@ -1,4 +1,5 @@
 import {parseHousePlan,houseBeatPause,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
+import {houseFormation,houseSpots,planHousePath,type HouseGeometry} from '../src/shared/house-navigation';
 import {clipById,clipByTitle,socialDeepseekClip} from '../src/shared/deepseek-animation';
 import {deepseekClips} from '../src/shared/deepseek-clips';
 import {socialClaudeClip} from '../src/shared/claude-animation';
@@ -7,7 +8,7 @@ import type {Interaction} from '../src/shared/motion';
 import { byId, providers } from '../src/shared/characters';
 import { socialScenes, relationshipKey } from '../src/shared/social';
 import { chooseSpeakers, demoReply, initialState, praiseLines, ids } from '../src/shared/director';
-import type { Action, AppState, CharacterId, CgAssetId, Message, AvatarIntent, Emotion } from '../src/shared/types';
+import type { Action, AppState, CharacterId, CgAssetId, Message, AvatarIntent, Emotion,RoomPoint } from '../src/shared/types';
 import { boundedPoint, defaultFurniture, inferredIntent, poseForAction, restingBody, residentPosition, targetDescription, validatedIntent } from '../src/shared/world';
 import { emptyAgentUi } from '../src/shared/agent';
 import { isAppLocale, translate } from '../src/shared/i18n';
@@ -54,7 +55,16 @@ export class GardenEngine {
   private nextDeepseek=Date.now()+120000;
   private lastDeepseekClip="";
   private lastClaudeClip="";
-  private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction}>();
+  private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction;speech?:{text:string;channel?:CharacterId;origin?:Message['origin'];jobId:string}}>();
+  private houseGeometry:HouseGeometry={width:360,height:300,count:3};
+  private houseCastKey='';
+  setHouseGeometry(width:number,height:number){
+    this.houseGeometry={width,height,count:presentCast(this.state).length};
+    if(this.state.presentation.surface!=='house')return;
+    const cast=presentCast(this.state),key=cast.join(',');if(key===this.houseCastKey)return;this.houseCastKey=key;
+    const formation=houseFormation(cast);for(const id of cast){const p=formation[id];this.state.room.residents[id]={...p,from:p,startedAt:0,arrivesAt:0,after:'idle',destination:''};this.state.bodies[id]=restingBody();}
+    this.publish();
+  }
   private nextBookmark=Date.now()+95000;
   constructor(state: AppState = initialState(), private notify: (state: AppState) => void = () => {}, private generate?: Generate, private delay = 650, private houseGenerate?:HouseGenerate) {
     this.state = state;
@@ -103,12 +113,17 @@ export class GardenEngine {
       const proposed=await this.houseGenerate(this.state,event,signal);
       if(proposed.beats.some(b=>castBefore.has(b.actor)&&!isSpeaking(this.state,b.actor)))return;
       if(round!==this.epoch||signal.aborted||(kind==='autonomous'&&!this.houseVisible)||this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
-      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset}),this.state,event,proposed.origin);
+      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset,gather:proposed.gather}),this.state,event,proposed.origin);
       if(!plan.beats.length)return;
       const at=Date.now();const cast=[...new Set(plan.beats.map(b=>b.actor))];
       const publicLines=plan.beats.filter(b=>!b.channel&&b.text).map(b=>byId[b.actor].name+':'+b.text).join(' ');
-      let offset=0;
-      const steps=plan.beats.map(b=>{const step={at:at+offset,actor:b.actor,intent:b.intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor};offset+=houseBeatPause(b);return step;});
+      let offset=plan.gather?250:0,previousPublic:CharacterId|undefined;
+      const steps:SceneStep[]=plan.gather?plan.gather.actors.map(id=>({at,actor:id,intent:{action:'approach',target:plan.gather!.target,duration:1},origin:plan.origin})):[];
+      const approached=new Set<CharacterId>();
+      for(const b of plan.beats){const intent={...b.intent},peer=b.replyTo??previousPublic;
+        if(this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
+        steps.push({at:at+offset,actor:b.actor,intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor});offset+=houseBeatPause(b);if(!b.channel&&b.text)previousPublic=b.actor;
+      }
       this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
       this.tick(at);
     }catch(error){if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
@@ -126,27 +141,28 @@ export class GardenEngine {
     if(!ids.includes(id))throw new Error(this.t('sys.unknownCharacter'));
     if(!isPresent(this.state,id))throw new Error(this.t('cast.needInvite',{name:byId[id].name}));
     const intent=validatedIntent(value);
-    if(this.state.presentation.surface==='house'&&intent.action==='walk'&&!intent.target)intent.action='idle';
+    const inHouse=this.state.presentation.surface==='house';
     const charTarget=this.characterTargetId(intent.target);
     if(charTarget&&!isPresent(this.state,charTarget))throw new Error(this.t('cast.needInvite',{name:byId[charTarget].name}));
     const resident=this.state.room.residents[id];
-    const current=residentPosition(resident,now);let point: {x:number;y:number}|undefined;
+    const current=residentPosition(resident,now);let point:RoomPoint|undefined,path:RoomPoint[]|undefined,houseTravel=0;
     let target=intent.target;
-    if(!target&&!interaction&&['read','sit','water','eat','sleep'].includes(intent.action)) target=this.state.room.furniture.find(f=>f.kind===({read:'bookshelf',sit:'sofa',water:'plant',eat:'table',sleep:'cushion'} as Record<string,string>)[intent.action])?.id;
-    if(target){const obj=this.state.room.furniture.find(f=>f.id===target);const other=ids.find(other=>other===target||byId[other].name.toLowerCase()===target!.toLowerCase());if(obj)point=boundedPoint(obj.x+6,obj.y+9);else if(other&&other!==id){const p=residentPosition(this.state.room.residents[other],now);point=boundedPoint(p.x+9,p.y+2);}else throw new Error(this.t('sys.badTarget'));}
+    if(!inHouse&&!target&&!interaction&&['read','sit','water','eat','sleep'].includes(intent.action)) target=this.state.room.furniture.find(f=>f.kind===({read:'bookshelf',sit:'sofa',water:'plant',eat:'table',sleep:'cushion'} as Record<string,string>)[intent.action])?.id;
+    if(target){const obj=this.state.room.furniture.find(f=>f.id===target);const other=ids.find(other=>other===target||byId[other].name.toLowerCase()===target!.toLowerCase());if(inHouse&&houseSpots[target])point=houseSpots[target];else if(obj)point=boundedPoint(obj.x+6,obj.y+9);else if(other&&other!==id){const p=residentPosition(this.state.room.residents[other],now);point=inHouse?p:boundedPoint(p.x+9,p.y+2);}else if(other!==id)throw new Error(this.t('sys.badTarget'));}
     if(intent.action==='walk'&&!point)point=boundedPoint(intent.x??current.x+(this.lifeIndex%2?10:-10),intent.y??current.y);
-    if(!this.state.room.wandering)point=undefined;
+    if(!this.state.room.wandering&&!(inHouse&&(target||intent.x!==undefined||intent.y!==undefined)))point=undefined;
+    if(inHouse&&point){const route=planHousePath(id,this.state.room.residents,presentCast(this.state),point,this.houseGeometry,now,charTarget);path=route.path;houseTravel=route.duration;point=path.at(-1);}
     const targetId=ids.find(other=>other===target||byId[other].name.toLowerCase()===target?.toLowerCase());
-    if(targetId&&targetId!==id&&source==='model'){this.queueJob({id:`model-reply-${targetId}-${now}`,source:'model-reply',priority:'reaction',cast:[targetId]},[{at:now+3500,actor:targetId,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),targetId).response,duration:7}}],now);}
+    if(targetId&&targetId!==id&&source==='model'&&!this.director.current?.source.startsWith('house:')){this.queueJob({id:`model-reply-${targetId}-${now}`,source:'model-reply',priority:'reaction',cast:[targetId]},[{at:now+3500,actor:targetId,intent:{action:'wave',emotion:'happy',bubble:localizedProfile(this.locale(),targetId).response,duration:7}}],now);}
     const after=poseForAction(intent.action); const duration=intent.duration!*1000;
     const moving=point&&Math.hypot(point.x-current.x,point.y-current.y)>1;
     if(!interaction){
       if(id==='xia'){const clipId=socialDeepseekClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
       if(id==='rin'){const clipId=socialClaudeClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
     }
-    const travel=moving?Math.max(800,Math.min(this.state.presentation.surface==='house'?900:5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85)):0;
-    if(moving)this.state.room.residents[id]={...point!,from:current,startedAt:now,arrivesAt:now+travel,after,destination:target?targetDescription(target,this.state.room.furniture):this.t('sys.nearby')};
-    else if(intent.action!=='approach')this.state.room.residents[id]={...resident,...current,from:current,startedAt:0,arrivesAt:0,after,destination:''};
+    const travel=moving?(inHouse?houseTravel:Math.max(800,Math.min(5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85))):0;
+    if(moving)this.state.room.residents[id]={...point!,from:current,path,startedAt:now,arrivesAt:now+travel,after,destination:target?targetDescription(target,this.state.room.furniture):this.t('sys.nearby')};
+    else this.state.room.residents[id]={...resident,...current,from:current,path:undefined,startedAt:0,arrivesAt:0,after,destination:''};
     const labels:Record<string,string>={wave:this.t('act.wave'),jump:this.t('act.jump'),celebrate:this.t('act.celebrate'),think:this.t('act.think'),read:this.t('act.read'),shy:this.t('act.shy'),sad:this.t('act.sad'),sit:this.t('act.sit'),water:this.t('act.water'),eat:this.t('act.eat'),sleep:this.t('act.sleep'),walk:this.t('act.walk'),approach:this.t('act.approach'),idle:this.t('act.idle')};
     // Travel: walk only; bubble + gesture/clip land on arrival (see tick + pendingArrive).
     if(moving)this.pendingArrive.set(id,{bubble:intent.bubble??'',interaction});
@@ -304,7 +320,7 @@ export class GardenEngine {
   private freezeRoom(now=Date.now()) {
     this.cancelScenes('freeze');
     this.pendingArrive.clear();
-    for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
+    for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,path:undefined,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
   }
   private playSocial(id:string,now=Date.now()) {
     if(this.state.settings.mode==='api'){this.nextSocial=now+180000;void this.reactHouse('autonomous',undefined,{text:id});return;}
@@ -428,7 +444,7 @@ export class GardenEngine {
           const match = text.match(/(\d+)\s*(?:分钟|min|minutes)?/i); await this.dispatch({ type: 'focus', minutes: match ? Number(match[1]) : 25 }); return;
         }
         if (/记住[：:，, ]|remember[:：, ]/i.test(text)) { const memory = text.split(/记住[：:，, ]|remember[:：, ]/i).slice(1).join('').trim(); if (memory) await this.dispatch({ type: 'remember', text: memory }); }
-        if (this.state.settings.mode === 'api' && (!this.generate || !this.state.settings.model)) { this.add('system', this.t('sys.needApi'), 'error'); return; }
+        if (this.state.settings.mode === 'api' && ((!this.generate&&!this.houseGenerate) || !this.state.settings.model)) { this.add('system', this.t('sys.needApi'), 'error'); return; }
         if(this.state.settings.mode==='api'&&this.houseGenerate){await this.reactHouse('message',action.target,{text});return;}
         await this.sequence(selected.map((speaker, i) => ({ speaker, text: demoReply(speaker, text, this.state.settings.intimacy, i, this.locale()) })), this.state.settings.mode === 'api', text); return;
       }
@@ -797,8 +813,10 @@ export class GardenEngine {
         changed=true;
       }
     }
+    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.path=undefined;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.speech&&pending.speech.jobId===this.director.activeJobId()&&isSpeaking(this.state,id)){const line=pending.speech;if(line.channel)this.addPrivate(line.channel,id,line.text,line.origin);else this.add(id,line.text,undefined,line.origin);}if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     this.director.dropMissing(presentCast(this.state));
     let {steps:due,completed}=this.director.due(now);
+    let waveDelay=0;
     for(const item of due){
       const tgt=item.intent.target&&ids.includes(item.intent.target as CharacterId)?item.intent.target as CharacterId:undefined;
       const runnable=isPresent(this.state,item.actor)&&(!tgt||isPresent(this.state,tgt))&&isSpeaking(this.state,item.actor)&&(!tgt||isSpeaking(this.state,tgt));
@@ -807,14 +825,17 @@ export class GardenEngine {
         const body=this.state.bodies[item.actor];
         if(item.preserveReaction&&body.interaction&&body.until>now){body.bubble=item.speech?.slice(0,55)??'';body.emotion=item.intent.emotion??body.emotion;}
         else this.perform(item.actor,item.intent,item.origin?.backend==='model'?'model':'local',now);
-        if(item.speech){if(item.channel)this.addPrivate(item.channel,item.actor,item.speech,item.origin);else this.add(item.actor,item.speech,undefined,item.origin);}
+        const arriving=this.state.presentation.surface==='house'&&this.state.room.residents[item.actor].arrivesAt>now;
+        if(arriving)waveDelay=Math.max(waveDelay,this.state.room.residents[item.actor].arrivesAt-now);
+        if(item.speech){if(arriving){const pending=this.pendingArrive.get(item.actor)??{bubble:item.speech.slice(0,55)};pending.speech={text:item.speech,channel:item.channel,origin:item.origin,jobId:this.director.activeJobId()??''};this.pendingArrive.set(item.actor,pending);}else if(item.channel)this.addPrivate(item.channel,item.actor,item.speech,item.origin);else this.add(item.actor,item.speech,undefined,item.origin);}
         this.director.noteOwnedEnd(this.ownedEndFor(item.actor));
       }catch{this.director.failEssential();due=[];break;}
     }
+    this.director.delayPending(waveDelay);
     this.director.sealSettle(now);
     if(!completed){({completed}=this.director.due(now));}
     if(completed){this.commitJobReward(completed);if(this.storyJobId===completed.id)this.storyJobId=null;this.maybeStartEventCg(completed);changed=true;}
-    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
+
     for(const id of ids){const d=this.state.desktopMoves[id];if(d&&now>=d.arrivesAt){this.state.pets[id]={...d.to,displayId:d.displayId};delete this.state.desktopMoves[id];changed=true;}}
     if(changed)this.publish();
     if(now>=this.nextDeepseek){

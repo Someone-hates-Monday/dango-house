@@ -3,10 +3,11 @@ import {useEffect,useRef,useState} from 'react';
 import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users} from 'lucide-react';
 import type {AppState,CharacterId,Food} from './shared/types';
 import type {HouseLayout} from './shared/mini-house';
-import {compactPositions} from './shared/mini-house';
+import {projectHouse} from './shared/house-navigation';
+import {residentPosition} from './shared/world';
+import {HouseResident} from './HouseResident';
 import {characters,byId} from './shared/characters';
 import {presentCast} from './shared/cast';
-import {Sprite,EmotionFx} from './Sprite';
 import {FurnitureArt} from './Room';
 import {cgClip} from './shared/cg-catalog';
 import './mini-house.css';
@@ -61,7 +62,8 @@ export function MiniHouse({state}:{state:AppState}){
   nearBottom.current=true;setChatOpen(true);
  };
  const submit=()=>{if(!text.trim())return;void send(channel?{type:'private-send',id:channel,text}:{type:'send',text});setText('');nearBottom.current=true;};
- const positions=compactPositions(residents.map(c=>c.id),layout.width-44,layout.height-148);
+ const geometry={width:layout.width,height:layout.height,count:residents.length};
+ const positions=residents.map(c=>({id:c.id,...projectHouse(residentPosition(state.room.residents[c.id],now),geometry)}));
  const selected=state.presentIds.includes(state.selected)?state.selected:state.presentIds[0];
  const dragHandlers={
   onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;cancelHover();dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
@@ -86,9 +88,8 @@ export function MiniHouse({state}:{state:AppState}){
    {session&&(collapsed||layout.cgHeight===0)&&<button className="house-roof-chip" title={!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg} onClick={()=>setCollapsed(false)}>♡ {!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg}</button>}
    <div className="house-scene" style={{height:layout.height-148}}>
     <div className="house-window-art"/><div className="house-floor"/><div className="house-rug"/><div className="house-sofa"><FurnitureArt kind="sofa"/></div>
-    {residents.map(c=>{const p=positions.find(p=>p.id===c.id)!;const body=state.bodies[c.id];return <button key={c.id} className={`house-resident ${selected===c.id?'selected':''}`} data-character={c.id} style={{left:p.x+(body.target&&body.until>Date.now()?Math.sign((positions.find(p=>p.id===body.target)?.x??p.x)-p.x)*6:0),top:p.y,zIndex:p.z+2,transform:`translate(-50%,-100%) scale(${Math.min(1.2,Math.max(.75,(layout.height-176-(residents.length>4?84:0))/128))})`}} onClick={()=>choose(c.id)} onPointerEnter={()=>{cancelHover();hover.current=setTimeout(()=>void send({type:'hover',id:c.id}),800);}} onPointerLeave={cancelHover} title={c.name} aria-label={c.name}>
-      <span className="house-resident-art"><Sprite character={c} skin={state.skins[c.id]} pose={body.pose.startsWith('walk')?'idle':body.pose} cue={body.until} activity={body.bubble} interaction={body.interaction} stoppedAt={body.stoppedAt} frozen={state.settings.dnd}/><EmotionFx emotion={body.emotion}/></span><span className="house-resident-name">{c.name}</span>
-    </button>;})}
+    {residents.map(c=><HouseResident key={c.id} character={c} body={state.bodies[c.id]} resident={state.room.residents[c.id]} geometry={geometry} skin={state.skins[c.id]} selected={selected===c.id} frozen={state.settings.dnd} onSelect={()=>choose(c.id)} onHover={()=>{cancelHover();hover.current=setTimeout(()=>void send({type:'hover',id:c.id}),800);}} onLeave={cancelHover}/>)}
+
    </div>
    <footer className="house-footer"><button className="house-caption" onClick={()=>setChatOpen(true)} title={last?.text??t.placeholder}><span>{last&&last.speaker!=='system'?(last.speaker==='user'?t.you:byId[last.speaker].name)+' · ':''}{last?.speaker==='system'?t.placeholder:last?.text||t.placeholder}</span></button><div className="house-tools"><button className="house-chat-open" onClick={()=>choose()}><MessageCircle size={15}/>{t.chat}</button>{selected&&<><button title={t.pat} aria-label={t.pat} onClick={()=>void send({type:'pat',id:selected})}><Hand size={17}/></button><button title={t.praise} aria-label={t.praise} onClick={()=>void send({type:'praise',id:selected})}><Heart size={17}/></button><button title={t.feed} aria-label={t.feed} onClick={()=>setFoodOpen(!foodOpen)}><Utensils size={17}/></button></>}<button className="house-brain-status" onClick={openSettings}>{state.settings.mode==='api'?t.live:t.demo}</button></div></footer>
    {foodOpen&&selected&&<div className="house-food-menu">{(['rice','tea','cake','fish'] as Food[]).map((food,i)=><button key={food} onClick={()=>{setFoodOpen(false);void send({type:'feed',id:selected,food});}}>{t.food[i]}</button>)}</div>}

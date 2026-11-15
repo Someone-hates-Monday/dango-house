@@ -190,6 +190,7 @@ export class SceneDirector {
   pending(): SceneStep[] {
     return this.current && !this.current.cancelled ? [...this.current.steps] : [];
   }
+  delayPending(ms:number){if(this.current&&!this.current.cancelled&&ms>0)for(const step of this.current.steps)step.at+=ms;}
 
   hasActiveJob(): boolean {
     return !!this.current && !this.current.cancelled;

@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.5 · 2026-11-15 · Walk over to chat / 走近再聊
+
+- 分离目的性移动与随意巡游，按实际角色坐标显示行走和停留；不再固定站位或只偏移几像素。Separate purposeful travel from wandering and render real paths with persistent destinations.
+- 同伴接话可走近对方，模型可用 `gather` 约两三位到窗边、地毯或家具附近；到位后再发言并推迟后续演出。Approach peers or gather at a shared spot; speech and later steps wait for arrival.
+- 路线预留同伴占用空间，允许部分重叠但控制在一半以内；无可用路线或已靠近时不原地走路。Reserve paths and limit overlap; no walking in place when blocked or already near.
+- 保留 GPT 已验收的视频形象；有现成走路动画的角色使用对应素材，其他角色移动时保留形象并轻微起伏。Keep approved identities; use reviewed walk clips where available and subtle stepping otherwise.
+
 ## 0.5.0-alpha.4 · 2026-11-15 · Cleaner roof / 简洁屋顶
 
 - 去掉“拖动小屋”文字把手，保留屋顶空白处/边缘按住拖动与位置记忆。Remove the labelled drag grip; retain blank-roof/edge dragging and persisted position.
