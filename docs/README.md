@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [用户互动优先、模型回复与同伴场景边界：0.5.0-alpha.7](HOUSE-ATTENTION.zh-CN.md) · [English](HOUSE-ATTENTION.en.md)
+
 - [窗口闪烁、免打扰后冻结与动作衔接：0.5.0-alpha.6](HOUSE-STABILITY.zh-CN.md) · [English](HOUSE-STABILITY.en.md)
 
 - [有目的地走近、结伴移动与到达后对白：0.5.0-alpha.5](HOUSE-PURPOSEFUL-MOVEMENT.zh-CN.md) · [English](HOUSE-PURPOSEFUL-MOVEMENT.en.md)

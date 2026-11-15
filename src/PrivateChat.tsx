@@ -1,3 +1,4 @@
+import {MessageOrigin} from './MessageOrigin';
 import {CompanionInteractions} from './CompanionInteractions';
 import { PortraitSprite } from './PortraitSprite';
 import { useEffect, useRef, useState } from 'react';
@@ -82,7 +83,7 @@ export function PrivateChat({ state, id }: { state: AppState; id: CharacterId })
                 ? state.relationship.userName
                 : m.speaker === 'system'
                   ? t('private.system')
-                  : character.name}
+                  : character.name}{m.speaker!=='user'&&m.speaker!=='system'&&<MessageOrigin origin={m.origin} locale={state.settings.locale}/>}
             </small>
             <p>{m.text || t('private.thinking')}</p>
           </div>

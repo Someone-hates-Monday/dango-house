@@ -18,7 +18,7 @@ const server=http.createServer(async(req,res)=>{
  if(system.includes('You direct a small shared home')){
   const input=JSON.parse(body.messages.at(-1).content),event=input.event??input,actor=event.actor??'xia',partner=actor==='xia'?'rin':'xia';
   requests.push(event.kind);
-  text=JSON.stringify({beats:[{actor,text:event.privateGreeting?'PRIVATE_FIXTURE_GREETING':'这次的'+event.kind+'我收到了，我们接着刚才的话题。',intent:{action:'shy',emotion:'happy',duration:2}},{actor:partner,text:event.privateGreeting?'她已经把书合好找你聊啦。':'那我坐你旁边，接着说吧。',replyTo:actor,intent:{action:'shy',emotion:'happy',duration:2}},{actor:'shiori',intent:{action:'think',emotion:'curious',duration:3}}]});
+  text=JSON.stringify({beats:[{actor,text:event.privateGreeting?'PRIVATE_FIXTURE_GREETING':'这次的'+event.kind+'我收到了，我们接着刚才的话题。',intent:{action:'shy',emotion:'happy',duration:2}},...(event.privateGreeting?[{actor:partner,text:event.privateGreeting?'她已经把书合好找你聊啦。':'那我坐你旁边，接着说吧。',replyTo:actor,intent:{action:'shy',emotion:'happy',duration:2}}]:[]),{actor:'shiori',intent:{action:'think',emotion:'curious',duration:3}}]});
  }
  res.writeHead(200,{'Content-Type':'text/event-stream'});
  res.end('data: '+JSON.stringify({choices:[{delta:{content:text}}]})+'\n\ndata: [DONE]\n\n');
@@ -55,8 +55,10 @@ try{
  await house.getByRole('button',{name:'聊聊',exact:true}).click();
  await house.locator('.house-chat textarea').waitFor();
  await house.getByRole('button',{name:'摸摸',exact:true}).click();
- await waitHouseState(house,s=>s.messages.filter(m=>m.origin?.backend==='model').length===2);
+ await waitHouseState(house,s=>s.messages.filter(m=>m.origin?.backend==='model').length===1);
  assert.ok(requests.includes('pat'));
+ const pat=await house.evaluate(()=>window.garden.getState());assert.equal(new Set(pat.messages.filter(m=>m.origin?.backend==='model').map(m=>m.speaker)).size,1,'direct pat must not require a second speaker');
+ assert.ok((await house.locator('.message-origin').allTextContents()).includes('AI'));
  await house.screenshot({path:path.join(out,'live-pat.png'),omitBackground:true,scale:'css'});
  await house.getByRole('button',{name:'投喂',exact:true}).click();
  await house.getByRole('button',{name:'米饭',exact:true}).click();

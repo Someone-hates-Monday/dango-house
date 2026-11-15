@@ -1,3 +1,4 @@
+import {MessageOrigin} from './MessageOrigin';
 import {HouseSkin,inHouseSilhouette} from './HouseSkin';
 import {useEffect,useRef,useState} from 'react';
 import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users} from 'lucide-react';
@@ -99,7 +100,7 @@ export function MiniHouse({state}:{state:AppState}){
   </section>
   {chatOpen&&<section className="house-chat" style={{top:layout.cgHeight+layout.height-10,height:layout.chatHeight+10}}>
    <header><button className={!channel?'active':''} onClick={()=>choose()}><Users size={14}/>{t.group}</button>{channel&&<strong>{byId[channel].name} · {t.private}</strong>}<button className="house-chat-close" aria-label={t.closeChat} onClick={()=>setChatOpen(false)}><X size={16}/><span>{t.closeChat}</span></button></header>
-   <div className="house-chat-messages" ref={list} onScroll={e=>{const el=e.currentTarget;nearBottom.current=el.scrollHeight-el.scrollTop-el.clientHeight<45;if(nearBottom.current)setUnread(false);}}>{messages.map(m=><div className={`house-message ${m.speaker==='user'?'mine':''} ${m.speaker==='system'?'notice':''} ${m.kind==='error'?'error':''}`} key={m.id} data-message-origin={m.origin?.backend}><small>{m.speaker==='user'?t.you:m.speaker==='system'?'':byId[m.speaker].name}</small><p>{m.text}</p></div>)}</div>
+   <div className="house-chat-messages" ref={list} onScroll={e=>{const el=e.currentTarget;nearBottom.current=el.scrollHeight-el.scrollTop-el.clientHeight<45;if(nearBottom.current)setUnread(false);}}>{messages.map(m=><div className={`house-message ${m.speaker==='user'?'mine':''} ${m.speaker==='system'?'notice':''} ${m.kind==='error'?'error':''}`} key={m.id} data-message-origin={m.origin?.backend}><small>{m.speaker==='user'?t.you:m.speaker==='system'?'':byId[m.speaker].name}{m.speaker!=='user'&&m.speaker!=='system'&&<MessageOrigin origin={m.origin} locale={state.settings.locale}/>}</small><p>{m.text}</p></div>)}</div>
    {unread&&<button className="house-unread" onClick={()=>{nearBottom.current=true;setUnread(false);if(list.current)list.current.scrollTop=list.current.scrollHeight;}}>{t.newMessages} ↓</button>}
    {state.busy&&<div className="house-thinking">{t.thinking}<button onClick={()=>void send({type:'stop'})} aria-label={t.stop}><X size={13}/></button></div>}
    <form onSubmit={e=>{e.preventDefault();submit();}}><textarea aria-label={channel?t.privatePh:t.placeholder} placeholder={channel?t.privatePh:t.placeholder} value={text} maxLength={4000} rows={2} onChange={e=>setText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();submit();}}}/><button aria-label={t.send} disabled={!text.trim()}><ArrowUp size={19}/></button></form>

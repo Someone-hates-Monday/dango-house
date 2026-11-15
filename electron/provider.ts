@@ -1,8 +1,7 @@
-import {housePrompt,parseHousePlan,needsHousePartner,type HouseEvent} from '../src/shared/house-events';
+import {housePrompt,parseHousePlan,needsHousePartner,modelContextMessages,type HouseEvent} from '../src/shared/house-events';
 import { byId, providers } from '../src/shared/characters';
 import type { AppState, CharacterId, AvatarIntent } from '../src/shared/types';
 import { avatarTool, endpointFor } from './avatar-tool';
-import { socialProfiles } from '../src/shared/social';
 import { isImpersonating, preferredProvider, providerLabel } from '../src/shared/cast';
 export async function* sseData(body: ReadableStream<Uint8Array>) {
   const reader = body.getReader(); const decoder = new TextDecoder(); let pending = '';
@@ -120,15 +119,14 @@ export async function generateReply(
     ...baseCharacter,
     personality:
       baseCharacter.personality +
-      ` 伙伴关系：${JSON.stringify(socialProfiles[id])}。有方向的关系熟悉度：${JSON.stringify(state.bonds)}。保持自己的偏好，可以邀请、关心和善意打趣伙伴，别把每个话题都变成争宠。`,
+      ` 现在是与用户的单独对话，优先回应用户本次的话语、动作和感受。不把用户的摸头或关心改写成对其他伙伴的亲密举动，不自行插入固定CP桥段或代替其他角色回答。`,
   };
   const via = providerLabel(provider);
   const impersonation = isImpersonating(id, provider)
     ? `后端实际是 ${via} 模型在代言同人角色「${character.name}」，不要声称自己是官方 ${character.name} API 或官方员工。`
     : `你是同人角色演绎，不是厂商官方人格。`;
-  const system = `最近真实共同事件（不含私聊正文）：${JSON.stringify(state.companionEvents.slice(-8))}。当前在场：${JSON.stringify(state.presentIds)}。你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然${state.settings.locale==='en'?'英文':state.settings.locale==='ja'?'日文':'中文'}，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
-  const messages = state.messages
-    .filter(m => m.speaker !== 'system' && m.text)
+  const system = `最近真实共同事件（不含私聊正文）：${JSON.stringify(state.companionEvents.filter(e=>e.result==='model-interaction').slice(-4))}。当前在场：${JSON.stringify(state.presentIds)}。你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然${state.settings.locale==='en'?'英文':state.settings.locale==='ja'?'日文':'中文'}，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
+  const messages = modelContextMessages(state)
     .slice(-24)
     .map(m => ({
       role: m.speaker === id ? 'assistant' : 'user',
@@ -153,7 +151,7 @@ export async function generateHousePlan(state:AppState,event:HouseEvent,getKey:(
  // At most one repair for an explicit interaction, never an autonomous retry loop.
  // Keep a valid model answer if the optional social expansion fails.
  try{
-  const expanded=await requestText(provider,model,key,housePrompt(state,event)+'\nThe draft below is missing a companion response or executable movement. Rewrite the COMPLETE episode with a relevant companion response and the requested movement. A request to go together MUST fill gather with the requested actors and a destination; every walk/approach needs target. Use stay:true for observers told to stay. Include the requested resident. Do not merely append another thanks-to-user. Private-entry reactions may only notice selection, never the greeting. Keep it short; do not require everyone to speak.',[{role:'user',content:JSON.stringify({event,draft:{beats:plan.beats,cgAsset:plan.cgAsset,gather:plan.gather}})}],AbortSignal.any([signal,AbortSignal.timeout(6500)]),()=>{},{endpoint:config?.endpoint});
+  const expanded=await requestText(provider,model,key,housePrompt(state,event)+'\nThe draft below is missing a required companion response (COMPANIONS focus only) or executable movement. Rewrite the COMPLETE episode respecting the attention focus above. USER focus must not add a companion exchange. A request to go together MUST fill gather with the requested actors and a destination; every walk/approach needs target. Use stay:true for observers told to stay. Include the requested resident. Do not merely append another thanks-to-user. Private-entry reactions may only notice selection, never the greeting. Keep it short; do not require everyone to speak.',[{role:'user',content:JSON.stringify({event,draft:{beats:plan.beats,cgAsset:plan.cgAsset,gather:plan.gather}})}],AbortSignal.any([signal,AbortSignal.timeout(6500)]),()=>{},{endpoint:config?.endpoint});
   const repaired=parseHousePlan(expanded,state,event,origin);
   return needsHousePartner(state,event,repaired)?plan:repaired;
  }catch{if(signal.aborted)throw signal.reason;return plan;}

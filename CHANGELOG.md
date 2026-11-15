@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.7 · 2026-11-15 · Attention belongs to the interaction / 区分用户与同伴互动
+
+- 摸头、投喂、喜爱和私聊优先回应用户，不再强制补第二人或自动走向同伴；明确的同伴交流仍保留多人接话与移动。User interactions accept solo responses; explicit social scenes retain exchanges and purposeful movement.
+- 移除提示中的固定回应与演示上下文污染，关闭 API 动作附赠固定同伴台词。Remove canned prompt replies, local-script context and implicit scripted API-tool responses.
+- 按互动对象过滤 CG，并在聊天记录区分 AI、本地与历史来源。Filter CG by audience and label model/demo/history provenance.
+- 139 项测试、隔离端到端检查和四项真实 DeepSeek 互动检查通过。139 tests, isolated end-to-end checks and four live DeepSeek interactions passed.
+
 ## 0.5.0-alpha.6 · 2026-11-15 · Stable window and reactions / 窗口与动画稳定性
 
 - 为气泡/CG 保留稳定的透明上方空间；修正新消息与秒级时钟竞态，避免对白导致窗口反复收缩、展开；相同原生边界不重复 setBounds。Stable transparent headroom and immediate bubbles; avoid redundant native resizing during dialogue.
