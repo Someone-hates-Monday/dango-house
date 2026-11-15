@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [聊天驱动同伴演出、自己玩与对白去梗化：0.5.0-alpha.10](COMPANION-SCENE-CONTROL.zh-CN.md) · [English](COMPANION-SCENE-CONTROL.en.md)
+
 - [鼠标停留回应与问候冷却：0.5.0-alpha.9](HOVER-GREETING.zh-CN.md) · [English](HOVER-GREETING.en.md)
 
 - [陪伴对白、人设参考与模型接管：0.5.0-alpha.8](COMPANION-DIALOGUE.zh-CN.md) · [English](COMPANION-DIALOGUE.en.md)

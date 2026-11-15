@@ -1,3 +1,4 @@
+import {voiceExamples} from './voice-examples';
 import type { CharacterId, Food } from '../types';
 import type { AppLocale } from '../i18n';
 import { byId } from '../characters';
@@ -456,15 +457,11 @@ export function dialogueLocale(locale: AppLocale | undefined): AppLocale {
 
 /** Legacy local lines become bounded, explicitly fictional style references in API prompts. */
 export function dialogueStyleExamples(locale:AppLocale,id:CharacterId){
- const L=dialogueLocale(locale),address=L==='en'?'you':L==='ja'?'あなた':'你';
- return [
-  {situation:'touch',text:pat[L][id]},
-  {situation:'private-entry',text:privateGreet(L,address)[id]},
-  {situation:'comfort',text:demoPack[L].tired[id]??demoPack[L].tired.fallback},
- ];
+ const [touch,entry,comfort]=voiceExamples[dialogueLocale(locale)][id];
+ return [{situation:'touch',text:touch},{situation:'private-entry',text:entry},{situation:'comfort',text:comfort}];
 }
 export function patLine(locale: AppLocale, id: CharacterId) {
-  return pat[dialogueLocale(locale)][id];
+  return voiceExamples[dialogueLocale(locale)][id][0];
 }
 export function tripLine(locale: AppLocale) {
   return trip[dialogueLocale(locale)];
@@ -473,7 +470,7 @@ export function hoverLine(locale: AppLocale, address: string, name: string) {
   return hover(dialogueLocale(locale), address, name);
 }
 export function privateGreeting(locale: AppLocale, id: CharacterId, address: string) {
-  return privateGreet(dialogueLocale(locale), address)[id];
+  const L=dialogueLocale(locale);return address+(L==='en'?', ':L==='ja'?'、':'，')+voiceExamples[L][id][1];
 }
 export function jealousLine(locale: AppLocale, id: CharacterId) {
   return jealous[dialogueLocale(locale)][id];

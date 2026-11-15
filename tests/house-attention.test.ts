@@ -6,7 +6,7 @@ import {affectionCgFor} from '../src/shared/cg-policy';
 import {socialProfiles} from '../src/shared/social';
 import {GardenEngine} from '../electron/engine';
 
-const origin={backend:'model' as const,provider:'fixture',model:'fixture'};
+const origin={backend:'model' as const,voiceRevision:2,provider:'fixture',model:'fixture'};
 const touch={id:'touch',kind:'pat',actor:'xia' as const,at:1};
 const beats=[{actor:'rin',text:'我也在听。',intent:{action:'think'}},{actor:'xia',text:'谢谢你的摸摸。',intent:{action:'shy'}}];
 

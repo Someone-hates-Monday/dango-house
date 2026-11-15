@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.10 · 2026-11-16 · Connected companion scenes / 聊天驱动同伴演出
+
+- 公共聊天按语义选择同伴场景；私聊邀请工具接通真实走近、接话、Q版动作及一份共享CG，取消的邀请不延迟偷跑。Semantic public scenes and private invitation tools execute movement, peer replies, gestures and a shared CG, with cancellation guards.
+- “你们自己玩”和用户回来可由模型更新持久相处偏好，底部显示当前状态；不擅自开启自动闲聊。Persist independent-play preference from explicit user intent and show it in the footer without enabling disabled autonomy.
+- 七位角色口语卡去除强制道具梗；新版语气上下文不再回放旧台词，可见历史与明确记忆保留。Separate conversational voices from props; migrate generation context while preserving visible history and explicit memories.
+- 156 项测试、公开/私聊端到端、真实 DeepSeek 联动与七位角色对白抽查通过。156 tests, public/private integration, live DeepSeek scene checks and seven voice samples passed.
+
 ## 0.5.0-alpha.9 · 2026-11-16 · Pointer attention / 鼠标停留回应
 
 - 小屋和自由桌宠停留后先有单次轻微视觉反馈，再等待模型；GPT 保持验收视频，不启用旧立绘。A single dwell acknowledgement precedes API speech and preserves GPT’s approved video.

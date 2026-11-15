@@ -1,4 +1,5 @@
-import {houseFocus,parseHousePlan,houseBeatPause,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
+import {companionVoiceRevision} from '../src/shared/companion-voice';
+import {houseFocus,parseHousePlan,houseBeatPause,type HouseEvent,type HouseGenerate,type CompanionInvitation} from '../src/shared/house-events';
 import {houseFormation,houseSpots,planHousePath,type HouseGeometry} from '../src/shared/house-navigation';
 import {clipById,clipByTitle,socialDeepseekClip} from '../src/shared/deepseek-animation';
 import {deepseekClips} from '../src/shared/deepseek-clips';
@@ -28,7 +29,7 @@ import { pushCompanionEvent, clearCompanionEvents, type CompanionEventKind } fro
 import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
 import { shouldAttemptStoryLlm, storyLlmPrompt } from '../src/shared/story-llm';
 type GenerateResult = { text: string; provider: string; model: string };
-type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act?: (intent:AvatarIntent)=>string) => Promise<string | GenerateResult>;
+type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act?: (intent:AvatarIntent)=>string,invite?:(request:CompanionInvitation)=>string) => Promise<string | GenerateResult>;
 export class GardenEngine {
   state: AppState;
   agent?: AgentRuntime;
@@ -113,15 +114,16 @@ export class GardenEngine {
       const proposed=await this.houseGenerate(this.state,event,signal);
       if(proposed.beats.some(b=>castBefore.has(b.actor)&&!isSpeaking(this.state,b.actor)))return;
       if(round!==this.epoch||signal.aborted||(kind==='autonomous'&&!this.houseVisible)||this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
-      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset,gather:proposed.gather}),this.state,event,proposed.origin);
+      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset,gather:proposed.gather,focus:proposed.focus,playMode:proposed.playMode}),this.state,event,proposed.origin);
       if(!plan.beats.length)return;
+      if(plan.playMode)this.state.settings.housePlayMode=plan.playMode;
       const at=Date.now();const cast=[...new Set(plan.beats.map(b=>b.actor))];
       const publicLines=plan.beats.filter(b=>!b.channel&&b.text).map(b=>byId[b.actor].name+':'+b.text).join(' ');
       let offset=plan.gather?250:0,previousPublic:CharacterId|undefined;
       const steps:SceneStep[]=plan.gather?plan.gather.actors.map(id=>({at,actor:id,intent:{action:'approach',target:plan.gather!.target,duration:1},origin:plan.origin})):[];
       const approached=new Set<CharacterId>();
       for(const b of plan.beats){const intent={...b.intent},peer=b.replyTo??previousPublic;
-        if(houseFocus(event)==='companions'&&this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
+        if(houseFocus(event,plan.focus)==='companions'&&this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
         steps.push({at:at+offset,actor:b.actor,intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor});offset+=houseBeatPause(b);if(!b.channel&&b.text)previousPublic=b.actor;
       }
       const job=this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
@@ -133,7 +135,7 @@ export class GardenEngine {
   private t(key: string, vars?: Record<string, string | number>) { return translate(this.locale(), key, vars); }
   publish() { this.state.revision++; this.notify(this.state); }
   add(speaker: Message['speaker'], text: string, kind?: Message['kind'], origin?: Message['origin']) {
-    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind, origin:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined) };
+    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind, origin:origin?.backend==='model'?{...origin,voiceRevision:companionVoiceRevision}:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined) };
     this.state.messages.push(message); this.state.messages = this.state.messages.slice(-500); this.publish(); return message;
   }
   private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string,origin?:Message['origin']){const message={id:crypto.randomUUID(),speaker,text,at:Date.now(),origin:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined)};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
@@ -332,7 +334,7 @@ export class GardenEngine {
     this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;
   }
   private playYuri(id:string,now=Date.now()) {
-    if(this.state.settings.mode==='api'){this.nextSocial=now+180000;if(this.state.settings.pairRomance!==false)void this.reactHouse('autonomous',undefined,{text:id});return;}
+    if(this.state.settings.mode==='api'){this.nextSocial=now+180000;if(this.state.settings.pairRomance!==false)void this.reactHouse('autonomous',undefined);return;}
     if(this.state.settings.pairRomance===false)return;
     const story = yuriScenes.find(s => s.id === id);
     if (!story || story.pair.some(actor => !speakingCast(this.state).includes(actor))) return;
@@ -377,6 +379,7 @@ export class GardenEngine {
     this.stop();
     if(useApi&&!this.generate){const text=this.t('sys.needApi');if(channel)this.addPrivate(channel,'system',text);else this.add('system',text,'error');return;}
     const round = this.epoch; const controller = new AbortController(); this.abort = controller;
+    let invitation:CompanionInvitation|undefined,replyComplete=false;
     this.state.busy = true; this.publish();
     try {
       for (const line of lines) {
@@ -390,12 +393,31 @@ export class GardenEngine {
           try {
             let acted=false;
             const context=channel?{...this.state,messages:this.state.privateMessages[channel]}:this.state;
-            const raw = await this.generate(context, line.speaker, input, controller.signal, text => { if (round === this.epoch) { message.text = text; this.publish(); } },intent=>{if(round!==this.epoch||controller.signal.aborted)throw new Error(this.t('sys.roundCancelled'));acted=true;return this.perform(line.speaker,intent,'model');});
+            const act=(intent:AvatarIntent)=>{
+              if(round!==this.epoch||controller.signal.aborted)throw Error(this.t('sys.roundCancelled'));
+              acted=true;return this.perform(line.speaker,intent,'model');
+            };
+            const invite=(request:CompanionInvitation)=>{
+              if(round!==this.epoch||controller.signal.aborted)throw Error(this.t('sys.roundCancelled'));
+              if(!channel||!request||typeof request!=='object')throw Error('Invalid private invitation');
+              if(invitation)throw Error('Only one companion invitation is allowed per turn');
+              if(request.playMode!=null&&!['together','self-play'].includes(request.playMode))throw Error('Invalid play mode');
+              if(request.target!=null&&(!ids.includes(request.target)||request.target===line.speaker||!isSpeaking(this.state,request.target)))throw Error('Choose a different present companion');
+              if(!request.target&&request.playMode!=='together')throw Error('A companion target is required');
+              if(request.target&&!this.houseGenerate)throw Error('House scene generator is unavailable');
+              if(request.topic!=null&&(typeof request.topic!=='string'||request.topic.length>120))throw Error('Invalid public topic');
+              invitation={target:request.target,topic:request.topic,playMode:request.playMode};acted=true;
+              return '邀请已排队。先完成给用户的简短回应；随后才真实走近并交流，不要声称已到达。';
+            };
+            const raw=await this.generate(context,line.speaker,input,controller.signal,text=>{
+              if(round===this.epoch){message.text=text;this.publish();}
+            },act,channel?invite:undefined);
             const result = typeof raw === 'string' ? { text: raw, provider: this.state.settings.provider, model: this.state.settings.model } : raw;
             if (round === this.epoch) {
               message.text = result.text;
-              message.origin = { backend: 'model', provider: result.provider, model: result.model };
+              message.origin = { backend: 'model', provider: result.provider, model: result.model,voiceRevision:companionVoiceRevision };
               if (!result.text.trim()) throw new Error(this.t('sys.emptyModel'));
+              replyComplete=true;
             }
             if(round===this.epoch&&!acted)this.perform(line.speaker,inferredIntent(result.text));
           } catch (error) {
@@ -410,7 +432,17 @@ export class GardenEngine {
         }
         this.state.mood[line.speaker] = this.state.focus ? 'focus' : 'idle';this.state.affection[line.speaker]=Math.min(100,this.state.affection[line.speaker]+1); this.publish();
       }
-    } finally { if (round === this.epoch) this.stop(); }
+    } finally {
+      const owned=round===this.epoch&&!controller.signal.aborted;
+      if(round===this.epoch)this.stop();
+      if(owned&&replyComplete&&invitation&&channel&&isSpeaking(this.state,channel)){
+        if(invitation.playMode)this.state.settings.housePlayMode=invitation.playMode;
+        this.publish();
+        if(invitation.target&&isSpeaking(this.state,invitation.target))await this.reactHouse('visit',channel,{
+          target:invitation.target,text:invitation.topic??'一起玩一会儿；仅交流公开的拜访话题',
+        });
+      }
+    }
   }
   async dispatch(action: Action) {
     if (!action || typeof action !== 'object') throw new Error(this.t('sys.badAction'));

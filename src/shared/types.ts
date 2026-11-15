@@ -10,6 +10,8 @@ export type Mood = 'idle' | 'happy' | 'talk' | 'focus';
 export interface Character { id: CharacterId; name: string; subtitle: string; color: string; pale: string; file: string; personality: string; tags: string[]; greeting: string; source: string; atlas?: boolean; }
 export interface ReplyOrigin {
   backend: 'local' | 'model';
+  /** Model-context style migration; visible history is never deleted. */
+  voiceRevision?:number;
   /** Actual provider used after fallback, not merely preferred. */
   provider?: string;
   model?: string;
@@ -109,6 +111,7 @@ export interface AppState {
     /** Independent of the user's friend/pet/romance relationship. */
     pairRomance?: boolean;
     cgAutoplay?: boolean;
+    housePlayMode?: 'together'|'self-play';
     /** Optional localhost Agent Bridge for Cursor/Claude/Codex plugins; app remains the primary product. */
     agentBridge: boolean;
     /** Today’s cast size preset; inferred from presentIds (not muted). */

@@ -141,7 +141,7 @@ if (single) app.whenReady().then(async () => {
   let restored: AppState | undefined;
   try { restored = restoreState(saved?.data ? JSON.parse(saved.data) : null); } catch { restored = restoreState(null); }
   try { keys = JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'credentials.json'), 'utf8')); } catch { keys = {}; }
-  engine = new GardenEngine(restored, broadcast, async (state, id, text, signal, update, act) =>
+  engine = new GardenEngine(restored, broadcast, async (state, id, text, signal, update, act, invite) =>
     generateReply(state, id, text, getKey, signal, update, act, (wanted, used) => {
       engine.add(
         'system',
@@ -151,7 +151,7 @@ if (single) app.whenReady().then(async () => {
         }),
         'notice',
       );
-    }),650,(state,event,signal)=>generateHousePlan(state,event,getKey,signal),
+    },invite),650,(state,event,signal)=>generateHousePlan(state,event,getKey,signal),
   );
   const mediaCache = path.join(app.getPath('userData'), 'media-cache');
   fs.mkdirSync(mediaCache, { recursive: true });

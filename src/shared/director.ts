@@ -63,6 +63,7 @@ export function restoreState(value: unknown, now = Date.now()): AppState {
   if (saved.settings && typeof saved.settings === 'object') {
     for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay'] as const) if (typeof saved.settings[key] === 'boolean') base.settings[key] = saved.settings[key];
     if (Number.isFinite(saved.settings.intimacy)) base.settings.intimacy = Math.max(0, Math.min(100, saved.settings.intimacy));
+    if(saved.settings.housePlayMode==='together'||saved.settings.housePlayMode==='self-play')base.settings.housePlayMode=saved.settings.housePlayMode;
     if (typeof saved.settings.provider === 'string') base.settings.provider = saved.settings.provider;
     if (typeof saved.settings.model === 'string') base.settings.model = saved.settings.model.slice(0, 120);
     if (saved.settings.mode === 'api') base.settings.mode = 'api';
