@@ -11,6 +11,8 @@ const send = (action: Action) => window.garden.dispatch(action);
 
 export function Connections({ state }: { state: AppState }) {
   const { t, locale } = useI18n(state);
+  const [group,setGroup]=useState('home');
+  const sections=locale==='en'?[['home','House & chat'],['companions','Residents & relationships'],['ai','AI connection'],['advanced','Advanced']]:locale==='ja'?[['home','小屋・会話'],['companions','住人・関係'],['ai','AI接続'],['advanced','詳細設定']]:[['home','小屋与聊天'],['companions','伙伴与关系'],['ai','AI 连接'],['advanced','高级选项']];
   const [provider, setProvider] = useState(providers.some(p=>p.id===state.settings.provider) ? state.settings.provider : 'glm');
   const current = state.connections[provider];
   const [model, setModel] = useState(current?.model ?? '');
@@ -41,7 +43,7 @@ export function Connections({ state }: { state: AppState }) {
     setKey('');
     setNotice('');
   };
-  const save = async (test = false) => {
+  const save = async () => {
     setWorking(true);
     try {
       const result=await connectBrain({provider,model,endpoint,tools,key});
@@ -50,6 +52,7 @@ export function Connections({ state }: { state: AppState }) {
       window.garden.window('show-house');
       return true;
     } catch (error) {
+      setKey('');setSaved(await window.garden.keyStatus());
       setNotice(error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': Error: /, '') : t('settings.connectFail'));
       return false;
     } finally {
@@ -60,9 +63,13 @@ export function Connections({ state }: { state: AppState }) {
   return (
     <section className="content-page connections-page">
       <span className="eyebrow">{t('settings.eyebrow')}</span>
-      <h1>{t('settings.title')}</h1>
+      <h1>{locale==='en'?'Global house settings':locale==='ja'?'小屋全体の設定':'小屋全局设置'}</h1>
+      <p className="settings-scope">{locale==='en'?'Changes here apply to the whole house, regardless of the selected resident.':locale==='ja'?'選択中の住人に関係なく、小屋全体に適用します。':'这里调整整个小屋，与当前选中了哪位伙伴无关。'}</p>
+      <nav className="settings-groups" aria-label={locale==='en'?'Settings categories':locale==='ja'?'設定カテゴリ':'设置分类'}>{sections.map(([id,label])=><button key={id} aria-pressed={group===id} className={group===id?'selected':''} onClick={()=>setGroup(id)}>{label}</button>)}</nav>
+      {group==='home'&&<div className="settings-home-guide">{locale==='en'?'Watch speech bubbles above the house; open the base chat for full history. Drag the roof to move, and the bottom-right corner to resize. The roof pin shows its current state.':locale==='ja'?'小屋の上の吹き出しで会話を見て、下のチャットで履歴を読みます。屋根で移動、右下でサイズ調整。ピンは現在の状態を表示します。':'平时看她们的气泡对白，点底部「聊聊」看完整记录。拖动屋顶移动小屋，右下角调整大小；屋檐图钉显示当前置顶状态。'}</div>}
+      {group==='advanced'&&<p className="settings-scope">{locale==='en'?'Optional alternate displays and integrations. These are not needed for everyday house companionship.':locale==='ja'?'別表示や外部連携の任意設定です。普段の小屋では必要ありません。':'以下是可选的其他展示方式与外部联动，日常小屋陪伴无需配置。'}</p>}
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="home" hidden={group!=='home'}>
         <h2>
           <Languages size={18} />
           {t('settings.language')}
@@ -86,7 +93,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.languageHint')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="companions" hidden={group!=='companions'}>
         <h2>
           <Heart size={18} />
           {t('settings.relation')}
@@ -129,7 +136,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.relationHint')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="companions" hidden={group!=='companions'}>
         <h2>
           <Heart size={18} />
           {t('settings.pairTone')}
@@ -164,7 +171,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.pairToneHint')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="advanced" hidden={group!=='advanced'}>
         <h2>{t('settings.desktop')}</h2>
         <div className="relationship-options">
           {(
@@ -181,7 +188,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.desktopHint')}</p>
         <button className="outline-button" onClick={()=>window.garden.window('show-desktop')}>{locale==='en'?'Use desktop pets':locale==='ja'?'デスクトップペットに切替':'进入桌宠 / Dock 模式'}</button>
         <label>
-          {t('settings.chatForm')}
+          {locale==='en'?'Standalone chat artwork (not the mini house)':locale==='ja'?'独立チャットの立ち絵（小屋とは別）':'独立聊天窗口的立绘（不影响迷你小屋）'}
           <select aria-label={t('settings.chatForm')} value={state.presentation.chatForm} onChange={e => void send({ type: 'presentation', patch: { chatForm: e.target.value as 'portrait' | 'chibi' } })}>
             <option value="portrait">{t('settings.portraitOpt')}</option>
             <option value="chibi">{t('settings.chibiOpt')}</option>
@@ -189,7 +196,7 @@ export function Connections({ state }: { state: AppState }) {
         </label>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="advanced" hidden={group!=='advanced'}>
         <h2>
           <Cable size={18} />
           {t('settings.bridgeTitle')}
@@ -282,7 +289,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.bridgeKeepApp')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="ai" hidden={group!=='ai'}>
         <h2>
           <Plug size={18} />
           {t('settings.connectTitle')}
@@ -328,7 +335,7 @@ export function Connections({ state }: { state: AppState }) {
           <p id="avatar-tools-help" className="helper">{t('settings.toolsHint')}</p>
         </div>
         <div className="connection-actions">
-          <button className="pink-button" disabled={working||!model.trim()||(!key.trim()&&!saved.includes(provider))} onClick={()=>void save(true)}>{working?t('settings.connecting'):t('settings.connectAndStart')}</button>
+          <button className="pink-button" disabled={working||!model.trim()||(!key.trim()&&!saved.includes(provider))} onClick={()=>void save()}>{working?t('settings.connecting'):t('settings.connectAndStart')}</button>
           <button className="text-button" onClick={()=>void send({type:'settings',patch:{mode:'demo'}})}>{t('settings.backDemo')}</button>
           <button className="outline-button" onClick={()=>window.garden.window('show-house')}>{t('settings.backHouse')}</button>
         </div>
@@ -340,7 +347,7 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.testHint')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="companions" hidden={group!=='companions'}>
         <h2>
           <Users size={18} />
           {t('settings.castTitle')}
@@ -386,9 +393,9 @@ export function Connections({ state }: { state: AppState }) {
         <p className="helper">{t('settings.castHint')}</p>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="advanced" hidden={group!=='advanced'}>
         <h2>{t('settings.overrideTitle')}</h2>
-        <p className="helper">{t('settings.overrideHint')}</p>
+        <p className="helper">{locale==='en'?'Only overrides the backend for individual private replies. Public house life uses the shared AI connection.':locale==='ja'?'個別の内緒話の接続だけを変更します。小屋の会話は共通AI接続を使います。':'仅覆盖单独私聊回复的后端；小屋公开对话与共同生活统一使用「AI 连接」里的小屋大脑。'}</p>
         <div className="override-grid">
           {characters.map(c => {
             const value = state.characterProviders[c.id as CharacterId] ?? '';
@@ -416,7 +423,7 @@ export function Connections({ state }: { state: AppState }) {
         </div>
       </div>
 
-      <div className="settings-section">
+      <div className="settings-section" data-settings-group="home" hidden={group!=='home'}>
         <h2>
           <Bell size={18} />
           {t('settings.reminders')}
@@ -445,10 +452,10 @@ export function Connections({ state }: { state: AppState }) {
         </div>
         <div className="preference-row">
           <div>
-            <strong>{t('settings.hoverGreet')}</strong>
+            <strong>{locale==='en'?'Autonomous life & greetings':locale==='ja'?'自発的な交流・あいさつ':'主动生活与问候'}</strong>
             <p>{t('settings.hoverHint')}</p>
           </div>
-          <button role="switch" aria-checked={state.settings.autonomous} aria-label={t('settings.autonomous')} className={`toggle ${state.settings.autonomous ? 'on' : ''}`} onClick={() => void send({ type: 'settings', patch: { autonomous: !state.settings.autonomous } })}>
+          <button role="switch" aria-checked={state.settings.autonomous} aria-label={t('settings.autonomous')} className={`toggle ${state.settings.autonomous ? 'on' : ''}`} onClick={() => {const enabled=!state.settings.autonomous;void send({type:'settings',patch:{autonomous:enabled}});void send({type:'room-settings',patch:{autonomous:enabled}});}}>
             <span />
           </button>
         </div>

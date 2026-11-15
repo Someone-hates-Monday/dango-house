@@ -168,7 +168,7 @@ if (single) app.whenReady().then(async () => {
   houseWindow.window.on('close',event=>{if(!quitting){event.preventDefault();houseWindow.window.hide();}});
   if(legacyTest){engine.state.presentation.surface='workbench';mainWindow.once('ready-to-show',()=>mainWindow.show());}
   else{engine.state.presentation.surface='house';engine.state.room.wandering=false;engine.state.settings.petsVisible=false;houseWindow.window.once('ready-to-show',showHouse);}
-  mainWindow.on('close', event => { if (!quitting) { event.preventDefault(); mainWindow.hide(); } });
+  mainWindow.on('close', event => { if (!quitting) { event.preventDefault(); showHouse(); } });
   for (const display of screen.getAllDisplays()) createOverlay(display.id);
   screen.on('display-added', (_event, display) => createOverlay(display.id));
   screen.on('display-removed', (_event, display) => {overlays.get(display.id)?.close();houseWindow?.current();});
@@ -197,11 +197,11 @@ if (single) app.whenReady().then(async () => {
     if(command==='show-house'){showHouse();return;}
     if(command==='show-settings'){showSettings();return;}
     if(command==='show-desktop'){engine.state.presentation.surface='desktop';engine.state.settings.petsVisible=true;engine.publish();mainWindow.hide();houseWindow.window.hide();engine.setHouseVisible(true);return;}
-    if(command==='house-pin'&&houseWindow){houseWindow.window.setAlwaysOnTop(!houseWindow.window.isAlwaysOnTop());return;}
+    if(command==='house-pin'&&houseWindow){houseWindow.togglePin();return;}
     if (command === 'show-chat') showHouse();
     const sender=BrowserWindow.fromWebContents(event.sender);
     if (command === 'minimize') sender?.minimize();
-    if (command === 'close') {if(sender===mainWindow)mainWindow.hide();else if(sender===houseWindow?.window)houseWindow.window.hide();else sender?.close();}
+    if (command === 'close') {if(sender===mainWindow)showHouse();else if(sender===houseWindow?.window)houseWindow.window.hide();else sender?.close();}
     if (command === 'quit') { quitting = true; app.quit(); }
   });
   ipcMain.on('garden:private',(event,id:CharacterId)=>{if(known(event.sender))openPrivate(id);});

@@ -1,5 +1,5 @@
 export interface HouseSize {width:number;height:number;chatOpen:boolean;cgHeight:number;panelHeight?:number}
-export interface HouseLayout {width:number;height:number;chatHeight:number;cgHeight:number}
+export interface HouseLayout {width:number;height:number;chatHeight:number;cgHeight:number;pinned?:boolean}
 export interface Rect {x:number;y:number;width:number;height:number}
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 export function composeHouse(bounds:Rect,work:Rect,request:HouseSize,count:number){

@@ -15,7 +15,7 @@ Resting by your Dock, waking when you hover: a headpat, or a little secret?
 <sub>Actual in-app Dock mode</sub>
 
 [![Windows](https://img.shields.io/badge/Windows-x64-f4a7bc)](https://github.com/Someone-hates-Monday/dango-house/releases)
-[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.1-bca7e8)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.2-bca7e8)](CHANGELOG.md)
 [![Checks](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml/badge.svg)](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml)
 [![Code license](https://img.shields.io/badge/code-MIT-a4cdb8)](LICENSE)
 [![Asset terms](https://img.shields.io/badge/art-noncommercial-f0cf8d)](THIRD_PARTY_NOTICES.md)
@@ -28,7 +28,7 @@ Welcome home. DeepSeek is waiting for dinner, Claude has saved the window seat, 
 
 Dango House is a Windows companion app where community-inspired AI girls share a tiny home. They chat, visit each other, ask for headpats, and get a little jealous of your attention. Choose friendship, pet-like companionship, or a more affectionate relationship.
 
-> **Source: v0.5.0-alpha.1; public Windows portable preview: [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5).** Screenshots use isolated offline profiles; see their version notes. Scripted scenes work locally; live AI chat needs your own API. Switch the UI among **简体中文 / English / 日本語** in settings.
+> **Source: v0.5.0-alpha.2; public Windows portable preview: [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5).** Screenshots use isolated offline profiles; see their version notes. Scripted scenes work locally; live AI chat needs your own API. Switch the UI among **简体中文 / English / 日本語** in settings.
 
 Current source opens a compact heart-roof house, with roof controls, chat/private conversation below and one shared CG above. One API key can perform the cast: in API mode the house model generates bounded multi-character turns and action intentions. All 109 DeepSeek clips, Dock/free pets and the optional MCP/REST stage remain available. This is one model coordinating household events, not seven independent agents. See [implementation and acceptance](docs/MINI-HOUSE-IMPLEMENTATION-DRAFT.en.md).
 

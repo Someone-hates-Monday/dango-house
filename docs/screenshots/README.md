@@ -1,5 +1,11 @@
 # 运行截图 / Runtime screenshots
 
+## 2026-11-15 · 0.5.0-alpha.2 settings and speech
+
+`mini-house-052.png`、`mini-house-speech-052.png`、`mini-house-settings-052.png`：`verify-mini-house.mjs --packaged` 的隔离离线存档，分别展示屋檐状态、角色气泡/私聊和完整全局设置，无用户资料或真实 API 请求。
+
+These three captures show roof state, speaker-labelled private dialogue and unified global settings in the real packaged app, using an isolated offline profile without personal data or live API calls. Existing asset terms apply.
+
 ## 2026-11-15 · 0.5.0-alpha.1 mini house
 
 `mini-house-050.png`：`scripts/verify-mini-house.mjs --packaged` 拍摄的透明迷你小屋，隔离离线存档；无用户聊天、凭证或真实 API 请求。未拼贴角色或重绘界面。

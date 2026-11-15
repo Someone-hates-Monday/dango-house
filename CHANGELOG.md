@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.2 · 2026-11-15 · Clear controls / 清晰的控制与全局设置
+
+- 恢复带角色名的气泡对白，在小屋上方一次显示一段；点气泡展开完整记录，CG 优先使用上方空间。Restore speaker-labelled speech bubbles; open history from the bubble, with CG taking priority above the house.
+- 屋檐设置直接打开完整全局设置，分为小屋与聊天、伙伴与关系、AI 连接和高级选项；桌宠/Dock、私聊后端覆盖、Agent 插件联动归入高级功能。One complete global settings page, grouped by daily house use, relationships, AI connection and advanced features.
+- 删除重复的紧凑连接表单及未使用旧设置；设置侧栏不再展示角色选择，避免误认为逐角色配置。Remove duplicate setup UIs and the misleading resident selector in global settings.
+- 明确显示“× 返回小屋”“× 关闭聊天”“× 收起”；置顶按钮以颜色、图钉方向和文字反馈真实状态，并跨重启保存。Explicit labelled close/back controls; pin color, direction and text reflect native persisted state.
+
 ## 0.5.0-alpha.1 · 2026-11-15 · A tiny shared home / 桌面迷你小屋
 
 - 透明爱心房子替代主工作台入口；沿屋檐排列按钮，底座承载互动与短句，下方展开聊天与连接表单。A transparent house, roof controls, shared base and attached chat/setup panel.

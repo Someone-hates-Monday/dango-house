@@ -65,7 +65,11 @@
 /* Roof charms stay clear of faces; a shared plinth carries speech and controls. */
 .house-header{left:0;right:0;top:0;height:108px;pointer-events:none;-webkit-app-region:no-drag;z-index:90}
 .house-header strong{position:absolute;left:50%;top:75px;transform:translateX(-50%);text-align:center;white-space:nowrap;font-size:11px;color:#a16c85}
-.house-header button{position:absolute;width:32px;height:32px;border:2px solid #b77f99;border-radius:12px 12px 15px 15px;background:#fff0dd;color:#925f7a;pointer-events:auto}
+.house-header button{position:absolute;width:36px;height:44px;padding:0;flex-direction:column;gap:1px;border:2px solid #b77f99;border-radius:12px 12px 15px 15px;background:#fff0dd;color:#925f7a;pointer-events:auto}
+.house-header button small{font-size:10px;line-height:12px;white-space:nowrap;max-width:30px;overflow:hidden;text-overflow:ellipsis}
+.house-header .house-pin svg{transform:rotate(40deg);transition:transform .2s}
+.house-header .house-pin.is-pinned{background:#a56383;border-color:#78415f;color:#fff5e6}
+.house-header .house-pin.is-pinned svg{transform:rotate(0deg)}
 .house-header button::before{content:'';position:absolute;left:13px;top:-9px;height:8px;border-left:2px solid #b77f99;pointer-events:none}
 .house-header button:hover{background:#f7d7df;border-color:#8d5572}
 .house-header button:focus-visible{outline:2px solid #784461;outline-offset:2px}
@@ -75,21 +79,13 @@
 .house-tools{display:flex;align-items:center;gap:3px;width:100%;min-height:28px}
 .house-tools .house-brain-status{margin-left:auto}
 .house-food-menu{bottom:73px}
-.house-roof-chip{top:25px;left:30%;max-width:58%;z-index:95}
+.house-roof-chip{top:25px;left:30%;max-width:58%;z-index:95;overflow:hidden;text-overflow:ellipsis}
+.house-speech{position:absolute;z-index:85;min-height:82px;max-height:130px;display:flex!important;flex-direction:column;align-items:stretch!important;gap:4px!important;padding:10px 14px;border:2px solid #b78096;border-radius:17px;background:#fff5e7;color:#765366;box-shadow:0 3px 10px #74354f22;text-align:left}
+.house-speech>small{font-size:12px;font-weight:600;color:#a05f80}
+.house-speech>span{font-size:14px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.house-speech>i{position:absolute;bottom:-10px;left:calc(50% - 8px);width:15px;height:15px;transform:rotate(45deg);background:#fff5e7;border-right:2px solid #b78096;border-bottom:2px solid #b78096}
+.house-chat>header .house-chat-close{min-height:32px;padding:4px 8px;background:#efd1da;border:1px solid #c492a8;gap:3px;font-size:11px}
 
-/* A connection note unfolds from the same base instead of opening a workbench. */
-.house-connection{flex:1;min-height:0;overflow-y:auto;padding:0 14px 14px;scrollbar-width:thin;scrollbar-color:#cfa5b7 transparent}
-.house-connection-intro{font-size:13px;margin:8px 0 12px;color:#966b7e}
-.house-connection form{display:block;margin:0;padding:0;border:0;background:transparent}
-.house-connection label{display:flex;flex-direction:column;gap:5px;font-size:13px;margin-bottom:12px}
-.house-connection input:not([type=checkbox]),.house-connection select{box-sizing:border-box;width:100%;min-width:0;height:40px;padding:7px 10px;border:1px solid #cfa5b7;border-radius:10px;background:#fffaf1;color:#765565;font:14px system-ui,sans-serif}
-.house-connection form button{width:auto;height:auto;min-height:30px;align-self:auto;font:12px system-ui,sans-serif;padding:5px 8px;background:#efd6df;color:#85536b;border:1px solid #d2a7b9;border-radius:8px}
-.house-model-examples{display:flex;gap:6px;flex-wrap:wrap;margin:-5px 0 12px}
-.house-connection details{margin:0 0 12px;font-size:13px}
-.house-connection summary{cursor:pointer;margin-bottom:7px}
-.house-connection .house-tool-toggle{flex-direction:row;align-items:center;gap:8px;margin-top:10px;line-height:1.5}
-.house-tool-toggle input{appearance:auto;width:20px;height:20px;flex:none;margin:0;accent-color:#a96987}
-.house-connection form .house-connect-submit{width:100%;min-height:40px;background:#a86b88;color:#fff6ea;font-size:14px;border:0}
-.house-connect-error{font-size:13px;color:#a04d65;overflow-wrap:anywhere}
-.house-advanced{margin-top:12px;font-size:12px;color:#906177;padding:5px 0;text-align:left}
-.house-root button:disabled{opacity:.5;cursor:default}
+
+.house-chat>header strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.house-chat>header .house-chat-close{flex-shrink:0}

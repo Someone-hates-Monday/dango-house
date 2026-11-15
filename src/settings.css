@@ -1,4 +1,15 @@
 /* Readable, scoped settings controls. Text inputs must not size native checkboxes. */
+.settings-section[hidden]{display:none!important}
+.settings-groups{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:0;background:#fff9fc;z-index:10;padding:12px 0;border-bottom:1px solid #e8d4e1}
+.connections-page .settings-groups button{border:1px solid #d8bfd1;border-radius:12px;background:#fff9fc;color:#856780}
+.connections-page .settings-groups .selected{background:#a96e8c;color:#fff5e9;border-color:#a96e8c}
+.settings-scope{font-size:14px;color:#886d83;margin:8px 0 12px}
+.settings-home-guide{font-size:14px;line-height:1.8;margin:20px 0 0;padding:14px 18px;background:#f7e7ef;border-radius:12px;color:#865f79}
+.global-settings-navigation details{margin:20px 0;color:#94798b;font-size:13px}
+.global-settings-navigation summary{padding:8px 12px;cursor:pointer}
+.global-settings-navigation details button{width:100%;margin-top:4px}
+.global-settings-note{font-size:13px;line-height:1.9;color:#927489;padding:18px 12px;border-top:1px solid #e9d9e3;margin-top:20px}
+.window-buttons .back-house-control{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;width:auto!important;min-width:110px;gap:6px;padding:0 12px;background:#f2dbe5;border:1px solid #d3a6bb;border-radius:8px;color:#8b5673;font-size:13px;-webkit-app-region:no-drag}
 .connections-page{font-size:14px;line-height:1.6;color:#705c75}
 .connections-page .settings-section{max-width:980px;padding:26px 0}
 .connections-page .settings-section h2{font-size:18px;line-height:1.4;color:#735c7a;margin-bottom:18px}
@@ -54,3 +65,5 @@
 .connections-page .language-options button small{font-size:13px;color:#806c86}
 .connections-page .bridge-snippet{font-size:13px;line-height:1.7;overflow:auto}
 @media(max-width:1100px){.connections-page{padding:28px 24px}.connections-page .field-pair{grid-template-columns:minmax(0,1fr)}.connections-page .language-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.global-settings .sidebar-bottom .settings-nav{display:none}

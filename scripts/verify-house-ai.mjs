@@ -26,7 +26,7 @@ const server=http.createServer(async(req,res)=>{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const env={...process.env,GARDEN_TEST_DATA:path.join(out,'profile-'+Date.now()),GARDEN_TEST_HOUSE:'1'};
 delete env.ELECTRON_RUN_AS_NODE;
-const executablePath=process.argv.includes('--packaged')?path.resolve('release/v0.5.0-alpha.1/win-unpacked/团子小屋.exe'):undefined;
+const executablePath=process.argv.includes('--packaged')?path.resolve(`release/v${JSON.parse(fs.readFileSync('package.json','utf8')).version}/win-unpacked/团子小屋.exe`):undefined;
 const app=await electron.launch({executablePath,args:executablePath?[`--user-data-dir=${env.GARDEN_TEST_DATA}`]:[process.cwd()],env});
 const errors=[];
 try{
@@ -37,20 +37,22 @@ try{
  await house.locator('.mini-frame').waitFor();
  await house.evaluate(()=>window.garden.dispatch({type:'settings',patch:{autonomous:false}}));
  await house.getByRole('button',{name:'设置与连接',exact:true}).click();
- const form=house.locator('.house-connection');
- await form.locator('select').selectOption('deepseek');
- await form.locator('details summary').click();
+ const main=app.windows().find(p=>p.url().includes('view=settings'));
+ const form=main.locator('.connections-page');
+ await form.getByRole('button',{name:'AI 连接',exact:true}).click();
+ await form.getByRole('button',{name:'DeepSeek',exact:true}).click();
  await form.getByRole('textbox',{name:'API 地址（完整地址或 Base URL）',exact:true}).fill('http://127.0.0.1:'+server.address().port+'/chat/completions');
- await form.getByRole('button',{name:'deepseek-flash',exact:true}).click();
+ await form.getByRole('button',{name:/deepseek-flash/}).click();
  await form.getByLabel('API Key',{exact:true}).fill('fixture-key-only');
  await form.getByRole('button',{name:'连接并开始陪伴',exact:true}).click();
- await form.getByRole('alert').waitFor();
+ await form.locator('.settings-notice').filter({hasText:/401/}).waitFor();
  assert.equal(await house.evaluate(async()=>(await window.garden.getState()).settings.mode),'demo');
  // The failed test still securely saved the key: reconnect with an empty input.
  assert.equal(await form.getByLabel('API Key',{exact:true}).inputValue(),'');
  fail=false;
  await form.getByRole('button',{name:'连接并开始陪伴',exact:true}).click();
  await waitHouseState(house,s=>s.settings.mode==='api');
+ await house.getByRole('button',{name:'聊聊',exact:true}).click();
  await house.locator('.house-chat textarea').waitFor();
  await house.getByRole('button',{name:'摸摸',exact:true}).click();
  await waitHouseState(house,s=>s.messages.filter(m=>m.origin?.backend==='model').length===2);
