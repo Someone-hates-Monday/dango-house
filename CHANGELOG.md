@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.3 · 2026-11-15 · Shared conversations & dragging / 接话与拖动
+
+- 小屋大脑改为规划相关角色的短回合交流，加入关系取向、同伴接话和无台词动作；显式互动的独白最多做一次有时限的模型补全。Plan connected multi-resident exchanges with social affinities, reply targets and silent reactions; at most one bounded expansion of a solitary explicit response.
+- 悬停和主动问候不能取消已排好的同伴台词；对白按长度留出阅读时间。Hover/autonomy cannot interrupt queued replies; pace turns for reading.
+- 私聊期间继续显示其他角色的公开气泡，保留私聊记录隔离。Public speech remains visible during private chat without leaking private transcripts.
+- 新增明确的“拖动小屋”屋顶把手和主进程拖动处理，保存实际窗口位置。Explicit roof grip moves the native window and persists position.
+
 ## 0.5.0-alpha.2 · 2026-11-15 · Clear controls / 清晰的控制与全局设置
 
 - 恢复带角色名的气泡对白，在小屋上方一次显示一段；点气泡展开完整记录，CG 优先使用上方空间。Restore speaker-labelled speech bubbles; open history from the bubble, with CG taking priority above the house.

@@ -1,6 +1,6 @@
 import {HouseSkin,inHouseSilhouette} from './HouseSkin';
 import {useEffect,useRef,useState} from 'react';
-import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users} from 'lucide-react';
+import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users,Grip} from 'lucide-react';
 import type {AppState,CharacterId,Food} from './shared/types';
 import type {HouseLayout} from './shared/mini-house';
 import {compactPositions} from './shared/mini-house';
@@ -21,6 +21,8 @@ export function MiniHouse({state}:{state:AppState}){
  const [layout,setLayout]=useState<HouseLayout>({width:380,height:260,chatHeight:0,cgHeight:0});
  const [size,setSize]=useState({width:380,height:260}),[initialized,setInitialized]=useState(false),[chatOpen,setChatOpen]=useState(false),[channel,setChannel]=useState<CharacterId|undefined>();
  const [text,setText]=useState(''),[foodOpen,setFoodOpen]=useState(false),[collapsed,setCollapsed]=useState(false),[unread,setUnread]=useState(false);
+ const dragging=useRef(false);
+ useEffect(()=>{const end=()=>{if(dragging.current){dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});}};window.addEventListener('blur',end);return()=>window.removeEventListener('blur',end);},[]);
  const hover=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
  const cancelHover=()=>clearTimeout(hover.current);
  useEffect(()=>cancelHover,[]);
@@ -32,15 +34,18 @@ export function MiniHouse({state}:{state:AppState}){
  const last=messages.at(-1);
  const [now,setNow]=useState(Date.now());
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
- const spoken=messages.slice().reverse().find(m=>m.speaker!=='system'&&m.speaker!=='user'&&m.text&&state.presentIds.includes(m.speaker));
+ const publicSpeech=state.messages.slice().reverse().find(m=>m.speaker!=='system'&&m.speaker!=='user'&&m.text&&state.presentIds.includes(m.speaker));
+ const privateSpeech=channel?state.privateMessages[channel].slice().reverse().find(m=>m.speaker===channel&&m.text):undefined;
+ const spoken=privateSpeech&&(!publicSpeech||privateSpeech.at>=publicSpeech.at)?privateSpeech:publicSpeech;
+ const speechPrivate=spoken===privateSpeech&&!!privateSpeech;
  const speech=spoken&&now-spoken.at<20000&&now>=spoken.at?spoken:undefined;
  const desiredCg=session?(!collapsed?Math.round(Math.min(360,size.width*.82)*9/16+46):0):speech?148:0;
  useEffect(()=>{
   document.documentElement.classList.add('house-document');
   const off=window.garden.onHouseLayout(value=>{setLayout(value);setSize(old=>old.width===value.width&&old.height===value.height?old:{width:value.width,height:value.height});});
   void window.garden.houseLayout().then(value=>{setLayout(value);setSize({width:value.width,height:value.height});setInitialized(true);});
-  const move=(e:PointerEvent)=>{const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip')||painted);};
-  const leave=()=>window.garden.hitTest(false);
+  const move=(e:PointerEvent)=>{if(dragging.current){window.garden.hitTest(true);return;}const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip,.house-drag-handle,.house-canopy')||painted);};
+  const leave=()=>{if(!dragging.current)window.garden.hitTest(false);};
   document.addEventListener('pointermove',move);document.addEventListener('pointerleave',leave);
   return()=>{off();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',leave);};
  },[]);
@@ -58,6 +63,13 @@ export function MiniHouse({state}:{state:AppState}){
  const submit=()=>{if(!text.trim())return;void send(channel?{type:'private-send',id:channel,text}:{type:'send',text});setText('');nearBottom.current=true;};
  const positions=compactPositions(residents.map(c=>c.id),layout.width-44,layout.height-148);
  const selected=state.presentIds.includes(state.selected)?state.selected:state.presentIds[0];
+ const dragHandlers={
+  onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;cancelHover();dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
+  onPointerMove:(e:React.PointerEvent<HTMLElement>)=>{if(dragging.current)window.garden.houseDrag('move',{x:e.screenX,y:e.screenY});},
+  onPointerUp:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
+  onPointerCancel:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
+ };
+ const dragLabel=state.settings.locale==='en'?'Drag house':state.settings.locale==='ja'?'小屋を移動':'拖动小屋';
  const collapseCg=()=>{playedAt.current=video.current?.currentTime??playedAt.current;setCollapsed(true);};
  return <div className="house-root" data-house-room-width={layout.width} data-house-room-height={layout.height}>
   {session&&clip&&layout.cgHeight>0&&!collapsed&&<section className="house-cg" data-house-cg={session.id} style={{height:layout.cgHeight-6,width:Math.min(360,layout.width*.82)}}>
@@ -65,13 +77,13 @@ export function MiniHouse({state}:{state:AppState}){
    <div className="house-cg-caption"><span>{clip.copy[state.settings.locale].title}</span><button onClick={collapseCg} aria-label={state.settings.locale==='zh-CN'?'收起短片':state.settings.locale==='ja'?'シーンをたたむ':'Collapse moment'}><Minus size={14}/></button><button onClick={()=>void send({type:'cg-dismiss',sessionId:session.id})} aria-label="Close CG"><X size={14}/></button></div>
   </section>}
   <section className="mini-frame" style={{top:layout.cgHeight,height:layout.height}} data-mini-house="true">
-   <HouseSkin width={layout.width} height={layout.height}/><div className="house-canopy"/>
+   <HouseSkin width={layout.width} height={layout.height}/><div className="house-canopy" {...dragHandlers}/><button className="house-drag-handle" aria-label={dragLabel} title={dragLabel} {...dragHandlers}><Grip size={14}/><span>{dragLabel}</span></button>
    <header className="house-header"><strong>{t.home}</strong>{[
      {ratio:.65,title:t.pin,label:layout.pinned!==false?t.pinned:t.unpinned,pin:true,icon:<Pin size={16}/>,action:()=>window.garden.window('house-pin')},
      {ratio:.77,title:t.settings,label:state.settings.locale==='zh-CN'?'设置':state.settings.locale==='ja'?'設定':'Setup',pin:false,icon:<Settings2 size={16}/>,action:openSettings},
      {ratio:.89,title:t.hide,label:t.close,pin:false,icon:<X size={17}/>,action:()=>window.garden.window('close')},
     ].map(item=><button key={item.title} className={item.pin?`house-pin ${layout.pinned!==false?'is-pinned':''}`:undefined} title={item.title} aria-label={item.title} aria-pressed={item.pin?layout.pinned!==false:undefined} onClick={item.action} style={{left:layout.width*item.ratio-18,top:20+(item.ratio-.5)*layout.width*50/(layout.width/2-11)}}>{item.icon}<small>{item.label}</small></button>)}</header>
-   {!session&&speech&&layout.cgHeight>0&&<button className="house-speech" aria-label={t.speech} onClick={()=>setChatOpen(true)} style={{top:-Math.min(138,layout.cgHeight-2),left:16,right:16}}><small>{byId[speech.speaker as CharacterId].name}{channel?' · '+t.private:''}</small><span>{speech.text}</span><i style={{left:Math.max(16,Math.min(layout.width-64,(positions.find(p=>p.id===speech.speaker)?.x??layout.width/2)+6))}}/></button>}
+   {!session&&speech&&layout.cgHeight>0&&<button className="house-speech" aria-label={t.speech} onClick={()=>{if(speechPrivate)setChatOpen(true);else choose();}} style={{top:-Math.min(138,layout.cgHeight-2),left:16,right:16}}><small>{byId[speech.speaker as CharacterId].name}{speechPrivate?' · '+t.private:''}</small><span>{speech.text}</span><i style={{left:Math.max(16,Math.min(layout.width-64,(positions.find(p=>p.id===speech.speaker)?.x??layout.width/2)+6))}}/></button>}
    {session&&(collapsed||layout.cgHeight===0)&&<button className="house-roof-chip" title={!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg} onClick={()=>setCollapsed(false)}>♡ {!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg}</button>}
    <div className="house-scene" style={{height:layout.height-148}}>
     <div className="house-window-art"/><div className="house-floor"/><div className="house-rug"/><div className="house-sofa"><FurnitureArt kind="sofa"/></div>

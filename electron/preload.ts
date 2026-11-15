@@ -6,6 +6,7 @@ const bridge: DesktopBridge = {
   subscribe: callback => { const listener = (_event: unknown, state: any) => callback(state); ipcRenderer.on('garden:update', listener); return () => ipcRenderer.removeListener('garden:update', listener); },
   window: command => ipcRenderer.send('garden:window', command),
   houseLayout:size=>ipcRenderer.invoke('garden:house-layout',size),
+  houseDrag:(phase,point)=>ipcRenderer.send('garden:house-drag',phase,point),
   onHouseLayout:callback=>{const listener=(_event:unknown,value:any)=>callback(value);ipcRenderer.on('garden:house-layout',listener);return()=>ipcRenderer.removeListener('garden:house-layout',listener);},
   onPage:callback=>{const listener=(_event:unknown,value:string)=>callback(value);ipcRenderer.on('garden:page',listener);return()=>ipcRenderer.removeListener('garden:page',listener);},
   hitTest: interactive => ipcRenderer.send('garden:hit', interactive),

@@ -23,6 +23,11 @@ try{
  const buttons=await house.locator('.house-header button').evaluateAll(els=>els.map(e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,topmost:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===e};}));
  assert.ok(buttons.every(b=>b.w>=32&&b.h>=32&&b.topmost),'roof buttons must be visible and clickable');
  for(let i=1;i<buttons.length;i++)assert.ok(buttons[i].x>=buttons[i-1].x+buttons[i-1].w,'roof controls must not overlap');
+ const nativeBounds=()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=house')).getBounds());
+ const beforeDrag=await nativeBounds();
+ const handle=house.getByRole('button',{name:'拖动小屋',exact:true});
+ await handle.hover();const hit=await handle.boundingBox();await house.mouse.move(hit.x+hit.width/2,hit.y+hit.height/2);await house.mouse.down();await house.mouse.move(hit.x+hit.width/2-40,hit.y+hit.height/2-25);await house.mouse.up();
+ const afterDrag=await nativeBounds();assert.ok(afterDrag.x<beforeDrag.x-20&&afterDrag.y<beforeDrag.y-10,'the visible handle must move the native window');
  await house.getByRole('button',{name:'设置与连接',exact:true}).click();
  const main=app.windows().find(p=>/view=(chat|settings)/.test(p.url()));
  await main.locator('.connections-page').waitFor();
@@ -65,11 +70,12 @@ try{
  assert.equal(await main.locator('.cg-moment').count(),0);
  await house.screenshot({path:path.join(out,'roof-cg.png'),omitBackground:true,scale:'css'});
  await waitHouseState(house,s=>!s.cgSession&&s.cgLastReceipt?.outcome==='ended',15000);
- const size=await house.evaluate(()=>window.garden.houseLayout());
+ const size=await house.evaluate(()=>window.garden.houseLayout());const finalBounds=await nativeBounds();const position={x:finalBounds.x,y:finalBounds.y+size.cgHeight};
  await app.close();app=await electron.launch(options);house=await findHouse();
  const restored=await house.evaluate(()=>window.garden.houseLayout());
+ const newBounds=await nativeBounds();assert.ok(Math.abs(newBounds.x-position.x)<=2&&Math.abs(newBounds.y+restored.cgHeight-position.y)<=2,'dragged house position must survive restart');
  assert.equal(restored.pinned,false);assert.equal(restored.width,size.width);assert.equal(restored.height,size.height);
  assert.deepEqual(errors,[]);
- const report={success:true,packaged,roofControlsClickable:true,globalSettings:true,pinNativeAndPersisted:true,speechBubbles:true,oneSharedCg:true,sevenResidents:true,persistedSize:true,size:restored,errors};
+ const report={success:true,packaged,roofControlsClickable:true,globalSettings:true,nativeDrag:true,positionPersisted:true,pinNativeAndPersisted:true,speechBubbles:true,oneSharedCg:true,sevenResidents:true,persistedSize:true,size:restored,errors};
  fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }finally{await app.close();}

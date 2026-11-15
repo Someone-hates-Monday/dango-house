@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {GardenEngine} from '../electron/engine';
 import {initialState} from '../src/shared/director';
-import {parseHousePlan,housePrompt,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
+import {parseHousePlan,housePrompt,houseBeatPause,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
 import {composeHouse,compactPositions} from '../src/shared/mini-house';
 import {inHouseSilhouette} from '../src/HouseSkin';
 
@@ -38,6 +38,24 @@ test('stop invalidates an in-flight house response, with no late speech or memor
 test('API failure does not produce a local scripted character reply',async()=>{
  const e=new GardenEngine(live(),()=>{},undefined,0,async()=>{throw Error('fixture');});const before=e.state.messages.length;await e.dispatch({type:'pat',id:'xia'});
  assert.equal(e.state.messages.slice(before).filter(m=>m.speaker==='xia').length,0);assert.ok(e.state.messages.some(m=>m.kind==='error'));
+});
+test('hover cannot cancel a queued household reply',async()=>{
+ const s=live();s.settings.autonomous=true;let calls=0;
+ const e=new GardenEngine(s,()=>{},undefined,0,async(state,event)=>{
+  calls++;return parseHousePlan(JSON.stringify({beats:[{actor:'xia',text:'饭分你一点，好不好？',intent:{action:'shy'}},{actor:'rin',text:'好，我坐你旁边。',replyTo:'xia',intent:{action:'approach',target:'xia'}},{actor:'shiori',intent:{action:'think',emotion:'curious'}}]}),state,event,origin);
+ });
+ await e.dispatch({type:'pat',id:'xia'});await e.dispatch({type:'hover',id:'shiori'});
+ e.tick(Date.now()+4000);
+ assert.equal(calls,1);assert.ok(e.state.messages.some(m=>m.speaker==='rin'&&m.origin?.backend==='model'));
+ e.tick(Date.now()+8500);assert.equal(e.state.bodies.shiori.emotion,'curious');
+ assert.ok(!e.state.messages.some(m=>m.speaker==='shiori'&&m.origin?.backend==='model'),'silent listeners do not invent dialogue');
+});
+test('silent gestures and reply targets validate before execution, with readable turn pacing',()=>{
+ const s=live(),plan=parseHousePlan(JSON.stringify({beats:[{actor:'xia',text:'这碗分你一半。',intent:{action:'eat'}},{actor:'rin',text:'我给你留了位置。',replyTo:'xia',intent:{action:'shy'}},{actor:'shiori',intent:{action:'think'}}]}),s,event,origin);
+ assert.equal(plan.beats[1].replyTo,'xia');assert.equal(plan.beats[2].text,'');
+ assert.ok(houseBeatPause(plan.beats[0])>=3400);assert.equal(houseBeatPause(plan.beats[2]),1100);
+ assert.throws(()=>parseHousePlan(JSON.stringify({beats:[{actor:'xia',text:'hi',replyTo:'absent',intent:{action:'idle'}}]}),s,event,origin));
+ assert.throws(()=>parseHousePlan(JSON.stringify({beats:[{actor:'xia',intent:{action:'shy'}}]}),s,event,origin));
 });
 test('leaving or enabling DND discards an already requested model response',async()=>{
  for(const action of [{type:'cast-present',id:'xia',present:false},{type:'settings',patch:{dnd:true}}] as const){

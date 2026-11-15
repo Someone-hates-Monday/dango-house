@@ -16,9 +16,9 @@ const server=http.createServer(async(req,res)=>{
  if(fail){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'fixture invalid key'}}));return;}
  let text='测试连接成功';
  if(system.includes('You direct a small shared home')){
-  const event=JSON.parse(body.messages.at(-1).content),actor=event.actor??'xia';
+  const input=JSON.parse(body.messages.at(-1).content),event=input.event??input,actor=event.actor??'xia',partner=actor==='xia'?'rin':'xia';
   requests.push(event.kind);
-  text=JSON.stringify({beats:[{actor,text:event.privateGreeting?'PRIVATE_FIXTURE_GREETING':'这次的'+event.kind+'我收到了，我们接着刚才的话题。',intent:{action:'shy',emotion:'happy',duration:2}},...(actor==='xia'?[{actor:'rin',text:'我也听见啦，给她留一点吧。',intent:{action:'wave',duration:2}}]:[])]});
+  text=JSON.stringify({beats:[{actor,text:event.privateGreeting?'PRIVATE_FIXTURE_GREETING':'这次的'+event.kind+'我收到了，我们接着刚才的话题。',intent:{action:'shy',emotion:'happy',duration:2}},{actor:partner,text:event.privateGreeting?'她已经把书合好找你聊啦。':'那我坐你旁边，接着说吧。',replyTo:actor,intent:{action:'shy',emotion:'happy',duration:2}},{actor:'shiori',intent:{action:'think',emotion:'curious',duration:3}}]});
  }
  res.writeHead(200,{'Content-Type':'text/event-stream'});
  res.end('data: '+JSON.stringify({choices:[{delta:{content:text}}]})+'\n\ndata: [DONE]\n\n');
@@ -63,10 +63,13 @@ try{
  await waitHouseState(house,s=>s.messages.some(m=>m.origin?.backend==='model'&&m.text.includes('feed')));
  await house.getByRole('button',{name:'Claude',exact:true}).click();
  await waitHouseState(house,s=>s.privateMessages.rin.some(m=>m.origin?.backend==='model'));
+ await waitHouseState(house,s=>s.messages.some(m=>m.text==='她已经把书合好找你聊啦。'));
+ await house.waitForFunction(()=>document.querySelector('.house-speech')?.textContent?.includes('她已经把书合好找你聊啦。'));
+ assert.ok((await house.locator('.house-chat header strong').innerText()).includes('Claude'),'a public speech bubble must not switch the private transcript');
  const state=await house.evaluate(()=>window.garden.getState());
  assert.ok(!state.messages.some(m=>m.text==='PRIVATE_FIXTURE_GREETING'));
  assert.deepEqual(errors,[]);
- const result={success:true,requests,connectFailureKeepsDemo:true,connectSuccessEnablesApi:true,savedKeyReused:true,privateIsolated:true,errors,mockedApi:true,packaged:!!executablePath};
+ const result={success:true,requests,connectFailureKeepsDemo:true,connectSuccessEnablesApi:true,savedKeyReused:true,privateIsolated:true,publicSpeechDuringPrivate:true,errors,mockedApi:true,packaged:!!executablePath};
  fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify(result,null,2));
  console.log(JSON.stringify(result));
 }finally{await app.close();server.close();}

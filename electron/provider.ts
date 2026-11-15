@@ -1,4 +1,4 @@
-import {housePrompt,parseHousePlan,type HouseEvent} from '../src/shared/house-events';
+import {housePrompt,parseHousePlan,needsHousePartner,type HouseEvent} from '../src/shared/house-events';
 import { byId, providers } from '../src/shared/characters';
 import type { AppState, CharacterId, AvatarIntent } from '../src/shared/types';
 import { avatarTool, endpointFor } from './avatar-tool';
@@ -144,8 +144,17 @@ export async function generateReply(
 
 /** One bounded generation for public household events; never sees private transcripts. */
 export async function generateHousePlan(state:AppState,event:HouseEvent,getKey:(provider:string)=>Promise<string>,signal:AbortSignal){
+ const started=Date.now();
  const provider=state.settings.provider,config=state.connections[provider];
  const model=config?.model||state.settings.model,key=await getKey(provider);
  const text=await requestText(provider,model,key,housePrompt(state,event),[{role:'user',content:JSON.stringify(event)}],signal,()=>{},{endpoint:config?.endpoint});
- return parseHousePlan(text,state,event,{backend:'model',provider,model});
+ const origin={backend:'model' as const,provider,model},plan=parseHousePlan(text,state,event,origin);
+ if(!needsHousePartner(state,event,plan)||Date.now()-started>10000)return plan;
+ // At most one repair for an explicit interaction, never an autonomous retry loop.
+ // Keep a valid model answer if the optional social expansion fails.
+ try{
+  const expanded=await requestText(provider,model,key,housePrompt(state,event)+'\nThe draft below only has one speaker. Rewrite the COMPLETE episode with one relevant companion answering or gently noticing the public event, and optionally a reply back. Include the requested resident. Do not merely append another thanks-to-user. Private-entry reactions may only notice selection, never the greeting. Keep it short; do not require everyone to speak.',[{role:'user',content:JSON.stringify({event,draft:{beats:plan.beats,cgAsset:plan.cgAsset}})}],AbortSignal.any([signal,AbortSignal.timeout(6500)]),()=>{},{endpoint:config?.endpoint});
+  const repaired=parseHousePlan(expanded,state,event,origin);
+  return needsHousePartner(state,event,repaired)?plan:repaired;
+ }catch{if(signal.aborted)throw signal.reason;return plan;}
 }

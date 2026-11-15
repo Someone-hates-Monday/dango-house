@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [接话、公开/私聊气泡与实际窗口拖动：0.5.0-alpha.3](HOUSE-SOCIAL-AND-DRAG.zh-CN.md) · [English](HOUSE-SOCIAL-AND-DRAG.en.md)
+
 - [全局设置整合、明确退出与气泡对白：0.5.0-alpha.2](SETTINGS-CONSOLIDATION.zh-CN.md) · [English](SETTINGS-CONSOLIDATION.en.md)
 
 - [迷你小屋与统一 AI 互动：实现与验收 0.5.0-alpha.1](MINI-HOUSE-IMPLEMENTATION-DRAFT.zh-CN.md) · [English](MINI-HOUSE-IMPLEMENTATION-DRAFT.en.md)

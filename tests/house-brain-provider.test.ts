@@ -1,7 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { generateReply } from '../electron/provider.ts';
+import { generateReply,generateHousePlan } from '../electron/provider.ts';
 import { initialState } from '../src/shared/director.ts';
+
+test('a solitary model draft receives at most one bounded social repair, with no fan-out',async()=>{
+ const state=initialState();state.presentIds=['xia','rin','shiori'];state.settings.provider='glm';
+ state.connections.glm={model:'fixture',endpoint:'http://127.0.0.1:39999/v1',tools:true};
+ const original=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;const beats=[{actor:'xia',text:'这碗饭我想分一点。',intent:{action:'eat'}},...(calls===2?[{actor:'rin',text:'那我给你留好位置。',replyTo:'xia',intent:{action:'shy'}}]:[])];return new Response('data: '+JSON.stringify({choices:[{delta:{content:JSON.stringify({beats})}}]})+'\n\ndata: [DONE]\n\n');};
+ try{
+  const plan=await generateHousePlan(state,{id:'social',kind:'feed',actor:'xia',at:1,food:'rice'},async()=> 'fixture',new AbortController().signal);
+  assert.equal(calls,2);assert.deepEqual(plan.beats.map(b=>b.actor),['xia','rin']);assert.equal(plan.beats[1].replyTo,'xia');
+  calls=0;await generateHousePlan(state,{id:'idle',kind:'autonomous',at:1},async()=> 'fixture',new AbortController().signal);assert.equal(calls,1,'no autonomous repair loop');
+  state.presentIds=['xia'];calls=0;await generateHousePlan(state,{id:'solo',kind:'pat',actor:'xia',at:1},async()=> 'fixture',new AbortController().signal);assert.equal(calls,1,'a solo resident is not required to invent a partner');
+ }finally{globalThis.fetch=original;}
+});
 
 test('one house backend uses distinct resident personas and an honest identity prompt', async () => {
   const state = initialState();

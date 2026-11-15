@@ -1,4 +1,4 @@
-import {parseHousePlan,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
+import {parseHousePlan,houseBeatPause,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
 import {clipById,clipByTitle,socialDeepseekClip} from '../src/shared/deepseek-animation';
 import {deepseekClips} from '../src/shared/deepseek-clips';
 import {socialClaudeClip} from '../src/shared/claude-animation';
@@ -88,6 +88,7 @@ export class GardenEngine {
   private async reactHouse(kind:string,actor?:CharacterId,details:Partial<HouseEvent>={}){
     if(this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
     if(actor&&!isSpeaking(this.state,actor))return;
+    if((kind==='hover'||kind==='autonomous')&&(this.state.busy||this.director.hasActiveJob()||this.state.cgSession))return;
     if(kind==='autonomous'){this.houseAutoTimes=this.houseAutoTimes.filter(t=>Date.now()-t<3600000);if(!this.houseVisible||this.houseAutoTimes.length>=6)return;this.houseAutoTimes.push(Date.now());}
     const now=Date.now(),key=kind+':'+(actor??'house');
     if(kind!=='message'&&now-(this.houseLast.get(key)??0)<1500)return;
@@ -105,9 +106,10 @@ export class GardenEngine {
       const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset}),this.state,event,proposed.origin);
       if(!plan.beats.length)return;
       const at=Date.now();const cast=[...new Set(plan.beats.map(b=>b.actor))];
-      const publicLines=plan.beats.filter(b=>!b.channel).map(b=>byId[b.actor].name+':'+b.text).join(' ');
-      const steps=plan.beats.map((b,i)=>({at:at+i*2400,actor:b.actor,intent:b.intent,speech:b.text,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor}));
-      this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||'与用户进行了一次私下问候'}},steps,at);
+      const publicLines=plan.beats.filter(b=>!b.channel&&b.text).map(b=>byId[b.actor].name+':'+b.text).join(' ');
+      let offset=0;
+      const steps=plan.beats.map(b=>{const step={at:at+offset,actor:b.actor,intent:b.intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor};offset+=houseBeatPause(b);return step;});
+      this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
       this.tick(at);
     }catch(error){if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
     finally{if(round===this.epoch){this.abort=undefined;this.pendingHouseKind=undefined;this.state.busy=false;this.publish();}}

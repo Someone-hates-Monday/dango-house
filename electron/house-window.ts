@@ -10,6 +10,7 @@ export class HouseWindowController {
  private top=0;
  private applied:Rect|null=null;
  private timer:ReturnType<typeof setTimeout>|undefined;
+ private dragStart:{point:{x:number;y:number};bounds:Rect}|undefined;
  constructor(preload:string,private file:string,private count:()=>number){
   const work=screen.getPrimaryDisplay().workArea;let saved:Partial<Rect>&{pinned?:boolean}={};
   try{saved=JSON.parse(fs.readFileSync(file,'utf8'));}catch{}
@@ -23,9 +24,9 @@ export class HouseWindowController {
    this.bounds={...this.bounds,x:b.x,y:b.y+this.top};this.layout(this.request);
   });
  }
- layout(request:HouseSize):HouseLayout{
+ layout(request:HouseSize,workArea?:Rect):HouseLayout{
   this.request={width:request.width,height:request.height,chatOpen:!!request.chatOpen,cgHeight:request.cgHeight,panelHeight:request.panelHeight};
-  const work=screen.getDisplayMatching(this.bounds).workArea;
+  const work=workArea??screen.getDisplayMatching(this.bounds).workArea;
   const result=composeHouse(this.bounds,work,this.request,this.count());this.bounds=result.house;this.top=result.layout.cgHeight;this.applied=result.host;
   const layout={...result.layout,pinned:this.window.isAlwaysOnTop()};
   this.window.setBounds(result.host);this.window.webContents.send('garden:house-layout',layout);
@@ -33,6 +34,14 @@ export class HouseWindowController {
   return layout;
  }
  current(){return this.layout(this.request);}
+ drag(phase:'start'|'move'|'end',point:{x:number;y:number}){
+  if(!point||!Number.isFinite(point.x)||!Number.isFinite(point.y)||Math.abs(point.x)>100000||Math.abs(point.y)>100000)return;
+  if(phase==='start')this.dragStart={point,bounds:{...this.bounds}};
+  else if(phase==='move'&&this.dragStart){
+   this.bounds={...this.bounds,x:this.dragStart.bounds.x+point.x-this.dragStart.point.x,y:this.dragStart.bounds.y+point.y-this.dragStart.point.y};
+   this.layout(this.request,screen.getDisplayNearestPoint({x:Math.round(point.x),y:Math.round(point.y)}).workArea);
+  }else if(phase==='end'){this.dragStart=undefined;this.flush();}
+ }
  togglePin(){this.window.setAlwaysOnTop(!this.window.isAlwaysOnTop());this.current();}
  flush(){clearTimeout(this.timer);try{fs.mkdirSync(path.dirname(this.file),{recursive:true});fs.writeFileSync(this.file,JSON.stringify({...this.bounds,pinned:this.window.isAlwaysOnTop()}));}catch{}}
  show(){this.layout(this.request);if(this.window.isMinimized())this.window.restore();this.window.show();this.window.focus();}

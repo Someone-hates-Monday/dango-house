@@ -192,6 +192,7 @@ if (single) app.whenReady().then(async () => {
     void engine.dispatch(action).catch(() => engine.add('system', '操作没有完成，请重试。', 'error'));
   });
   ipcMain.handle('garden:house-layout',(event,size)=>{if(event.sender!==houseWindow.window.webContents)throw Error('Invalid house window');return size?houseWindow.layout(size):houseWindow.current();});
+  ipcMain.on('garden:house-drag',(event,phase,point)=>{if(event.sender===houseWindow.window.webContents&&['start','move','end'].includes(phase))houseWindow.drag(phase,point);});
   ipcMain.on('garden:window', (event, command: string) => {
     if (!known(event.sender)) return;
     if(command==='show-house'){showHouse();return;}

@@ -173,6 +173,7 @@ export interface DesktopBridge {
   subscribe(callback: (state: AppState) => void): () => void;
   window(command: 'minimize' | 'close' | 'show-chat' | 'show-house' | 'show-settings' | 'show-desktop' | 'house-pin' | 'quit'): void;
   houseLayout(size?:import('./mini-house').HouseSize):Promise<import('./mini-house').HouseLayout>;
+  houseDrag(phase:'start'|'move'|'end',point:{x:number;y:number}):void;
   onHouseLayout(callback:(layout:import('./mini-house').HouseLayout)=>void):()=>void;
   onPage(callback:(page:string)=>void):()=>void;
   hitTest(interactive: boolean): void;
