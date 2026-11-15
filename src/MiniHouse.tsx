@@ -1,6 +1,6 @@
 import {HouseSkin,inHouseSilhouette} from './HouseSkin';
 import {useEffect,useRef,useState} from 'react';
-import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users,Grip} from 'lucide-react';
+import {Settings2,MessageCircle,Hand,Heart,Utensils,ArrowUp,Minus,X,Pin,Users} from 'lucide-react';
 import type {AppState,CharacterId,Food} from './shared/types';
 import type {HouseLayout} from './shared/mini-house';
 import {compactPositions} from './shared/mini-house';
@@ -44,7 +44,7 @@ export function MiniHouse({state}:{state:AppState}){
   document.documentElement.classList.add('house-document');
   const off=window.garden.onHouseLayout(value=>{setLayout(value);setSize(old=>old.width===value.width&&old.height===value.height?old:{width:value.width,height:value.height});});
   void window.garden.houseLayout().then(value=>{setLayout(value);setSize({width:value.width,height:value.height});setInitialized(true);});
-  const move=(e:PointerEvent)=>{if(dragging.current){window.garden.hitTest(true);return;}const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip,.house-drag-handle,.house-canopy')||painted);};
+  const move=(e:PointerEvent)=>{if(dragging.current){window.garden.hitTest(true);return;}const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip,.house-canopy')||painted);};
   const leave=()=>{if(!dragging.current)window.garden.hitTest(false);};
   document.addEventListener('pointermove',move);document.addEventListener('pointerleave',leave);
   return()=>{off();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',leave);};
@@ -69,7 +69,6 @@ export function MiniHouse({state}:{state:AppState}){
   onPointerUp:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
   onPointerCancel:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
  };
- const dragLabel=state.settings.locale==='en'?'Drag house':state.settings.locale==='ja'?'小屋を移動':'拖动小屋';
  const collapseCg=()=>{playedAt.current=video.current?.currentTime??playedAt.current;setCollapsed(true);};
  return <div className="house-root" data-house-room-width={layout.width} data-house-room-height={layout.height}>
   {session&&clip&&layout.cgHeight>0&&!collapsed&&<section className="house-cg" data-house-cg={session.id} style={{height:layout.cgHeight-6,width:Math.min(360,layout.width*.82)}}>
@@ -77,7 +76,7 @@ export function MiniHouse({state}:{state:AppState}){
    <div className="house-cg-caption"><span>{clip.copy[state.settings.locale].title}</span><button onClick={collapseCg} aria-label={state.settings.locale==='zh-CN'?'收起短片':state.settings.locale==='ja'?'シーンをたたむ':'Collapse moment'}><Minus size={14}/></button><button onClick={()=>void send({type:'cg-dismiss',sessionId:session.id})} aria-label="Close CG"><X size={14}/></button></div>
   </section>}
   <section className="mini-frame" style={{top:layout.cgHeight,height:layout.height}} data-mini-house="true">
-   <HouseSkin width={layout.width} height={layout.height}/><div className="house-canopy" {...dragHandlers}/><button className="house-drag-handle" aria-label={dragLabel} title={dragLabel} {...dragHandlers}><Grip size={14}/><span>{dragLabel}</span></button>
+   <HouseSkin width={layout.width} height={layout.height}/><div className="house-canopy" {...dragHandlers}/>
    <header className="house-header"><strong>{t.home}</strong>{[
      {ratio:.65,title:t.pin,label:layout.pinned!==false?t.pinned:t.unpinned,pin:true,icon:<Pin size={16}/>,action:()=>window.garden.window('house-pin')},
      {ratio:.77,title:t.settings,label:state.settings.locale==='zh-CN'?'设置':state.settings.locale==='ja'?'設定':'Setup',pin:false,icon:<Settings2 size={16}/>,action:openSettings},

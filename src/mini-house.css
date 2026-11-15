@@ -89,5 +89,4 @@
 
 .house-chat>header strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .house-chat>header .house-chat-close{flex-shrink:0}
-.house-drag-handle{position:absolute;left:12%;top:53px;z-index:91;height:29px;padding:0 7px;border:1px solid #b77f99;border-radius:10px;background:#fff0dd;color:#935d78;font-size:11px;cursor:grab!important;touch-action:none;user-select:none;-webkit-app-region:no-drag}
-.house-drag-handle:active,.house-canopy:active{cursor:grabbing!important}
+.house-canopy:active{cursor:grabbing!important}

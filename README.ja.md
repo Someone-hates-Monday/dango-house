@@ -15,7 +15,7 @@ Dock に伏せて寄り添い、マウスが近づくと立ち上がる——な
 <sub>実際のアプリの Dock モード</sub>
 
 [![Windows](https://img.shields.io/badge/Windows-x64-f4a7bc)](https://github.com/Someone-hates-Monday/dango-house/releases)
-[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.3-bca7e8)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source_alpha-0.5.0--alpha.4-bca7e8)](CHANGELOG.md)
 [![Checks](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml/badge.svg)](https://github.com/Someone-hates-Monday/dango-house/actions/workflows/ci.yml)
 [![Code license](https://img.shields.io/badge/code-MIT-a4cdb8)](LICENSE)
 [![Asset terms](https://img.shields.io/badge/art-noncommercial-f0cf8d)](THIRD_PARTY_NOTICES.md)
@@ -28,7 +28,7 @@ Dock に伏せて寄り添い、マウスが近づくと立ち上がる——な
 
 団子小屋は Windows 向けの寄り添いアプリです。コミュニティ発の AI 娘たちが同じ小屋で暮らし、おしゃべりしたり、なでなでしてもらったり、少しだけ争寵したりします。
 
-> **ソースは v0.5.0-alpha.3、公開 Windows ポータブルプレビューは [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5) です。** オフラインデモでも遊べます。本番チャットには自分の API が必要です。「接続と設定」で **简体中文 / English / 日本語** を切り替えられます。
+> **ソースは v0.5.0-alpha.4、公開 Windows ポータブルプレビューは [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5) です。** オフラインデモでも遊べます。本番チャットには自分の API が必要です。「接続と設定」で **简体中文 / English / 日本語** を切り替えられます。
 
 現在のソースでは小さなハート屋根の家が主画面です。屋根に操作ボタン、下に会話、上に共有 CG を配置します。一つの API 接続で、小屋のモデルが短い複数人の会話と動作を生成します。DeepSeek の 109 動画、Dock・デスクトップ表示、MCP/REST 接続も利用できます。七人の独立した自律 Agent ではありません。[実装と検証（English）](docs/MINI-HOUSE-IMPLEMENTATION-DRAFT.en.md)。
 

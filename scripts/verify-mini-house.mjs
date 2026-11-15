@@ -25,9 +25,10 @@ try{
  for(let i=1;i<buttons.length;i++)assert.ok(buttons[i].x>=buttons[i-1].x+buttons[i-1].w,'roof controls must not overlap');
  const nativeBounds=()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=house')).getBounds());
  const beforeDrag=await nativeBounds();
- const handle=house.getByRole('button',{name:'拖动小屋',exact:true});
+ assert.equal(await house.locator('.house-drag-handle').count(),0);
+ const handle=house.locator('.house-canopy');
  await handle.hover();const hit=await handle.boundingBox();await house.mouse.move(hit.x+hit.width/2,hit.y+hit.height/2);await house.mouse.down();await house.mouse.move(hit.x+hit.width/2-40,hit.y+hit.height/2-25);await house.mouse.up();
- const afterDrag=await nativeBounds();assert.ok(afterDrag.x<beforeDrag.x-20&&afterDrag.y<beforeDrag.y-10,'the visible handle must move the native window');
+ const afterDrag=await nativeBounds();assert.ok(afterDrag.x<beforeDrag.x-20&&afterDrag.y<beforeDrag.y-10,'the blank roof must move the native window');
  await house.getByRole('button',{name:'设置与连接',exact:true}).click();
  const main=app.windows().find(p=>/view=(chat|settings)/.test(p.url()));
  await main.locator('.connections-page').waitFor();

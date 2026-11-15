@@ -1,5 +1,7 @@
 # Shared conversations and roof dragging · 0.5.0-alpha.3
 
+Update: `0.5.0-alpha.4` removes the labelled grip at the user's request. Drag the blank roof or its edge directly; native movement and persistence are unchanged. The original alpha.3 implementation is documented below.
+
 The old prompt allowed very short solitary replies. Worse, hover greetings could cancel a queued scene after generation cleared `busy`, and opening private chat hid public speech bubbles.
 
 The house model now plans connected 2–5-turn exchanges among relevant residents, with up to six steps including silent gestures. Personas, social affinities, girl–girl preference and optional `replyTo` guide peer responses. Not everyone must speak. Silent steps never create fabricated chat lines.

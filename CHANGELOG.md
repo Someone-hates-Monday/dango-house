@@ -1,5 +1,9 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.4 · 2026-11-15 · Cleaner roof / 简洁屋顶
+
+- 去掉“拖动小屋”文字把手，保留屋顶空白处/边缘按住拖动与位置记忆。Remove the labelled drag grip; retain blank-roof/edge dragging and persisted position.
+
 ## 0.5.0-alpha.3 · 2026-11-15 · Shared conversations & dragging / 接话与拖动
 
 - 小屋大脑改为规划相关角色的短回合交流，加入关系取向、同伴接话和无台词动作；显式互动的独白最多做一次有时限的模型补全。Plan connected multi-resident exchanges with social affinities, reply targets and silent reactions; at most one bounded expansion of a solitary explicit response.
