@@ -1,7 +1,7 @@
 {
   "name": "desktop-pet-garden",
   "productName": "团子小屋",
-  "version": "0.5.0-alpha.8",
+  "version": "0.5.0-alpha.9",
   "private": true,
   "type": "module",
   "description": "团子小屋 · AI 娘乐园 / A cozy desktop home for seven AI companions",

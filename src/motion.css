@@ -41,3 +41,8 @@
 @keyframes portraitBreathe{0%,100%{transform:scale(1) rotate(-.2deg)}50%{transform:scale(1.009) rotate(.2deg)}}
 @keyframes portraitShy{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(2px) rotate(-.8deg)}}
 @keyframes portraitHappy{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.008)}}
+
+.desktop-pet[data-attention=noticed] .pet-body{animation:pet-notice 1.1s ease-out 1;transform-origin:center bottom}
+.desktop-pet[data-attention=noticed] .pet-name{filter:drop-shadow(0 0 4px #bfa5dc)}
+@keyframes pet-notice{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-2px) rotate(-1.4deg)}70%{transform:translateY(-1px) rotate(.6deg)}}
+@media(prefers-reduced-motion:reduce){.desktop-pet[data-attention=noticed] .pet-body{animation:none}}

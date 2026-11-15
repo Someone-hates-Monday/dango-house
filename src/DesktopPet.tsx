@@ -1,3 +1,4 @@
+import {useDwellGreeting} from './useDwellGreeting';
 import {CompanionInteractions} from './CompanionInteractions';
 import {useFloatingLayout} from './useFloatingLayout';
 import {useEffect,useRef,useState,useMemo} from 'react';
@@ -32,19 +33,18 @@ function FreeCast({state,displayId,primary}:{state:AppState;displayId:number;pri
 function DesktopPet({character,state,displayId,now,size,position:p,onDrag}:{character:Character;state:AppState;displayId:number;now:number;size:{w:number;h:number};position:RoomPoint;onDrag:(point:RoomPoint|null)=>void}){
   const[dragging,setDragging]=useState(false);
   const drag=useRef<{x:number;y:number;from:RoomPoint;moved:boolean}|null>(null);
-  const hover=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
-  useEffect(()=>()=>clearTimeout(hover.current),[]);
   const movement=state.desktopMoves[character.id];const body=state.bodies[character.id];const active=body.until>now;
   const resolvedPose=useActualPose(body.pose,p.x*(size.w-160),p.y*(size.h-210),now);const pose=dragging?'wait':resolvedPose;
   const moving=!!movement||pose.startsWith('walk')||!!state.room.residents[character.id]?.arrivesAt;
   const interaction=moving&&body.interaction?.kind!=='trip'?undefined:body.interaction;
+  const attention=useDwellGreeting(!state.settings.dnd&&!moving&&!dragging,()=>void window.garden.dispatch({type:'hover',id:character.id}),600);
   const latest=[...state.messages].reverse().find(m=>m.speaker===character.id&&m.text);
   const bubble=!moving&&active&&body.bubble?body.bubble:!moving&&latest&&now-latest.at<7000?latest.text:'';
-  return <div className={`desktop-pet ${dragging?'dragging':''}`} data-character={character.id} style={{left:p.x*Math.max(1,size.w-160),top:p.y*Math.max(1,size.h-210)}} onPointerEnter={()=>{clearTimeout(hover.current);hover.current=setTimeout(()=>void window.garden.dispatch({type:'hover',id:character.id}),450);}} onPointerLeave={()=>clearTimeout(hover.current)}>
+  return <div className={`desktop-pet ${dragging?'dragging':''}`} data-character={character.id} data-attention={attention.noticed?'noticed':undefined} style={{left:p.x*Math.max(1,size.w-160),top:p.y*Math.max(1,size.h-210)}} onPointerEnter={attention.enter} onPointerLeave={attention.leave}>
     {bubble&&!state.settings.dnd&&<div className="pet-bubble">{bubble.slice(0,66)}{bubble.length>66?'…':''}</div>}
     <div className="pet-tools"><CompanionInteractions id={character.id} state={state} compact/><button title={`和${character.name}私聊`} onClick={()=>window.garden.openPrivate(character.id)}><MessageCircle size={14}/></button><button title="摸摸头" onClick={()=>void window.garden.dispatch({type:'pat',id:character.id})}><Hand size={14}/></button><button title="投喂大米饭" onClick={()=>void window.garden.dispatch({type:'feed',id:character.id,food:'rice'})}>🍚</button><button title="打招呼" onClick={()=>void window.garden.dispatch({type:'perform',id:character.id,intent:{action:'wave',emotion:'happy'}})}><Heart size={14}/></button></div>
     <div className="pet-body" title="点头部摸摸 · 点身体私聊 · 按住拖动" onPointerDown={e=>{
-      if(e.button!==0)return;clearTimeout(hover.current);e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,from:p,moved:false};setDragging(true);
+      if(e.button!==0)return;attention.cancel();e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,from:p,moved:false};setDragging(true);
     }} onPointerMove={e=>{
       if(!drag.current)return;const d=drag.current;if(Math.abs(e.clientX-d.x)+Math.abs(e.clientY-d.y)>6)d.moved=true;
       onDrag({x:Math.max(0,Math.min(1,d.from.x+(e.clientX-d.x)/Math.max(1,size.w-160))),y:Math.max(0,Math.min(1,d.from.y+(e.clientY-d.y)/Math.max(1,size.h-210)))});

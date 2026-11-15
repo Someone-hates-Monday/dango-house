@@ -95,3 +95,9 @@
 .house-floor{top:clamp(56px,30%,72px)}
 .house-walk-soft{animation:house-soft-steps .48s ease-in-out infinite}
 @keyframes house-soft-steps{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+
+/* A single quiet nod, never an alternate GPT identity or an endless hover loop. */
+.house-resident[data-attention=noticed]:not([data-moving=true]) .house-resident-art{transform-origin:center bottom;animation:resident-notice 1.1s ease-out 1}
+.house-resident[data-attention=noticed] .house-resident-name{border-color:#a285c0;box-shadow:0 0 7px #bfa5dc80}
+@keyframes resident-notice{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-2px) rotate(-1.4deg)}70%{transform:translateY(-1px) rotate(.6deg)}}
+@media(prefers-reduced-motion:reduce){.house-resident[data-attention=noticed] .house-resident-art{animation:none}}

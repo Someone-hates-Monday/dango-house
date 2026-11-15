@@ -25,9 +25,6 @@ export function MiniHouse({state}:{state:AppState}){
  const [text,setText]=useState(''),[foodOpen,setFoodOpen]=useState(false),[collapsed,setCollapsed]=useState(false),[unread,setUnread]=useState(false);
  const dragging=useRef(false);
  useEffect(()=>{const end=()=>{if(dragging.current){dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});}};window.addEventListener('blur',end);return()=>window.removeEventListener('blur',end);},[]);
- const hover=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
- const cancelHover=()=>clearTimeout(hover.current);
- useEffect(()=>cancelHover,[]);
  const list=useRef<HTMLDivElement>(null),nearBottom=useRef(true),resize=useRef<{x:number;y:number;width:number;height:number}|null>(null),video=useRef<HTMLVideoElement>(null),playedAt=useRef(0),lastCg=useRef<string|undefined>(undefined);
  const session=state.presentation.surface==='house'&&state.cgSession?.host==='room'?state.cgSession:undefined;
  const clip=session?cgClip(session.asset):undefined;
@@ -59,8 +56,8 @@ export function MiniHouse({state}:{state:AppState}){
  useEffect(()=>{nearBottom.current=true;setUnread(false);if(list.current)list.current.scrollTop=list.current.scrollHeight;},[channel,chatOpen]);
  useEffect(()=>{if(nearBottom.current){if(list.current)list.current.scrollTop=list.current.scrollHeight;}else setUnread(true);},[last?.id,last?.text,messages.length]);
  useEffect(()=>{if(channel&&!state.presentIds.includes(channel)){setChannel(undefined);}},[state.presentIds,channel]);
- const openSettings=()=>{cancelHover();window.garden.window('show-settings');};
- const choose=(id?:CharacterId)=>{cancelHover();
+ const openSettings=()=>{window.garden.window('show-settings');};
+ const choose=(id?:CharacterId)=>{
   if(channel!==id){if(channel)void send({type:'private-return',id:channel});if(id){void send({type:'select',id});void send({type:'private-open',id});}setChannel(id);}
   nearBottom.current=true;setChatOpen(true);
  };
@@ -69,7 +66,7 @@ export function MiniHouse({state}:{state:AppState}){
  const positions=residents.map(c=>({id:c.id,...projectHouse(residentPosition(state.room.residents[c.id],now),geometry)}));
  const selected=state.presentIds.includes(state.selected)?state.selected:state.presentIds[0];
  const dragHandlers={
-  onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;cancelHover();dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
+  onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
   onPointerMove:(e:React.PointerEvent<HTMLElement>)=>{if(dragging.current)window.garden.houseDrag('move',{x:e.screenX,y:e.screenY});},
   onPointerUp:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
   onPointerCancel:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
@@ -91,7 +88,7 @@ export function MiniHouse({state}:{state:AppState}){
    {session&&(collapsed||layout.cgHeight===0)&&<button className="house-roof-chip" title={!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg} onClick={()=>setCollapsed(false)}>♡ {!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg}</button>}
    <div className="house-scene" style={{height:layout.height-148}}>
     <div className="house-window-art"/><div className="house-floor"/><div className="house-rug"/><div className="house-sofa"><FurnitureArt kind="sofa"/></div>
-    {residents.map(c=><HouseResident key={c.id} character={c} body={state.bodies[c.id]} resident={state.room.residents[c.id]} geometry={geometry} skin={state.skins[c.id]} selected={selected===c.id} frozen={state.settings.dnd} onSelect={()=>choose(c.id)} onHover={()=>{cancelHover();hover.current=setTimeout(()=>void send({type:'hover',id:c.id}),800);}} onLeave={cancelHover}/>)}
+    {residents.map(c=><HouseResident key={c.id} character={c} body={state.bodies[c.id]} resident={state.room.residents[c.id]} geometry={geometry} skin={state.skins[c.id]} selected={selected===c.id} frozen={state.settings.dnd} onSelect={()=>choose(c.id)} onHover={()=>void send({type:'hover',id:c.id})}/>)}
 
    </div>
    <footer className="house-footer"><button className="house-caption" onClick={()=>setChatOpen(true)} title={last?.text??t.placeholder}><span>{last&&last.speaker!=='system'?(last.speaker==='user'?t.you:byId[last.speaker].name)+' · ':''}{last?.speaker==='system'?t.placeholder:last?.text||t.placeholder}</span></button><div className="house-tools"><button className="house-chat-open" onClick={()=>choose()}><MessageCircle size={15}/>{t.chat}</button>{selected&&<><button title={t.pat} aria-label={t.pat} onClick={()=>void send({type:'pat',id:selected})}><Hand size={17}/></button><button title={t.praise} aria-label={t.praise} onClick={()=>void send({type:'praise',id:selected})}><Heart size={17}/></button><button title={t.feed} aria-label={t.feed} onClick={()=>setFoodOpen(!foodOpen)}><Utensils size={17}/></button></>}<button className="house-brain-status" onClick={openSettings}>{state.settings.mode==='api'?t.live:t.demo}</button></div></footer>

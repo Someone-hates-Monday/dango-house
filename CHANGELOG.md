@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.9 · 2026-11-16 · Pointer attention / 鼠标停留回应
+
+- 小屋和自由桌宠停留后先有单次轻微视觉反馈，再等待模型；GPT 保持验收视频，不启用旧立绘。A single dwell acknowledgement precedes API speech and preserves GPT’s approved video.
+- 忙碌、场景占用或 API 失败不再误计问候冷却；主动闲聊开关不再禁止用户悬停互动。Dropped/failed greetings do not burn cooldown; pointer input is independent of autonomous chatter.
+- 短暂划过、点击、拖动、失焦和免打扰取消等待；成功问候保留频率限制。Cancel accidental dwell while retaining successful-speech limits.
+- 148 项测试、真实指针隔离检查及一次真实 DeepSeek GPT 问候通过。148 tests, isolated pointer integration and a live DeepSeek GPT greeting passed.
+
 ## 0.5.0-alpha.8 · 2026-11-15 · Companion voices / 自然陪伴对白
 
 - 七位角色共用结构化表达指引，普通善意互动不再默认以责怪、拒绝反转或收费收尾。Shared voice guidance favors natural responses to ordinary kindness without obligatory corrective endings.

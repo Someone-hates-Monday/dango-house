@@ -124,9 +124,9 @@ export class GardenEngine {
         if(houseFocus(event)==='companions'&&this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
         steps.push({at:at+offset,actor:b.actor,intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor});offset+=houseBeatPause(b);if(!b.channel&&b.text)previousPublic=b.actor;
       }
-      this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
-      this.tick(at);
-    }catch(error){if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
+      const job=this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
+      this.tick(at);return !!job;
+    }catch(error){if(kind==='hover')this.houseLast.delete(key);if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
     finally{if(round===this.epoch){this.abort=undefined;this.pendingHouseKind=undefined;this.state.busy=false;this.publish();}}
   }
   private locale() { return this.state.settings.locale; }
@@ -472,7 +472,17 @@ export class GardenEngine {
         this.queueRivalryEscalation(action.id,now);
         return;
       }
-      case 'hover': {if(!ids.includes(action.id)||this.state.settings.dnd||!this.state.settings.autonomous)return;const now=Date.now();if(now-(this.hovered[action.id]??0)<90000||now-this.lastGreeting<15000)return;this.hovered[action.id]=now;this.lastGreeting=now;if(this.state.settings.mode==='api'){if(!this.state.busy)await this.reactHouse('hover',action.id);return;}this.perform(action.id,{action:'wave',emotion:'happy',bubble:hoverLine(this.locale(),this.state.relationship.address,byId[action.id].name),duration:6});return;}
+      case 'hover': {
+        // Mouse attention is user input, independent of autonomous chatter.
+        if(!ids.includes(action.id)||!isSpeaking(this.state,action.id)||this.state.settings.dnd||this.state.focus)return;
+        // A dropped greeting must not consume its per-resident cooldown.
+        if(this.state.busy||this.director.hasActiveJob()||this.state.cgSession)return;
+        const now=Date.now();
+        if(now-(this.hovered[action.id]??0)<90000||now-this.lastGreeting<15000)return;
+        if(this.state.settings.mode==='api'){if(!await this.reactHouse('hover',action.id))return;}
+        else this.perform(action.id,{action:'wave',emotion:'happy',bubble:hoverLine(this.locale(),this.state.relationship.address,byId[action.id].name),duration:6});
+        this.hovered[action.id]=Date.now();this.lastGreeting=Date.now();return;
+      }
       case 'reminder': {if(action.operation==='remove')this.state.reminders=this.state.reminders.filter(r=>r.id!==action.id);else if(action.operation==='toggle'){const r=this.state.reminders.find(r=>r.id===action.id);if(r){r.enabled=!r.enabled;r.nextAt=Date.now()+r.intervalMinutes*60000;}}else if(typeof action.text==='string'&&action.text.trim()&&Number.isFinite(action.intervalMinutes)&&action.intervalMinutes!>=1&&action.intervalMinutes!<=1440&&this.state.reminders.length<12)this.state.reminders.push({id:crypto.randomUUID(),text:action.text.trim().slice(0,120),intervalMinutes:action.intervalMinutes!,nextAt:Date.now()+action.intervalMinutes!*60000,enabled:true});break;}
       case 'relationship': {if(!['friend','pet','romance'].includes(action.mode))return;this.state.relationship={mode:action.mode,userName:String(action.userName).slice(0,30),address:String(action.address).slice(0,30)};if(this.pendingCg?.automatic&&!allowsEventCg(this.state,this.pendingCg.asset))this.cancelScenes('relationship-change');break;}
       case 'private-open': {
