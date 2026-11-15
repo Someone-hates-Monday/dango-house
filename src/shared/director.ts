@@ -29,7 +29,7 @@ export function initialState(now = Date.now()): AppState {
     settings: { dnd: false, autonomous: true, intimacy: 55, petsVisible: true, provider: 'glm', model: '', mode: 'demo', locale: defaultLocale, pairTone: 'warm', pairRomance: true, cgAutoplay: true, agentBridge: false, castPreset: 'all' },
     memories: [], focus: null, agent: emptyAgentUi(), activity: '大家都在庭院里', busy: false,
     messages: [
-      { id: 'welcome', speaker: 'system', text: '欢迎回到团子小屋！先去「互动小屋」看看大家在做什么吧。', at: now },
+      { id: 'welcome', speaker: 'system', text: '欢迎来到团子小屋。点点她们说悄悄话，或从下方「聊聊」加入大家；屋檐上的设置可以连接 AI。', at: now },
       ...characters.map((c, i): Message => ({ id: `welcome-${c.id}`, speaker: c.id, text: c.greeting, at: now + i })),
     ],
   };

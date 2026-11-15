@@ -1,3 +1,4 @@
+import {connectBrain} from './connect-brain';
 import { useState, useEffect } from 'react';
 import { Plug, Heart, Check, Plus, Trash2, Bell, Languages, Cable, Users } from 'lucide-react';
 import { characters, providers } from './shared/characters';
@@ -30,7 +31,7 @@ export function Connections({ state }: { state: AppState }) {
   useEffect(() => {
     void window.garden.keyStatus().then(setSaved);
     void window.garden.bridgeStatus().then(setBridge).catch(() => setBridge(null));
-  }, [state.settings.agentBridge, state.revision]);
+  }, [state.settings.agentBridge]);
   const choose = (id: string) => {
     setProvider(id);
     const config = state.connections[id];
@@ -43,14 +44,10 @@ export function Connections({ state }: { state: AppState }) {
   const save = async (test = false) => {
     setWorking(true);
     try {
-      if (key.trim()) {
-        await window.garden.saveKey(provider, key);
-        setKey('');
-        setSaved(await window.garden.keyStatus());
-      }
-      await window.garden.dispatch({ type: 'connection', provider, profile: { model, endpoint, tools } });
-      await window.garden.dispatch({ type: 'settings', patch: { provider, model } });
-      setNotice(test ? await window.garden.testConnection(provider, model, endpoint) : t('settings.savedOk'));
+      const result=await connectBrain({provider,model,endpoint,tools,key});
+      setKey('');setSaved(await window.garden.keyStatus());
+      setNotice(result+' · '+t('settings.liveStarted'));
+      window.garden.window('show-house');
       return true;
     } catch (error) {
       setNotice(error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': Error: /, '') : t('settings.connectFail'));
@@ -182,6 +179,7 @@ export function Connections({ state }: { state: AppState }) {
           ))}
         </div>
         <p className="helper">{t('settings.desktopHint')}</p>
+        <button className="outline-button" onClick={()=>window.garden.window('show-desktop')}>{locale==='en'?'Use desktop pets':locale==='ja'?'デスクトップペットに切替':'进入桌宠 / Dock 模式'}</button>
         <label>
           {t('settings.chatForm')}
           <select aria-label={t('settings.chatForm')} value={state.presentation.chatForm} onChange={e => void send({ type: 'presentation', patch: { chatForm: e.target.value as 'portrait' | 'chibi' } })}>
@@ -330,25 +328,9 @@ export function Connections({ state }: { state: AppState }) {
           <p id="avatar-tools-help" className="helper">{t('settings.toolsHint')}</p>
         </div>
         <div className="connection-actions">
-          <button className="pink-button" disabled={working} onClick={() => void save(false)}>
-            {t('settings.save')}
-          </button>
-          <button className="outline-button" disabled={working || !model.trim() || (!key.trim() && !saved.includes(provider))} onClick={() => void save(true)}>
-            {working ? t('settings.connecting') : t('settings.saveTest')}
-          </button>
-          <button
-            className="outline-button"
-            disabled={working || !model.trim() || !saved.includes(provider)}
-            onClick={async () => {
-              if (!(await save(false))) return;
-              if (saved.includes(provider) && model.trim()) await send({ type: 'settings', patch: { provider, model, mode: 'api' } });
-            }}
-          >
-            {t('settings.enableApi')}
-          </button>
-          <button className="text-button" onClick={() => void send({ type: 'settings', patch: { mode: 'demo' } })}>
-            {t('settings.backDemo')}
-          </button>
+          <button className="pink-button" disabled={working||!model.trim()||(!key.trim()&&!saved.includes(provider))} onClick={()=>void save(true)}>{working?t('settings.connecting'):t('settings.connectAndStart')}</button>
+          <button className="text-button" onClick={()=>void send({type:'settings',patch:{mode:'demo'}})}>{t('settings.backDemo')}</button>
+          <button className="outline-button" onClick={()=>window.garden.window('show-house')}>{t('settings.backHouse')}</button>
         </div>
         {notice && (
           <p className="settings-notice" role="status">

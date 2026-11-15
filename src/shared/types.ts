@@ -27,7 +27,7 @@ export interface PetState { x: number; y: number; displayId: number; }
 export interface FocusTask { id: string; endAt: number; minutes: number; owner: CharacterId; }
 export type Pose = 'idle' | 'walk-right' | 'walk-left' | 'wave' | 'jump' | 'sad' | 'wait' | 'think' | 'read';
 export type Emotion = 'neutral' | 'happy' | 'shy' | 'sad' | 'curious';
-export interface Embodiment { pose: Pose; emotion: Emotion; until: number; label: string; bubble: string; interaction?: import('./motion').Interaction; stoppedAt?:number; }
+export interface Embodiment { target?:CharacterId; pose: Pose; emotion: Emotion; until: number; label: string; bubble: string; interaction?: import('./motion').Interaction; stoppedAt?:number; }
 export interface RoomPoint { x: number; y: number; }
 export type FurnitureKind = 'sofa' | 'table' | 'bookshelf' | 'plant' | 'lamp' | 'cushion';
 export interface Furniture extends RoomPoint { id: string; kind: FurnitureKind; }
@@ -89,7 +89,7 @@ export interface AppState {
   connections: Record<string, ConnectionProfile>;
   /** Optional per-character provider override; unset entries use the house-brain provider. */
   characterProviders: Partial<Record<CharacterId, string>>;
-  presentation: {desktopMode:'free'|'dock';chatForm:'portrait'|'chibi'};
+  presentation: {desktopMode:'free'|'dock';chatForm:'portrait'|'chibi';surface?:'house'|'workbench'|'desktop'};
   privateMessages: Record<CharacterId, Message[]>;
   relationship: { mode: 'friend'|'pet'|'romance'; userName: string; address: string };
   desktopMoves: Partial<Record<CharacterId,{from:RoomPoint;to:RoomPoint;startedAt:number;arrivesAt:number;displayId:number}>>;
@@ -171,7 +171,10 @@ export interface DesktopBridge {
   getState(): Promise<AppState>;
   dispatch(action: Action): Promise<void>;
   subscribe(callback: (state: AppState) => void): () => void;
-  window(command: 'minimize' | 'close' | 'show-chat' | 'quit'): void;
+  window(command: 'minimize' | 'close' | 'show-chat' | 'show-house' | 'show-settings' | 'show-desktop' | 'house-pin' | 'quit'): void;
+  houseLayout(size?:import('./mini-house').HouseSize):Promise<import('./mini-house').HouseLayout>;
+  onHouseLayout(callback:(layout:import('./mini-house').HouseLayout)=>void):()=>void;
+  onPage(callback:(page:string)=>void):()=>void;
   hitTest(interactive: boolean): void;
   openPrivate(id: CharacterId): void;
   saveKey(provider: string, key: string): Promise<void>;

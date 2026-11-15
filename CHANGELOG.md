@@ -1,5 +1,13 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.1 · 2026-11-15 · A tiny shared home / 桌面迷你小屋
+
+- 透明爱心房子替代主工作台入口；沿屋檐排列按钮，底座承载互动与短句，下方展开聊天与连接表单。A transparent house, roof controls, shared base and attached chat/setup panel.
+- 紧凑三人默认阵容、可调整并记忆的房屋尺寸；保留多人和桌宠/Dock 高级入口。Compact trio, persisted resizing, optional larger casts and Dock/free-pet views.
+- API 模式统一生成群聊和触摸、投喂、夸奖、私聊欢迎、同伴生活的回复/动作；测试成功后自动启用；错误不回退成伪 AI 剧本。Bounded model-directed house events, automatic enablement after connection testing, honest errors.
+- 单份 CG 在房子外上方播放，聊天在下方；空间不足时折叠提示。One shared CG above the house, chat below, folded affordance when space is insufficient.
+- 保留 GPT 正确的 225 帧循环与 P1 动画；增加迷你窗口、模拟 API 和解码循环验收。Retain approved GPT media and add native-window/API-fixture/decoded-loop checks.
+
 ## 0.4.0-alpha.6 · 2026-11-15 · Readable settings / 设置页易读性
 
 - 修正文本输入框的整行样式错误作用于复选框；工具开关、角色勾选和说明重新靠近，统一字号与点击区域。Fix full-width checkbox styling and keep controls beside their labels; improve text and hit targets.

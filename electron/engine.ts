@@ -1,3 +1,4 @@
+import {parseHousePlan,type HouseEvent,type HouseGenerate} from '../src/shared/house-events';
 import {clipById,clipByTitle,socialDeepseekClip} from '../src/shared/deepseek-animation';
 import {deepseekClips} from '../src/shared/deepseek-clips';
 import {socialClaudeClip} from '../src/shared/claude-animation';
@@ -21,7 +22,7 @@ import { cgAssetForCompletedJob, cgClip, isCgAssetId } from '../src/shared/cg-ca
 import {allowsEventCg,affectionCgFor} from '../src/shared/cg-policy';
 import { bondOf, bumpBond, cpPartner } from '../src/shared/bonds';
 import { inferCastPreset, presentForPreset, speakingCast, presentCast, isPresent, isSpeaking, normalizePresentIds } from '../src/shared/cast';
-import { SceneDirector, type SceneJob, type ScenePriority, type SceneReward } from '../src/shared/scene-director';
+import { SceneDirector, type SceneJob, type ScenePriority, type SceneReward, type SceneStep } from '../src/shared/scene-director';
 import { pushCompanionEvent, clearCompanionEvents, type CompanionEventKind } from '../src/shared/events';
 import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
 import { shouldAttemptStoryLlm, storyLlmPrompt } from '../src/shared/story-llm';
@@ -55,7 +56,7 @@ export class GardenEngine {
   private lastClaudeClip="";
   private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction}>();
   private nextBookmark=Date.now()+95000;
-  constructor(state: AppState = initialState(), private notify: (state: AppState) => void = () => {}, private generate?: Generate, private delay = 650) {
+  constructor(state: AppState = initialState(), private notify: (state: AppState) => void = () => {}, private generate?: Generate, private delay = 650, private houseGenerate?:HouseGenerate) {
     this.state = state;
     if (!this.state.agent) this.state.agent = emptyAgentUi();
     if (!this.state.favor) this.state.favor = { focusId: null, streak: 0 };
@@ -79,6 +80,38 @@ export class GardenEngine {
     });
     this.state.agent = this.agent.getUi();
   }
+  houseVisible=true;
+  private pendingHouseKind:string|undefined;
+  private houseAutoTimes:number[]=[];
+  setHouseVisible(visible:boolean){this.houseVisible=visible;if(!visible&&(this.pendingHouseKind==='autonomous'||this.director.current?.source==='house:autonomous'))this.stop();}
+  private houseLast=new Map<string,number>();
+  private async reactHouse(kind:string,actor?:CharacterId,details:Partial<HouseEvent>={}){
+    if(this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
+    if(actor&&!isSpeaking(this.state,actor))return;
+    if(kind==='autonomous'){this.houseAutoTimes=this.houseAutoTimes.filter(t=>Date.now()-t<3600000);if(!this.houseVisible||this.houseAutoTimes.length>=6)return;this.houseAutoTimes.push(Date.now());}
+    const now=Date.now(),key=kind+':'+(actor??'house');
+    if(kind!=='message'&&now-(this.houseLast.get(key)??0)<1500)return;
+    this.houseLast.set(key,now);this.stop();const round=this.epoch;
+    const controller=new AbortController();this.abort=controller;
+    const event:HouseEvent={...details,id:crypto.randomUUID(),kind,actor,at:now};this.pendingHouseKind=kind;
+    this.state.busy=true;this.state.activity=this.locale()==='en'?'The house is thinking…':this.locale()==='ja'?'みんなが考えています…':'她们在想怎么回应…';this.publish();
+    try{
+      if(!this.houseGenerate)throw Error('小屋互动生成器尚未连接');
+      const signal=AbortSignal.any([controller.signal,AbortSignal.timeout(20000)]);
+      const castBefore=new Set(speakingCast(this.state));
+      const proposed=await this.houseGenerate(this.state,event,signal);
+      if(proposed.beats.some(b=>castBefore.has(b.actor)&&!isSpeaking(this.state,b.actor)))return;
+      if(round!==this.epoch||signal.aborted||(kind==='autonomous'&&!this.houseVisible)||this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
+      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset}),this.state,event,proposed.origin);
+      if(!plan.beats.length)return;
+      const at=Date.now();const cast=[...new Set(plan.beats.map(b=>b.actor))];
+      const publicLines=plan.beats.filter(b=>!b.channel).map(b=>byId[b.actor].name+':'+b.text).join(' ');
+      const steps=plan.beats.map((b,i)=>({at:at+i*2400,actor:b.actor,intent:b.intent,speech:b.text,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor}));
+      this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||'与用户进行了一次私下问候'}},steps,at);
+      this.tick(at);
+    }catch(error){if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
+    finally{if(round===this.epoch){this.abort=undefined;this.pendingHouseKind=undefined;this.state.busy=false;this.publish();}}
+  }
   private locale() { return this.state.settings.locale; }
   private t(key: string, vars?: Record<string, string | number>) { return translate(this.locale(), key, vars); }
   publish() { this.state.revision++; this.notify(this.state); }
@@ -91,12 +124,13 @@ export class GardenEngine {
     if(!ids.includes(id))throw new Error(this.t('sys.unknownCharacter'));
     if(!isPresent(this.state,id))throw new Error(this.t('cast.needInvite',{name:byId[id].name}));
     const intent=validatedIntent(value);
+    if(this.state.presentation.surface==='house'&&intent.action==='walk'&&!intent.target)intent.action='idle';
     const charTarget=this.characterTargetId(intent.target);
     if(charTarget&&!isPresent(this.state,charTarget))throw new Error(this.t('cast.needInvite',{name:byId[charTarget].name}));
     const resident=this.state.room.residents[id];
     const current=residentPosition(resident,now);let point: {x:number;y:number}|undefined;
     let target=intent.target;
-    if(!target&&['read','sit','water','eat','sleep'].includes(intent.action)) target=this.state.room.furniture.find(f=>f.kind===({read:'bookshelf',sit:'sofa',water:'plant',eat:'table',sleep:'cushion'} as Record<string,string>)[intent.action])?.id;
+    if(!target&&!interaction&&['read','sit','water','eat','sleep'].includes(intent.action)) target=this.state.room.furniture.find(f=>f.kind===({read:'bookshelf',sit:'sofa',water:'plant',eat:'table',sleep:'cushion'} as Record<string,string>)[intent.action])?.id;
     if(target){const obj=this.state.room.furniture.find(f=>f.id===target);const other=ids.find(other=>other===target||byId[other].name.toLowerCase()===target!.toLowerCase());if(obj)point=boundedPoint(obj.x+6,obj.y+9);else if(other&&other!==id){const p=residentPosition(this.state.room.residents[other],now);point=boundedPoint(p.x+9,p.y+2);}else throw new Error(this.t('sys.badTarget'));}
     if(intent.action==='walk'&&!point)point=boundedPoint(intent.x??current.x+(this.lifeIndex%2?10:-10),intent.y??current.y);
     if(!this.state.room.wandering)point=undefined;
@@ -108,14 +142,14 @@ export class GardenEngine {
       if(id==='xia'){const clipId=socialDeepseekClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
       if(id==='rin'){const clipId=socialClaudeClip(intent.action,intent.bubble??'',now);if(clipId)interaction={kind:'clip',clipId,startedAt:now};}
     }
-    const travel=moving?Math.max(800,Math.min(5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85)):0;
+    const travel=moving?Math.max(800,Math.min(this.state.presentation.surface==='house'?900:5500,Math.hypot(point!.x-current.x,point!.y-current.y)*85)):0;
     if(moving)this.state.room.residents[id]={...point!,from:current,startedAt:now,arrivesAt:now+travel,after,destination:target?targetDescription(target,this.state.room.furniture):this.t('sys.nearby')};
     else if(intent.action!=='approach')this.state.room.residents[id]={...resident,...current,from:current,startedAt:0,arrivesAt:0,after,destination:''};
     const labels:Record<string,string>={wave:this.t('act.wave'),jump:this.t('act.jump'),celebrate:this.t('act.celebrate'),think:this.t('act.think'),read:this.t('act.read'),shy:this.t('act.shy'),sad:this.t('act.sad'),sit:this.t('act.sit'),water:this.t('act.water'),eat:this.t('act.eat'),sleep:this.t('act.sleep'),walk:this.t('act.walk'),approach:this.t('act.approach'),idle:this.t('act.idle')};
     // Travel: walk only; bubble + gesture/clip land on arrival (see tick + pendingArrive).
     if(moving)this.pendingArrive.set(id,{bubble:intent.bubble??'',interaction});
     else this.pendingArrive.delete(id);
-    this.state.bodies[id]={pose:moving?(point!.x>current.x?'walk-right':'walk-left'):after,emotion:intent.emotion??({shy:'shy',sad:'sad',celebrate:'happy',jump:'happy',think:'curious'} as Record<string,Emotion>)[intent.action]??'neutral',until:now+travel+duration,label:labels[intent.action],bubble:moving?'':(intent.bubble??''),interaction:moving?undefined:interaction};
+    this.state.bodies[id]={target:charTarget,pose:moving?(point!.x>current.x?'walk-right':'walk-left'):after,emotion:intent.emotion??({shy:'shy',sad:'sad',celebrate:'happy',jump:'happy',think:'curious'} as Record<string,Emotion>)[intent.action]??'neutral',until:now+travel+duration,label:labels[intent.action],bubble:moving?'':(intent.bubble??''),interaction:moving?undefined:interaction};
     const pet=this.state.pets[id];const other=target?ids.find(other=>other===target||byId[other].name.toLowerCase()===target!.toLowerCase()):undefined;
     if(pet&&moving&&this.state.room.wandering&&this.state.presentation.desktopMode==='free'){const progress=this.state.desktopMoves[id];const t=progress?Math.max(0,Math.min(1,(now-progress.startedAt)/(progress.arrivesAt-progress.startedAt))):1;const from=progress?{x:progress.from.x+(progress.to.x-progress.from.x)*t,y:progress.from.y+(progress.to.y-progress.from.y)*t}:{x:pet.x,y:pet.y};const destination=other?this.state.pets[other]:undefined;let x=from.x+(this.lifeIndex%2?0.07:-0.07),y=from.y;if(destination&&destination.displayId===pet.displayId){x=from.x+Math.max(-.22,Math.min(.22,destination.x+(from.x<destination.x?-.08:.08)-from.x));y=destination.y;}const to={x:Math.max(.02,Math.min(.95,x)),y:Math.max(.05,Math.min(.98,y))};const duration=Math.max(1000,Math.abs(to.x-from.x)*22000);this.state.desktopMoves[id]={from,to,startedAt:now,arrivesAt:now+duration,displayId:pet.displayId};this.state.bodies[id].until=Math.max(this.state.bodies[id].until,now+duration+2000);}
     this.state.room.log.unshift({id:crypto.randomUUID(),actor:id,text:`${labels[intent.action]}${target?` · ${targetDescription(target,this.state.room.furniture)}`:''}`,at:now,source});this.state.room.log=this.state.room.log.slice(0,35);this.publish();
@@ -202,8 +236,8 @@ export class GardenEngine {
       }
       return;
     }
-    const asset = cgAssetForCompletedJob(job);
-    if (asset&&this.eventCgReady(asset)&&this.startCgSession(asset, 'room',false,true))this.lastEventCgAt=Date.now();
+    const asset = job.cgAsset??cgAssetForCompletedJob(job);
+    if (asset&&this.eventCgReady(asset)&&this.startCgSession(asset,this.state.presentation.surface==='desktop'?'desktop':'room',false,true))this.lastEventCgAt=Date.now();
   }
   private eventCgReady(asset:CgAssetId){return allowsEventCg(this.state,asset)&&this.cgCastPresent(asset)&&Date.now()-this.lastEventCgAt>=120000&&!this.state.cgSession;}
   private cancelPrivateVisit(id: CharacterId) {
@@ -238,8 +272,8 @@ export class GardenEngine {
     return Math.max(bodyUntil, arrive, desk);
   }
   private queueJob(
-    meta: { id: string; source: string; priority: ScenePriority; cast: CharacterId[]; reward?: SceneReward },
-    steps: { at: number; actor: CharacterId; intent: AvatarIntent; speech?: string }[],
+    meta: { id: string; source: string; priority: ScenePriority; cast: CharacterId[]; reward?: SceneReward; cgAsset?:CgAssetId },
+    steps: SceneStep[],
     now = Date.now(),
   ) {
     const present = presentCast(this.state);
@@ -271,6 +305,7 @@ export class GardenEngine {
     for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
   }
   private playSocial(id:string,now=Date.now()) {
+    if(this.state.settings.mode==='api'){this.nextSocial=now+180000;void this.reactHouse('autonomous',undefined,{text:id});return;}
     const story=socialScenes.find(s=>s.id===id);const speak=speakingCast(this.state);
     if(!story||story.cast.some(actor=>!speak.includes(actor)))return;
     const loc=localizedScene(this.locale(),id);
@@ -279,6 +314,7 @@ export class GardenEngine {
     this.nextRoomLife=now+steps.length*4200+60000;this.nextSocial=now+steps.length*4200+180000;
   }
   private playYuri(id:string,now=Date.now()) {
+    if(this.state.settings.mode==='api'){this.nextSocial=now+180000;if(this.state.settings.pairRomance!==false)void this.reactHouse('autonomous',undefined,{text:id});return;}
     if(this.state.settings.pairRomance===false)return;
     const story = yuriScenes.find(s => s.id === id);
     if (!story || story.pair.some(actor => !speakingCast(this.state).includes(actor))) return;
@@ -391,12 +427,13 @@ export class GardenEngine {
         }
         if (/记住[：:，, ]|remember[:：, ]/i.test(text)) { const memory = text.split(/记住[：:，, ]|remember[:：, ]/i).slice(1).join('').trim(); if (memory) await this.dispatch({ type: 'remember', text: memory }); }
         if (this.state.settings.mode === 'api' && (!this.generate || !this.state.settings.model)) { this.add('system', this.t('sys.needApi'), 'error'); return; }
+        if(this.state.settings.mode==='api'&&this.houseGenerate){await this.reactHouse('message',action.target,{text});return;}
         await this.sequence(selected.map((speaker, i) => ({ speaker, text: demoReply(speaker, text, this.state.settings.intimacy, i, this.locale()) })), this.state.settings.mode === 'api', text); return;
       }
       case 'presentation': {const p=action.patch;if(p.desktopMode==='dock'||p.desktopMode==='free'){this.freezeRoom();this.state.presentation.desktopMode=p.desktopMode;}if(p.chatForm==='portrait'||p.chatForm==='chibi')this.state.presentation.chatForm=p.chatForm;break;}
       case 'select': if (ids.includes(action.id)) this.state.selected = action.id; break;
-      case 'trip': {if(!ids.includes(action.id))return;this.perform(action.id,{action:'sad',emotion:'sad',bubble:tripLine(this.locale()),duration:9},'local',Date.now(),{kind:'trip',startedAt:Date.now()});return;}
-      case 'pat': {if(!ids.includes(action.id)||!isPresent(this.state,action.id))return;this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);applyFavor(this.state,action.id,0);this.perform(action.id,{action:'shy',emotion:'happy',bubble:patLine(this.locale(),action.id),duration:7},'local',Date.now(),{kind:'pat',startedAt:Date.now()});this.queueRivalryEscalation(action.id);return;}
+      case 'trip': {if(!ids.includes(action.id)||!isPresent(this.state,action.id))return;this.perform(action.id,{action:'sad',emotion:'sad',bubble:this.state.settings.mode==='api'?'':tripLine(this.locale()),duration:9},'local',Date.now(),{kind:'trip',startedAt:Date.now()});if(this.state.settings.mode==='api')await this.reactHouse('trip',action.id);return;}
+      case 'pat': {if(!ids.includes(action.id)||!isPresent(this.state,action.id))return;this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);applyFavor(this.state,action.id,0);this.perform(action.id,{action:'shy',emotion:'happy',bubble:this.state.settings.mode==='api'?'':patLine(this.locale(),action.id),duration:7},'local',Date.now(),{kind:'pat',startedAt:Date.now()});if(this.state.settings.mode==='api'){await this.reactHouse('pat',action.id);return;}this.queueRivalryEscalation(action.id);return;}
       case 'feed': {
         if(!ids.includes(action.id)||!isPresent(this.state,action.id)||!['rice','cake','fish','tea'].includes(action.food))return;
         const name=this.t('food.'+action.food);
@@ -404,7 +441,8 @@ export class GardenEngine {
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+(favorite?4:2));
         applyFavor(this.state,action.id,0);
         const now=Date.now();
-        this.perform(action.id,{action:'eat',emotion:'happy',bubble:feedLine(this.locale(),action.id,action.food,name,this.state.relationship.address),duration:8},'local',now,{kind:'feed',startedAt:now,food:action.food});
+        this.perform(action.id,{action:'eat',emotion:'happy',bubble:this.state.settings.mode==='api'?'':feedLine(this.locale(),action.id,action.food,name,this.state.relationship.address),duration:8},'local',now,{kind:'feed',startedAt:now,food:action.food});
+        if(this.state.settings.mode==='api'){await this.reactHouse('feed',action.id,{food:action.food});return;}
         const partner=cpPartner(action.id);
         if(isSpeaking(this.state,partner)&&bondOf(this.state.bonds,action.id,partner)>=40){
           const share=shareSnackBubble(this.state.settings.pairTone??'warm',action.id,partner,name);
@@ -413,7 +451,7 @@ export class GardenEngine {
         this.queueRivalryEscalation(action.id,now);
         return;
       }
-      case 'hover': {if(!ids.includes(action.id)||this.state.settings.dnd||!this.state.settings.autonomous)return;const now=Date.now();if(now-(this.hovered[action.id]??0)<90000||now-this.lastGreeting<15000)return;this.hovered[action.id]=now;this.lastGreeting=now;this.perform(action.id,{action:'wave',emotion:'happy',bubble:hoverLine(this.locale(),this.state.relationship.address,byId[action.id].name),duration:6});return;}
+      case 'hover': {if(!ids.includes(action.id)||this.state.settings.dnd||!this.state.settings.autonomous)return;const now=Date.now();if(now-(this.hovered[action.id]??0)<90000||now-this.lastGreeting<15000)return;this.hovered[action.id]=now;this.lastGreeting=now;if(this.state.settings.mode==='api'){if(!this.state.busy)await this.reactHouse('hover',action.id);return;}this.perform(action.id,{action:'wave',emotion:'happy',bubble:hoverLine(this.locale(),this.state.relationship.address,byId[action.id].name),duration:6});return;}
       case 'reminder': {if(action.operation==='remove')this.state.reminders=this.state.reminders.filter(r=>r.id!==action.id);else if(action.operation==='toggle'){const r=this.state.reminders.find(r=>r.id===action.id);if(r){r.enabled=!r.enabled;r.nextAt=Date.now()+r.intervalMinutes*60000;}}else if(typeof action.text==='string'&&action.text.trim()&&Number.isFinite(action.intervalMinutes)&&action.intervalMinutes!>=1&&action.intervalMinutes!<=1440&&this.state.reminders.length<12)this.state.reminders.push({id:crypto.randomUUID(),text:action.text.trim().slice(0,120),intervalMinutes:action.intervalMinutes!,nextAt:Date.now()+action.intervalMinutes!*60000,enabled:true});break;}
       case 'relationship': {if(!['friend','pet','romance'].includes(action.mode))return;this.state.relationship={mode:action.mode,userName:String(action.userName).slice(0,30),address:String(action.address).slice(0,30)};if(this.pendingCg?.automatic&&!allowsEventCg(this.state,this.pendingCg.asset))this.cancelScenes('relationship-change');break;}
       case 'private-open': {
@@ -431,6 +469,7 @@ export class GardenEngine {
         this.privateOpened={id:action.id,at:now};
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+2);
         const address=this.state.relationship.address||(this.locale()==='en'?'you':this.locale()==='ja'?'あなた':'你');
+        if(this.state.settings.mode==='api'){applyFavor(this.state,action.id,0);this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'chat',startedAt:now});await this.reactHouse('private-open',action.id,{privateGreeting:true});return;}
         const greeting=privateGreeting(this.locale(),action.id,address);
         applyFavor(this.state,action.id,0);
         this.perform(action.id,{action:'celebrate',emotion:'happy',bubble:greeting.slice(0,52),duration:9},'local',now,{kind:'chat',startedAt:now});
@@ -458,6 +497,7 @@ export class GardenEngine {
         }
         visit.settled=true;
         this.privateVisits.set(action.id,visit);
+        if(this.state.settings.mode==='api'){this.privateOpened=null;await this.reactHouse('private-return',action.id);return;}
         const rivals=choseHerRivals(this.state,action.id);
         const line=privateReturnLine(action.id,rivals,this.state.companionEvents,this.state.settings.pairTone??'warm');
         this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
@@ -467,6 +507,7 @@ export class GardenEngine {
         this.publish();return;
       }
       case 'companion-story': {
+        if(this.state.settings.mode==='api'){await this.reactHouse('story',action.favored,{text:action.id});return;}
         const now=Date.now();
         if(action.id==='chose-her-return'){
           await this.dispatch({type:'private-return',id:action.favored&&ids.includes(action.favored)?action.favored:this.state.selected});
@@ -519,6 +560,7 @@ export class GardenEngine {
       case 'companion-visit': {
         if(!ids.includes(action.id)||!ids.includes(action.target)||action.id===action.target)throw new Error('Invalid companion');
         if(!isPresent(this.state,action.id)||!isPresent(this.state,action.target))throw new Error(this.t('cast.needInvite',{name:byId[!isPresent(this.state,action.id)?action.id:action.target].name}));
+        if(this.state.settings.mode==='api'){await this.reactHouse('visit',action.id,{target:action.target});return;}
         const now=Date.now();
         const fromLine=localizedProfile(this.locale(),action.id).response;
         const toLine=localizedProfile(this.locale(),action.target).response;
@@ -586,6 +628,7 @@ export class GardenEngine {
         this.stop(); this.state.selected = action.id; this.state.affection[action.id] = Math.min(100, this.state.affection[action.id] + 3);
         applyFavor(this.state, action.id, 0);
         this.add('user', praiseUserLine(this.locale(), byId[action.id].name));
+        if(this.state.settings.mode==='api'){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});await this.reactHouse('praise',action.id);return;}
         {const round=this.epoch;await this.sequence(praiseLines(action.id, this.state.settings.intimacy, this.locale()));
         // sequence starts and finishes one round; a newer request cancels this reaction.
         if(this.epoch===round+2){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});this.queueRivalryEscalation(action.id,now);const asset=affectionCgFor(action.id);if(asset&&this.eventCgReady(asset))this.beginCgMeetThenPlay(asset,'room',true,7000);}}return;
@@ -666,6 +709,7 @@ export class GardenEngine {
         if (!owner) { this.add('system', this.t('sys.focusNeedMember')); return; }
         this.stop(); this.state.focus = { id: crypto.randomUUID(), endAt: Date.now() + action.minutes * 60_000, minutes: action.minutes, owner };
         this.add('system', this.t('sys.focusStart', { minutes: action.minutes, name: byId[owner].name }));
+        if(this.state.settings.mode==='api'){await this.reactHouse('focus-start',owner,{text:String(action.minutes)});return;}
         {const focus=focusDialogue(this.locale());await this.sequence([
           { speaker: owner, text: focus.owner(action.minutes) },
           ...active.filter(id => id !== owner).slice(0, 1).map(speaker => ({ speaker, text: speaker === 'xia' ? focus.xia() : focus.other() })),
@@ -758,8 +802,10 @@ export class GardenEngine {
       const runnable=isPresent(this.state,item.actor)&&(!tgt||isPresent(this.state,tgt))&&isSpeaking(this.state,item.actor)&&(!tgt||isSpeaking(this.state,tgt));
       if(!runnable){this.director.failEssential();due=[];break;}
       try{
-        this.perform(item.actor,item.intent,'local',now);
-        if(item.speech)this.add(item.actor,item.speech);
+        const body=this.state.bodies[item.actor];
+        if(item.preserveReaction&&body.interaction&&body.until>now){body.bubble=item.speech?.slice(0,55)??'';body.emotion=item.intent.emotion??body.emotion;}
+        else this.perform(item.actor,item.intent,item.origin?.backend==='model'?'model':'local',now);
+        if(item.speech){if(item.channel)this.addPrivate(item.channel,item.actor,item.speech,item.origin);else this.add(item.actor,item.speech,undefined,item.origin);}
         this.director.noteOwnedEnd(this.ownedEndFor(item.actor));
       }catch{this.director.failEssential();due=[];break;}
     }
@@ -799,12 +845,12 @@ export class GardenEngine {
       for (const id of ids) { this.state.mood[id] = 'idle'; this.state.affection[id] = Math.min(100, this.state.affection[id] + 1); }
       this.state.activity = this.t('sys.focusDone');
       this.add('system', this.t('sys.focusEnded', { minutes: task.minutes }));
-      if (!this.state.settings.dnd && isSpeaking(this.state, task.owner)) this.add(task.owner, this.t('sys.focusOwnerDone'));
+      if (!this.state.settings.dnd && isSpeaking(this.state, task.owner)){if(this.state.settings.mode==='api')void this.reactHouse('focus-finished',task.owner,{text:String(task.minutes)});else this.add(task.owner,this.t('sys.focusOwnerDone'));}
       return;
     }
     if (this.state.settings.dnd || !this.state.settings.autonomous || this.state.focus || this.state.busy || now < this.nextAutonomous || now - this.lastInteraction < 120_000) return;
     this.nextAutonomous = now + 10 * 60_000;
     const speaker = speakingCast(this.state)[0];
-    if (speaker) this.add(speaker, this.t('sys.idleNudge'));
+    if(speaker){if(this.state.settings.mode==='api')void this.reactHouse('autonomous',undefined);else this.add(speaker,this.t('sys.idleNudge'));}
   }
 }

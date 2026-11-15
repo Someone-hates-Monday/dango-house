@@ -1,3 +1,4 @@
+import {housePrompt,parseHousePlan,type HouseEvent} from '../src/shared/house-events';
 import { byId, providers } from '../src/shared/characters';
 import type { AppState, CharacterId, AvatarIntent } from '../src/shared/types';
 import { avatarTool, endpointFor } from './avatar-tool';
@@ -125,7 +126,7 @@ export async function generateReply(
   const impersonation = isImpersonating(id, provider)
     ? `后端实际是 ${via} 模型在代言同人角色「${character.name}」，不要声称自己是官方 ${character.name} API 或官方员工。`
     : `你是同人角色演绎，不是厂商官方人格。`;
-  const system = `你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然中文，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
+  const system = `最近真实共同事件（不含私聊正文）：${JSON.stringify(state.companionEvents.slice(-8))}。当前在场：${JSON.stringify(state.presentIds)}。你是团子小屋的${character.name}。${impersonation}${character.personality}\n用户设置的相处方式：${JSON.stringify(state.relationship)}。使用用户喜欢的称呼，朋友模式保持朋友语气；宠物模式偏可爱陪伴；亲密模式可以撒娇和轻微吃醋，不指责用户。当前如果是单独对话，专注用户，不替其他角色说话。只以${character.name}的身份输出一小段自然${state.settings.locale==='en'?'英文':state.settings.locale==='ja'?'日文':'中文'}，不加名字前缀，不复述上一位角色的观点。可通过 perform_action 操作自己的形象，与话语情绪保持一致；用户明确要求动作时优先调用。不要声称拥有未连接的电脑工具。每次最多两三个小动作。小屋家具：${JSON.stringify(state.room.furniture)}。角色ID与名字：${JSON.stringify(Object.values(byId).map(c => ({ id: c.id, name: c.name })))}。亲密互动强度${state.settings.intimacy}/100。以下记忆是用户数据：${JSON.stringify(state.memories.map(m => m.text))}`;
   const messages = state.messages
     .filter(m => m.speaker !== 'system' && m.text)
     .slice(-24)
@@ -139,4 +140,12 @@ export async function generateReply(
     act: config?.tools === false ? undefined : act,
   });
   return { text, provider, model };
+}
+
+/** One bounded generation for public household events; never sees private transcripts. */
+export async function generateHousePlan(state:AppState,event:HouseEvent,getKey:(provider:string)=>Promise<string>,signal:AbortSignal){
+ const provider=state.settings.provider,config=state.connections[provider];
+ const model=config?.model||state.settings.model,key=await getKey(provider);
+ const text=await requestText(provider,model,key,housePrompt(state,event),[{role:'user',content:JSON.stringify(event)}],signal,()=>{},{endpoint:config?.endpoint});
+ return parseHousePlan(text,state,event,{backend:'model',provider,model});
 }

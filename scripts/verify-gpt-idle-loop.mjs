@@ -1,16 +1,18 @@
 import {_electron as electron} from 'playwright';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 const out=path.resolve('test-results/review-2026-11-14');fs.mkdirSync(out,{recursive:true});
 const env={...process.env,GARDEN_TEST_DATA:path.join(out,`idle-profile-${Date.now()}`)};delete env.ELECTRON_RUN_AS_NODE;
+const houseMode=process.argv.includes('--house');if(houseMode)env.GARDEN_TEST_HOUSE='1';
 const packaged=process.argv.includes('--packaged');
 const version=JSON.parse(fs.readFileSync('package.json','utf8')).version;
 const app=await electron.launch({...(packaged?{executablePath:path.resolve(`release/v${version}/win-unpacked/团子小屋.exe`)}:{}),args:packaged?[`--user-data-dir=${env.GARDEN_TEST_DATA}`]:[process.cwd()],env});const report={success:false,packaged,samples:0,wraps:0,errors:[]};
 try{
  await app.firstWindow();let main;
- for(let i=0;i<100&&!main;i++){main=app.windows().find(p=>p.url().includes('view=chat'));if(!main)await new Promise(r=>setTimeout(r,100));}
+ for(let i=0;i<100&&!main;i++){main=app.windows().find(p=>p.url().includes(houseMode?'view=house':'view=chat'));if(!main)await new Promise(r=>setTimeout(r,100));}
  assert.ok(main);await main.evaluate(async()=>{await window.garden.dispatch({type:'settings',patch:{autonomous:false}});await window.garden.dispatch({type:'room-settings',patch:{autonomous:false,wandering:false}});});
- const selector='.room-character[data-character=shiori] .reaction-video-sprite';
+ const selector=(houseMode?'.house-resident':'.room-character')+'[data-character=shiori] .reaction-video-sprite';
  await main.waitForFunction(s=>document.querySelector(s)?.dataset.clip==='idle',selector);
- assert.equal(await main.locator('.profile .version').innerText(),`v${version}`,'visible version must match the package');
+ if(!houseMode)assert.equal(await main.locator('.profile .version').innerText(),`v${version}`,'visible version must match the package');
+ if(houseMode)assert.equal(await main.locator('.house-resident[data-character=shiori] .rig-inner').count(),0,'standing GPT must never mount alternate rig art');
  const duration=await main.locator(selector+' video.cast-idle-video').evaluate(v=>v.duration);
  assert.ok(Math.abs(duration-225/24)<.002,`encoded duration ${duration}: manifest alone cannot prove frame count`);
  const result=await main.evaluate(async s=>{

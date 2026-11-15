@@ -1,5 +1,11 @@
 # 运行截图 / Runtime screenshots
 
+## 2026-11-15 · 0.5.0-alpha.1 mini house
+
+`mini-house-050.png`：`scripts/verify-mini-house.mjs --packaged` 拍摄的透明迷你小屋，隔离离线存档；无用户聊天、凭证或真实 API 请求。未拼贴角色或重绘界面。
+
+`mini-house-050.png`: transparent mini house captured by the packaged verification script with an isolated offline profile. No personal chats, keys, live API calls, composited residents or repainted UI. Artwork retains existing terms.
+
 2026-10-30，Windows，v0.3.7。通过 `scripts/capture-showcase.mjs` 启动真实便携应用，使用全新离线存档拍摄；没有用户聊天、凭证或真实 API 请求。截图未合成角色、对白或交互效果。  
 Captured on Windows with v0.3.7 on 2026-10-30 using `scripts/capture-showcase.mjs`, a real packaged app, and a fresh offline profile. No user chats, credentials, or live API requests. Characters, dialogue, and effects were not composited.
 

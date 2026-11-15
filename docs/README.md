@@ -6,6 +6,9 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [迷你小屋与统一 AI 互动：实现与验收 0.5.0-alpha.1](MINI-HOUSE-IMPLEMENTATION-DRAFT.zh-CN.md) · [English](MINI-HOUSE-IMPLEMENTATION-DRAFT.en.md)
+- [迷你小屋实测记录与接手](MINI-HOUSE-ACCEPTANCE.zh-CN.md) · [English](MINI-HOUSE-ACCEPTANCE.en.md)
+
 - [模型 ID 填写与设置页易读性：0.4.0-alpha.6](SETTINGS-MODEL-GUIDE.zh-CN.md) · [English](SETTINGS-MODEL-GUIDE.en.md)
 
 - [11 月 15 日阶段收尾与接手约束：0.4.0-alpha.5](PHASE-CLOSEOUT-2026-11-15.zh-CN.md) · [English](PHASE-CLOSEOUT-2026-11-15.en.md) · [GPT 错误尾帧根因](GPT-IDENTITY-INVESTIGATION-2026-11-15.md)

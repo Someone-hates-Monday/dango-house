@@ -47,13 +47,13 @@ export function CGMoment({state,host,primary=true}:{state:AppState;host:'room'|'
  const[collapsed,setCollapsed]=useState(false),[failed,setFailed]=useState(false),[forced,setForced]=useState(false);
  const[anchor,setAnchor]=useState<CSSProperties|{display:'none'}>({display:'none'});
  const[space,setSpace]=useState<'pending'|'ok'|'tight'>('pending');
- const eligible=!!session&&session.host===host&&(host!=='desktop'||primary);
+ const eligible=!!session&&session.host===host&&(host!=='desktop'||primary)&&(host!=='room'||state.presentation.surface!=='house');
  const owns=useSessionOwner(session?.id,eligible);
  const visible=eligible&&owns;
  const dismiss=()=>{if(session)void window.garden.dispatch({type:'cg-dismiss',sessionId:session.id});};
  const complete=(outcome:'ended'|'failed')=>{if(session)void window.garden.dispatch({type:'cg-complete',sessionId:session.id,outcome});};
  useEffect(()=>{setCollapsed(false);setFailed(false);setForced(false);setSpace('pending');setAnchor({display:'none'});},[session?.id]);
- useEffect(()=>{if(!visible)return;const key=(event:KeyboardEvent)=>{if(event.key==='Escape')dismiss();};const hide=()=>{if(document.hidden)dismiss();};document.addEventListener('keydown',key);document.addEventListener('visibilitychange',hide);return()=>{document.removeEventListener('keydown',key);document.removeEventListener('visibilitychange',hide);};},[visible,session?.id]);
+ useEffect(()=>{if(!visible)return;const key=(event:KeyboardEvent)=>{if(event.key==='Escape')dismiss();};const hide=()=>{if(document.hidden)video.current?.pause();};document.addEventListener('keydown',key);document.addEventListener('visibilitychange',hide);return()=>{document.removeEventListener('keydown',key);document.removeEventListener('visibilitychange',hide);};},[visible,session?.id]);
  useEffect(()=>{if(collapsed)video.current?.pause();else if(visible&&space==='ok')void video.current?.play().catch(()=>{});},[collapsed,visible,space]);
  useLayoutEffect(()=>{
   if(!visible||collapsed||!clip)return;

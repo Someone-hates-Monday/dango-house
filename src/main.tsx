@@ -1,3 +1,4 @@
+import {MiniHouse} from './MiniHouse';
 import {PortraitSprite} from './PortraitSprite';
 import {appVersion} from './shared/version';
 import {CGMoment} from './CGMoment';
@@ -45,7 +46,8 @@ function Toggle({ value, onChange, label }: { value: boolean; onChange: () => vo
 const dispatch = (action: Action) => void window.garden.dispatch(action);
 function App() {
   const { state, error } = useGarden();
-  const [page, setPage] = useState('room');
+  const [page, setPage] = useState(new URLSearchParams(location.search).get('view')==='settings'?'settings':'room');
+  useEffect(()=>window.garden.onPage?.(setPage),[]);
   const { t } = useI18n(state);
   if (!state) return <div className="loading"><Sprout size={32} /><p>{error || t('app.loading')}</p></div>;
   const selected = byId[state.selected];
@@ -55,8 +57,8 @@ function App() {
     <aside className="sidebar">
       <div className="brand"><img src="./icon.png" alt={t('brand.name')} /><div><strong>{t('brand.name')}</strong><span>{t('brand.sub')}</span></div></div>
       <div className="workspace-label">{t('brand.workspace')} <span>01</span></div>
-      <nav><button className={page === 'room' ? 'active' : ''} onClick={() => setPage('room')}><Heart size={19} />{t('nav.room')}<span className="nav-count">{t('nav.new')}</span></button>
-        <button className={page === 'chat' ? 'active' : ''} onClick={() => setPage('chat')}><MessageCircle size={19} />{t('nav.chat')}<span className="nav-count">{characters.length}</span></button>
+      <nav><button className={page === 'room' ? 'active' : ''} onClick={() => window.garden.window('show-house')}><Heart size={19} />{t('nav.room')}<span className="nav-count">{t('nav.new')}</span></button>
+        <button className={page === 'chat' ? 'active' : ''} onClick={() => window.garden.window('show-house')}><MessageCircle size={19} />{t('nav.chat')}<span className="nav-count">{characters.length}</span></button>
         <button className={page === 'watch' ? 'active' : ''} onClick={() => setPage('watch')}><Clapperboard size={19} />{t('nav.watch')}{state.agent?.tasks.some(task => task.status === 'running' || task.status === 'paused') && <span className="nav-count">·</span>}</button>
         <button className={page === 'characters' ? 'active' : ''} onClick={() => setPage('characters')}><Users size={19} />{t('nav.characters')}</button>
         <button className={page === 'memories' ? 'active' : ''} onClick={() => setPage('memories')}><BookOpen size={19} />{t('nav.memories')}{state.memories.length > 0 && <span className="nav-count">{state.memories.length}</span>}</button>
@@ -161,8 +163,10 @@ function Pets() {
     return () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
   }, []);
   if (!state) return null;
+  if(!state.settings.petsVisible)return null;
   return <div className="pet-overlay"><DesktopCast state={state} displayId={displayId} primary={primary}/><CGMoment state={state} host="desktop" primary={primary}/></div>;
 }
 function PrivateWindow(){const {state,error}=useGarden();const id=new URLSearchParams(location.search).get('character') as CharacterId;const locale=state?.settings.locale??'zh-CN';const loading=translate(locale,'private.loading');return state&&byId[id]?<PrivateChat state={state} id={id}/>:<div className="loading">{error||loading}</div>;}
+function HouseApp(){const {state,error}=useGarden();return state?<MiniHouse state={state}/>:<div className='loading'>{error||'…'}</div>;}
 const view = new URLSearchParams(location.search).get('view');
-createRoot(document.getElementById('root')!).render(<React.StrictMode>{view === 'pets' ? <Pets/> : view === 'private' ? <PrivateWindow/> : <App/>}</React.StrictMode>);
+createRoot(document.getElementById('root')!).render(<React.StrictMode>{view==='house'?<HouseApp/>:view === 'pets' ? <Pets/> : view === 'private' ? <PrivateWindow/> : <App/>}</React.StrictMode>);

@@ -1,4 +1,4 @@
-import type { AvatarIntent, CharacterId } from './types';
+import type { AvatarIntent, CharacterId, CgAssetId, ReplyOrigin } from './types';
 import type { CompanionEventKind } from './events';
 
 export type ScenePriority = 'user' | 'reaction' | 'idle';
@@ -8,6 +8,9 @@ export interface SceneStep {
   actor: CharacterId;
   intent: AvatarIntent;
   speech?: string;
+  channel?:CharacterId;
+  origin?:ReplyOrigin;
+  preserveReaction?:boolean;
 }
 
 export interface SceneReward {
@@ -20,6 +23,7 @@ export interface SceneReward {
 }
 
 export interface SceneJob {
+  cgAsset?:CgAssetId;
   id: string;
   cast: CharacterId[];
   source: string;

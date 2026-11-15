@@ -1,9 +1,10 @@
+import {HouseWindowController} from './house-window';
 import { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, globalShortcut, safeStorage, dialog } from 'electron';
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { GardenEngine } from './engine';
-import { generateReply, requestText } from './provider';
+import { generateReply, generateHousePlan, requestText } from './provider';
 import { restoreState } from '../src/shared/director';
 import { providers } from '../src/shared/characters';
 import { ids } from '../src/shared/director';
@@ -26,6 +27,7 @@ app.setName('Qiting');
 const single = app.requestSingleInstanceLock();
 if (!single) app.quit();
 let mainWindow: BrowserWindow;
+let houseWindow:HouseWindowController;
 let tray: Tray;
 let quitting = false;
 let database: DatabaseSync;
@@ -63,7 +65,9 @@ function broadcast(state: AppState) {
   }
   clearTimeout(saveTimer); saveTimer = setTimeout(persist, 300);
 }
-function showChat() { if (mainWindow.isMinimized()) mainWindow.restore(); mainWindow.show(); mainWindow.focus(); }
+function showChat() {if(houseWindow)houseWindow.window.hide();if(engine){engine.state.presentation.surface='workbench';engine.publish();}if(mainWindow.isMinimized())mainWindow.restore();mainWindow.show();mainWindow.focus();}
+function showHouse(){if(!houseWindow)return;engine.state.presentation.surface='house';engine.state.settings.petsVisible=false;engine.state.room.wandering=false;engine.publish();mainWindow.hide();houseWindow.show();}
+function showSettings(){showChat();const go=()=>mainWindow.webContents.send('garden:page','settings');if(mainWindow.webContents.isLoadingMainFrame())mainWindow.webContents.once('did-finish-load',go);else go();}
 function openPrivate(id:CharacterId){if(!ids.includes(id))return;void engine.dispatch({type:'private-open',id});const existing=privateWindows.get(id);if(existing&&!existing.isDestroyed()){existing.show();existing.focus();return;}const work=screen.getPrimaryDisplay().workArea;const win=new BrowserWindow({width:470,height:650,minWidth:400,minHeight:480,x:work.x+work.width-490,y:work.y+Math.max(10,work.height-690),frame:false,title:'团子小屋 · 专属聊天',backgroundColor:'#fff8fc',webPreferences:{preload,contextIsolation:true,nodeIntegration:false,sandbox:true}});secure(win);privateWindows.set(id,win);load(win,'private',undefined,id);win.on('closed',()=>{privateWindows.delete(id);void engine.dispatch({type:'private-return',id});});}
 function createOverlay(displayId: number) {
   const display = screen.getAllDisplays().find(d => d.id === displayId); if (!display) return;
@@ -146,7 +150,7 @@ if (single) app.whenReady().then(async () => {
         }),
         'notice',
       );
-    }),
+    }),650,(state,event,signal)=>generateHousePlan(state,event,getKey,signal),
   );
   const mediaCache = path.join(app.getPath('userData'), 'media-cache');
   fs.mkdirSync(mediaCache, { recursive: true });
@@ -154,24 +158,32 @@ if (single) app.whenReady().then(async () => {
   applyBridgePatch(app.getPath('userData'), { enabled: !!engine.state.settings.agentBridge });
   try { await syncBridgeFromDisk(); } catch (error) { console.warn('Agent Bridge failed to start:', error); }
   for(const [index,id]of ids.entries()){const p=engine.state.pets[id];if(!p||!screen.getAllDisplays().some(d=>d.id===p.displayId))engine.state.pets[id]={x:.08+index*.13,y:.96,displayId:screen.getPrimaryDisplay().id};}
+  const legacyTest=!!process.env.GARDEN_TEST_DATA&&!process.env.GARDEN_TEST_HOUSE;
   mainWindow = new BrowserWindow({ width: 1280, height: 860, minWidth: 1000, minHeight: 700, frame: false, backgroundColor: '#f7f5f0', title: '团子小屋 · 桌面伙伴', show: false, webPreferences: { preload, contextIsolation: true, nodeIntegration: false, sandbox: true } });
-  secure(mainWindow); load(mainWindow, 'chat');
-  mainWindow.once('ready-to-show', () => mainWindow.show());
+  secure(mainWindow); load(mainWindow,legacyTest?'chat':'settings');
+  if(!saved?.data&&!legacyTest){engine.state.presentIds=['xia','rin','shiori'];engine.state.settings.castPreset='core';engine.state.messages=engine.state.messages.filter(m=>m.speaker==='system');}
+  houseWindow=new HouseWindowController(preload,path.join(app.getPath('userData'),'house-window.json'),()=>engine.state.presentIds.length);
+  secure(houseWindow.window);load(houseWindow.window,'house');
+  houseWindow.window.on('hide',()=>engine.setHouseVisible(false));houseWindow.window.on('minimize',()=>engine.setHouseVisible(false));houseWindow.window.on('show',()=>engine.setHouseVisible(true));houseWindow.window.on('restore',()=>engine.setHouseVisible(true));
+  houseWindow.window.on('close',event=>{if(!quitting){event.preventDefault();houseWindow.window.hide();}});
+  if(legacyTest){engine.state.presentation.surface='workbench';mainWindow.once('ready-to-show',()=>mainWindow.show());}
+  else{engine.state.presentation.surface='house';engine.state.room.wandering=false;engine.state.settings.petsVisible=false;houseWindow.window.once('ready-to-show',showHouse);}
   mainWindow.on('close', event => { if (!quitting) { event.preventDefault(); mainWindow.hide(); } });
   for (const display of screen.getAllDisplays()) createOverlay(display.id);
   screen.on('display-added', (_event, display) => createOverlay(display.id));
-  screen.on('display-removed', (_event, display) => overlays.get(display.id)?.close());
-  screen.on('display-metrics-changed', (_event, display) => overlays.get(display.id)?.setBounds(display.workArea));
+  screen.on('display-removed', (_event, display) => {overlays.get(display.id)?.close();houseWindow?.current();});
+  screen.on('display-metrics-changed', (_event, display) => {overlays.get(display.id)?.setBounds(display.workArea);houseWindow?.current();});
   const icon = nativeImage.createFromPath(path.join(root, 'dist/icon.png'));
   tray = new Tray(icon); tray.setToolTip('团子小屋 · 伙伴们在等你');
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: '打开庭院', click: showChat },
+    { label: '打开迷你小屋', click: showHouse },
+    { label: '设置与高级功能', click: showSettings },
     { label: '显示 / 隐藏桌宠', click: () => void engine.dispatch({ type: 'settings', patch: { petsVisible: !engine.state.settings.petsVisible } }) },
     { label: '切换任务栏停靠 / 自由桌宠', click: () => void engine.dispatch({type:'presentation',patch:{desktopMode:engine.state.presentation.desktopMode==='dock'?'free':'dock'}}) },
     { label: '免打扰 开 / 关', click: () => void engine.dispatch({ type: 'settings', patch: { dnd: !engine.state.settings.dnd } }) },
     { type: 'separator' }, { label: '退出团子小屋', click: () => { quitting = true; app.quit(); } },
   ]));
-  tray.on('double-click', showChat);
+  tray.on('double-click', showHouse);
   globalShortcut.register('CommandOrControl+Shift+G', () => void engine.dispatch({ type: 'settings', patch: { petsVisible: !engine.state.settings.petsVisible } }));
   ipcMain.handle('garden:state', event => { if (!known(event.sender)) throw new Error('无效窗口'); return engine.state; });
   ipcMain.handle('garden:action', (event, action: Action) => {
@@ -179,28 +191,33 @@ if (single) app.whenReady().then(async () => {
     // The handler returns immediately; the engine owns cancellable turn execution.
     void engine.dispatch(action).catch(() => engine.add('system', '操作没有完成，请重试。', 'error'));
   });
+  ipcMain.handle('garden:house-layout',(event,size)=>{if(event.sender!==houseWindow.window.webContents)throw Error('Invalid house window');return size?houseWindow.layout(size):houseWindow.current();});
   ipcMain.on('garden:window', (event, command: string) => {
     if (!known(event.sender)) return;
-    if (command === 'show-chat') showChat();
+    if(command==='show-house'){showHouse();return;}
+    if(command==='show-settings'){showSettings();return;}
+    if(command==='show-desktop'){engine.state.presentation.surface='desktop';engine.state.settings.petsVisible=true;engine.publish();mainWindow.hide();houseWindow.window.hide();engine.setHouseVisible(true);return;}
+    if(command==='house-pin'&&houseWindow){houseWindow.window.setAlwaysOnTop(!houseWindow.window.isAlwaysOnTop());return;}
+    if (command === 'show-chat') showHouse();
     const sender=BrowserWindow.fromWebContents(event.sender);
     if (command === 'minimize') sender?.minimize();
-    if (command === 'close') {if(sender===mainWindow)mainWindow.hide();else sender?.close();}
+    if (command === 'close') {if(sender===mainWindow)mainWindow.hide();else if(sender===houseWindow?.window)houseWindow.window.hide();else sender?.close();}
     if (command === 'quit') { quitting = true; app.quit(); }
   });
   ipcMain.on('garden:private',(event,id:CharacterId)=>{if(known(event.sender))openPrivate(id);});
   ipcMain.on('garden:hit', (event, interactive: boolean) => {
     const window = BrowserWindow.fromWebContents(event.sender);
-    if (typeof interactive === 'boolean' && window && [...overlays.values()].includes(window)) window.setIgnoreMouseEvents(!interactive, { forward: true });
+    if (typeof interactive === 'boolean' && window && ([...overlays.values()].includes(window)||window===houseWindow?.window)) window.setIgnoreMouseEvents(!interactive, { forward: true });
   });
   ipcMain.handle('garden:key', async (event, provider: string, key: string) => {
-    if (event.sender !== mainWindow.webContents || !providers.some(p => p.id === provider) || typeof key !== 'string' || key.length > 4096) throw new Error('凭证输入无效');
+    if ((event.sender !== mainWindow.webContents&&event.sender!==houseWindow?.window.webContents) || !providers.some(p => p.id === provider) || typeof key !== 'string' || key.length > 4096) throw new Error('凭证输入无效');
     if (!key.trim()) delete keys[provider];
     else { if (!(await safeStorage.isAsyncEncryptionAvailable())) throw new Error('系统凭证保护暂不可用，未保存。'); keys[provider] = (await safeStorage.encryptStringAsync(key.trim())).toString('base64'); }
     const target = path.join(app.getPath('userData'), 'credentials.json'); fs.writeFileSync(`${target}.tmp`, JSON.stringify(keys)); fs.renameSync(`${target}.tmp`, target);
   });
-  ipcMain.handle('garden:keys', event => { if (event.sender !== mainWindow.webContents) return []; return Object.keys(keys); });
+  ipcMain.handle('garden:keys', event => { if (event.sender !== mainWindow.webContents&&event.sender!==houseWindow?.window.webContents) return []; return Object.keys(keys); });
   ipcMain.handle('garden:test', async (event, provider: string, model: string, endpoint?:string) => {
-    if (event.sender !== mainWindow.webContents || typeof model !== 'string' || model.length > 120 || !providers.some(p => p.id === provider)) throw new Error('连接参数无效');
+    if ((event.sender !== mainWindow.webContents&&event.sender!==houseWindow?.window.webContents) || typeof model !== 'string' || model.length > 120 || !providers.some(p => p.id === provider)) throw new Error('连接参数无效');
     try { const result = await requestText(provider, model, await getKey(provider), '请仅回复：连接成功', [{ role: 'user', content: '你好' }], new AbortController().signal, () => {},{endpoint:typeof endpoint==='string'?endpoint:undefined}); if (!result.trim()) throw new Error('没有返回文字'); return '连接成功，模型已返回文字。'; }
     catch (error) { throw new Error(error instanceof Error ? error.message : '连接失败'); }
   });
@@ -251,11 +268,12 @@ if (single) app.whenReady().then(async () => {
   });
   setInterval(() => engine.tick(), 150);
   engine.tick();
-  app.on('second-instance', showChat);
+  app.on('second-instance', showHouse);
 }).catch(error => { console.error('团子小屋启动失败：', error); app.exit(1); });
 
 app.on('window-all-closed', () => {});
 app.on('before-quit', () => {
+  houseWindow?.flush();
   quitting = true;
   if (bridgeServer) void bridgeServer.stop();
   if (engine) { engine.shutdownAgents(); engine.stop(); clearTimeout(saveTimer); persist(); }
