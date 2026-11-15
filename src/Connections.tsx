@@ -10,7 +10,7 @@ const send = (action: Action) => window.garden.dispatch(action);
 
 export function Connections({ state }: { state: AppState }) {
   const { t, locale } = useI18n(state);
-  const [provider, setProvider] = useState(['glm', 'kimi'].includes(state.settings.provider) ? state.settings.provider : 'glm');
+  const [provider, setProvider] = useState(providers.some(p=>p.id===state.settings.provider) ? state.settings.provider : 'glm');
   const current = state.connections[provider];
   const [model, setModel] = useState(current?.model ?? '');
   const [endpoint, setEndpoint] = useState(current?.endpoint ?? '');
@@ -145,7 +145,7 @@ export function Connections({ state }: { state: AppState }) {
             {locale==='en'?'Scene clips after interactions':locale==='ja'?'交流後のシーン再生':'互动后的剧情短片'} · {state.settings.cgAutoplay===false?(locale==='en'?'Off':locale==='ja'?'オフ':'关闭'):(locale==='en'?'On':locale==='ja'?'オン':'开启')}
           </button>
         </div>
-        <p className="helper">{locale==='en'?'Girl–girl affection is independent of your role. Romantic scenes toward you follow Lover mode. Manual previews remain available.':locale==='ja'?'女の子同士の親密さはあなたとの関係と別設定です。あなたへの恋愛シーンは恋人モードに従います。手動プレビューはいつでも利用できます。':'女孩之间的贴贴与你的身份分开设置；面向你的恋爱短片只在恋人模式下随互动出现。手动预览仍可查看全部片段。'}</p>
+        <p className="helper">{locale==='en'?'Girl–girl affection is independent of your role. Romantic scenes toward you follow Lover mode. Scenes appear naturally through interactions.':locale==='ja'?'女の子同士の親密さはあなたとの関係と別設定です。あなたへの恋愛シーンは恋人モードに従います。シーンは交流から自然に始まります。':'女孩之间的贴贴与你的身份分开设置；面向你的恋爱短片只在恋人模式下随互动出现。剧情会通过日常互动自然出现。'}</p>
         <div className="relationship-options">
           {(
             [
@@ -311,17 +311,24 @@ export function Connections({ state }: { state: AppState }) {
         </label>
         <label>
           {t('settings.model')}
-          <input aria-label={t('settings.model')} value={model} maxLength={120} onChange={e => setModel(e.target.value)} placeholder={t('settings.modelPh')} />
+          <input aria-label={t('settings.model')} aria-describedby="model-id-help" value={model} maxLength={120} onChange={e => setModel(e.target.value)} placeholder={provider==='deepseek'?'deepseek-flash':t('settings.modelPh')} />
         </label>
+        <p id="model-id-help" className="helper model-id-help">{t('settings.modelHelp')}{provider==='deepseek'&&<> {t('settings.deepseekHelp')}</>}</p>
+        {provider==='deepseek'&&<div className="model-presets" role="group" aria-label={t('settings.modelExamples')}>
+          <button type="button" onClick={()=>setModel('deepseek-flash')}><code>deepseek-flash</code><span>{t('settings.modelEveryday')}</span></button>
+          <button type="button" onClick={()=>setModel('deepseek-v4-pro')}><code>deepseek-v4-pro</code><span>{t('settings.modelComplex')}</span></button>
+        </div>}
         <label>
           {t('settings.key')}
           <input aria-label={t('settings.key')} type="password" autoComplete="off" value={key} onChange={e => setKey(e.target.value)} placeholder={saved.includes(provider) ? t('settings.keySaved') : t('settings.keyNew')} />
         </label>
-        <label className="tool-checkbox">
-          <input type="checkbox" checked={tools} onChange={e => setTools(e.target.checked)} />
-          {t('settings.tools')}
-        </label>
-        <p className="helper">{t('settings.toolsHint')}</p>
+        <div className="tool-option">
+          <label className="tool-checkbox">
+            <input type="checkbox" aria-describedby="avatar-tools-help" checked={tools} onChange={e => setTools(e.target.checked)} />
+            <span>{t('settings.tools')}</span>
+          </label>
+          <p id="avatar-tools-help" className="helper">{t('settings.toolsHint')}</p>
+        </div>
         <div className="connection-actions">
           <button className="pink-button" disabled={working} onClick={() => void save(false)}>
             {t('settings.save')}

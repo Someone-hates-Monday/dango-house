@@ -22,6 +22,7 @@ import './community.css';
 import './room.css';
 import './sprites.css';
 import './motion.css';
+import './settings.css';
 
 function useGarden() {
   const [state, setState] = useState<AppState | null>(null);

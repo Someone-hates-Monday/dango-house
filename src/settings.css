@@ -1,0 +1,56 @@
+/* Readable, scoped settings controls. Text inputs must not size native checkboxes. */
+.connections-page{font-size:14px;line-height:1.6;color:#705c75}
+.connections-page .settings-section{max-width:980px;padding:26px 0}
+.connections-page .settings-section h2{font-size:18px;line-height:1.4;color:#735c7a;margin-bottom:18px}
+.connections-page .settings-section label{font-size:14px;color:#795f7d;line-height:1.6}
+.connections-page .helper{font-size:13px;line-height:1.7;color:#806c86}
+.connections-page .settings-section>.helper{margin:8px 0 14px}
+.connections-page .settings-section input:not([type=checkbox]):not([type=radio]):not([type=range]),.connections-page .settings-section select{min-height:44px;font-size:15px;padding:10px 12px;line-height:1.5;color:#705c75}
+.connections-page input::placeholder{color:#917d94;opacity:1}
+.connections-page .settings-section label input[type=checkbox],.connections-page .settings-section label input[type=radio]{display:block;width:20px;height:20px;min-width:20px;flex:0 0 20px;margin:0;padding:0;accent-color:#ae7394;cursor:pointer}
+.connections-page button:not(.toggle){min-height:40px;font-size:14px;line-height:1.5;padding:9px 14px}
+.connections-page button svg{width:18px;height:18px}
+.connections-page .relationship-options{flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.connections-page .relationship-options button{gap:10px;text-align:left;color:#806686}
+.connections-page .relationship-options .selected{color:#8e5074;border-color:#bd85a7}
+.connections-page .field-pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.connections-page .field-pair>label{min-width:0}
+.connections-page .provider-tabs{gap:8px;margin-bottom:18px}
+.connections-page .provider-tabs .selected{color:#785087;border-color:#ae8ec1}
+.connections-page .connection-actions{flex-wrap:wrap;gap:10px;margin:16px 0 8px}
+.connections-page .settings-notice{font-size:14px;line-height:1.7}
+.connections-page .settings-section .tool-option{margin-top:16px}
+.connections-page .settings-section .tool-checkbox{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:44px;width:fit-content;max-width:100%;margin:0;cursor:pointer}
+.connections-page .tool-checkbox>span{flex:0 1 auto;min-width:0}
+.connections-page .tool-option>.helper{margin:2px 0 0 30px;max-width:70ch}
+.connections-page .model-id-help{margin-bottom:8px}
+.connections-page .model-presets{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.connections-page .model-presets button{display:inline-flex;align-items:center;gap:10px;border:1px solid #dfcddd;border-radius:9px;background:#fff5fb;color:#785b7d;text-align:left}
+.connections-page .model-presets code{font-size:14px}
+.connections-page .model-presets span{font-size:13px;color:#806c86}
+.connections-page .settings-section .cast-present-card{display:flex;align-items:center;gap:12px;min-height:72px;margin:0;padding:12px}
+.connections-page .cast-present-card strong{font-size:14px}
+.connections-page .cast-present-card small{font-size:13px;line-height:1.5}
+.connections-page .cast-present-card.off{opacity:1;color:#89768e}
+.connections-page .preference-row{display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:14px;align-items:center;justify-content:start;padding:14px 0}
+.connections-page .preference-row>div{grid-column:2;grid-row:1;min-width:0}
+.connections-page .preference-row>.toggle{grid-column:1;grid-row:1}
+.connections-page .preference-row strong{font-size:15px;color:#755f7c}
+.connections-page .preference-row p{font-size:13px;color:#806c86;line-height:1.7;margin-top:4px}
+.connections-page .toggle,.connections-page .toggle.on{position:relative;width:52px;height:44px;min-height:44px;flex:0 0 52px;padding:0;border:0;background:transparent}
+.connections-page .toggle::before{content:'';position:absolute;left:0;top:7px;width:52px;height:30px;background:#d9cfde;border-radius:20px;transition:background .2s}
+.connections-page .toggle.on::before{background:#ae7394}
+.connections-page .toggle span{position:absolute;left:3px;top:10px;width:24px;height:24px;border-radius:50%;background:#fffafd;transform:none;box-shadow:0 1px 3px #60436025}
+.connections-page .toggle.on span{transform:translateX(22px)}
+.connections-page .reminder-row{gap:12px;align-items:center;line-height:1.6}
+.connections-page .reminder-row>div{min-width:0;overflow-wrap:anywhere}
+.connections-page .reminder-row b{font-size:14px}
+.connections-page .reminder-row small{font-size:13px;color:#806c86;margin-top:3px}
+.connections-page .reminder-row>button:last-child{min-width:40px;flex-shrink:0}
+.connections-page .reminder-form{flex-wrap:wrap;align-items:center;gap:10px}
+.connections-page .reminder-form input:first-child{min-width:180px}
+.connections-page .reminder-form input[type=number]{width:100px}
+.connections-page .language-options button strong{font-size:16px}
+.connections-page .language-options button small{font-size:13px;color:#806c86}
+.connections-page .bridge-snippet{font-size:13px;line-height:1.7;overflow:auto}
+@media(max-width:1100px){.connections-page{padding:28px 24px}.connections-page .field-pair{grid-template-columns:minmax(0,1fr)}.connections-page .language-options{grid-template-columns:repeat(3,minmax(0,1fr))}}

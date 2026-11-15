@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.4.0-alpha.6 · 2026-11-15 · Readable settings / 设置页易读性
+
+- 修正文本输入框的整行样式错误作用于复选框；工具开关、角色勾选和说明重新靠近，统一字号与点击区域。Fix full-width checkbox styling and keep controls beside their labels; improve text and hit targets.
+- 为 DeepSeek 官方接口提供可点击填写的 `deepseek-flash` / `deepseek-v4-pro` 示例，保留自定义输入，明确第三方中转需按其控制台填写。Add official DeepSeek model examples with editable IDs and gateway guidance.
+- 设置页保留当前后端，不再把 DeepSeek 等已选服务重置为 GLM；移除已不存在的手动预览文案。Preserve the active provider and remove obsolete preview instructions.
+- 中英日设置页与两种窗口尺寸完成布局检查；新版仍使用已清理的 GPT 待机素材。Check settings across three locales and two window sizes; retain the cleaned GPT idle.
+
 ## 0.4.0-alpha.5 · 2026-11-15 · Remove contaminated tail / 清理污染尾帧
 
 - 复现并确认：S1 文件实际 241 帧，末尾 16 帧是导出目录残留的另一名龙女，清单误记为 225 帧。Confirmed 16 stale PNG frames of a different character were appended to the 225-frame S1 export.
