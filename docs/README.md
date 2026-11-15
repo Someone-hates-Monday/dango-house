@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [窗口闪烁、免打扰后冻结与动作衔接：0.5.0-alpha.6](HOUSE-STABILITY.zh-CN.md) · [English](HOUSE-STABILITY.en.md)
+
 - [有目的地走近、结伴移动与到达后对白：0.5.0-alpha.5](HOUSE-PURPOSEFUL-MOVEMENT.zh-CN.md) · [English](HOUSE-PURPOSEFUL-MOVEMENT.en.md)
 
 - [接话、公开/私聊气泡与实际窗口拖动：0.5.0-alpha.3](HOUSE-SOCIAL-AND-DRAG.zh-CN.md) · [English](HOUSE-SOCIAL-AND-DRAG.en.md)

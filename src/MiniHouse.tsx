@@ -39,8 +39,10 @@ export function MiniHouse({state}:{state:AppState}){
  const privateSpeech=channel?state.privateMessages[channel].slice().reverse().find(m=>m.speaker===channel&&m.text):undefined;
  const spoken=privateSpeech&&(!publicSpeech||privateSpeech.at>=publicSpeech.at)?privateSpeech:publicSpeech;
  const speechPrivate=spoken===privateSpeech&&!!privateSpeech;
- const speech=spoken&&now-spoken.at<20000&&now>=spoken.at?spoken:undefined;
- const desiredCg=session?(!collapsed?Math.round(Math.min(360,size.width*.82)*9/16+46):0):speech?148:0;
+ const speech=spoken&&Math.max(0,now-spoken.at)<20000?spoken:undefined;
+ // Reserve transparent, pointer-through headroom once. New lines and bubble
+ // expiry must never resize a Windows transparent window during playback.
+ const desiredCg=Math.round(Math.min(360,size.width*.82)*9/16+46);
  useEffect(()=>{
   document.documentElement.classList.add('house-document');
   const off=window.garden.onHouseLayout(value=>{setLayout(value);setSize(old=>old.width===value.width&&old.height===value.height?old:{width:value.width,height:value.height});});

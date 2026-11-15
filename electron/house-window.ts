@@ -20,7 +20,7 @@ export class HouseWindowController {
   const first=composeHouse(this.bounds,work,this.request,this.count());this.bounds=first.house;
   this.window=new BrowserWindow({...first.host,frame:false,transparent:true,backgroundColor:'#00000000',hasShadow:false,resizable:false,alwaysOnTop:saved.pinned!==false,show:false,title:'团子小屋 · 迷你小屋',webPreferences:{preload,contextIsolation:true,nodeIntegration:false,sandbox:true}});
   this.window.on('move',()=>{
-   const b=this.window.getBounds();if(this.applied&&b.x===this.applied.x&&b.y===this.applied.y)return;
+   const b=this.window.getBounds();if(this.applied&&Math.abs(b.x-this.applied.x)<=1&&Math.abs(b.y-this.applied.y)<=1)return;
    this.bounds={...this.bounds,x:b.x,y:b.y+this.top};this.layout(this.request);
   });
  }
@@ -29,7 +29,10 @@ export class HouseWindowController {
   const work=workArea??screen.getDisplayMatching(this.bounds).workArea;
   const result=composeHouse(this.bounds,work,this.request,this.count());this.bounds=result.house;this.top=result.layout.cgHeight;this.applied=result.host;
   const layout={...result.layout,pinned:this.window.isAlwaysOnTop()};
-  this.window.setBounds(result.host);this.window.webContents.send('garden:house-layout',layout);
+  const actual=this.window.getBounds();
+  if((['x','y','width','height'] as const).some(k=>Math.abs(actual[k]-result.host[k])>1))this.window.setBounds(result.host);
+  this.applied=this.window.getBounds();
+  this.window.webContents.send('garden:house-layout',layout);
   clearTimeout(this.timer);this.timer=setTimeout(()=>this.flush(),250);
   return layout;
  }

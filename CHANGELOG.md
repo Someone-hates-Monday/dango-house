@@ -1,5 +1,12 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.6 · 2026-11-15 · Stable window and reactions / 窗口与动画稳定性
+
+- 为气泡/CG 保留稳定的透明上方空间；修正新消息与秒级时钟竞态，避免对白导致窗口反复收缩、展开；相同原生边界不重复 setBounds。Stable transparent headroom and immediate bubbles; avoid redundant native resizing during dialogue.
+- 修复 Claude 退出免打扰/停止后的视频冻结，以及走路结束不能正确切入互动的状态判断。Recover Claude idle after DND/stop and correctly hand off from travel to gestures.
+- 摸头、投喂和直接选择的动画优先播放；DeepSeek 正常走路结束直接衔接到达动作，明确摔倒演出不变。Prioritize direct gestures and hand off DeepSeek travel without an unrelated recovery tail.
+- 吃白饭按实际素材长度保留；演示中的分享动作等投喂完成再开始。Honor the rice clip duration before starting a sharing scene.
+
 ## 0.5.0-alpha.5 · 2026-11-15 · Walk over to chat / 走近再聊
 
 - 分离目的性移动与随意巡游，按实际角色坐标显示行走和停留；不再固定站位或只偏移几像素。Separate purposeful travel from wandering and render real paths with persistent destinations.

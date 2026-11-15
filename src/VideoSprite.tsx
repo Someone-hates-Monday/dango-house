@@ -10,7 +10,7 @@ export function VideoSprite({pose,cue,activity='',className='',frame=0,row=0,int
   const desired=useRef({pose,cue,activity,interaction,stoppedAt});desired.current={pose,cue,activity,interaction,stoppedAt};
   useEffect(()=>{
     const video=ref.current!,element=surface.current!,still=snapshot.current!;let alive=true,raf=0,current='idle',phase='idle',lastCue=cue,lastStop=stoppedAt,pending:string|null=null,tripId=0,completedCue=-1,loading=false,activeCue=0,sleepUntil=0;
-    let pendingCue=0;
+    let pendingCue=0,seenDirect=0;
     const clipFor=()=>{const p=desired.current;if(p.cue===completedCue)return 'idle';return chooseDeepseekClip(p.pose,p.cue,p.interaction);};
     const load=(clip:string,time=clip==='walk'?1.75:0)=>{
       if(video.readyState>=2){still.width=640;still.height=360;still.getContext('2d')!.drawImage(video,0,0,640,360);still.style.height=current==='walk'?'83%':'100%';still.style.top=current==='walk'?'8.5%':'0';still.style.transform=video.style.transform;still.style.transition='none';still.style.opacity='1';}
@@ -23,6 +23,10 @@ export function VideoSprite({pose,cue,activity='',className='',frame=0,row=0,int
       if(freeze.current){video.pause();element.dataset.motionPhase='frozen';return;}
       if(video.paused&&phase!=='paused'&&!video.ended&&loading===false)void video.play().catch(()=>{});
       if(p.stoppedAt&&p.stoppedAt!==lastStop){lastStop=p.stoppedAt;pending=null;load('idle');}
+      const direct=p.interaction;
+      if(direct&&direct.startedAt!==seenDirect&&Date.now()-direct.startedAt<4200&&(['pat','feed','affection','chat','bookmark'].includes(direct.kind)||direct.priority==='direct')){
+        seenDirect=direct.startedAt;pending=null;pendingCue=0;completedCue=-1;lastCue=p.cue;load(target);
+      }
       if(p.cue!==lastCue&&p.cue!==0){lastCue=p.cue;if(phase==='paused')load(target);else if(target!=='idle'){pending=target;pendingCue=p.cue;}}
       const trip=p.interaction?.kind==='trip'&&Date.now()-p.interaction.startedAt<7300?p.interaction:undefined;
       if(trip){if(tripId!==trip.startedAt){tripId=trip.startedAt;load('walk',4.45);}const sample=tripSample((Date.now()-trip.startedAt)/1000);phase=`trip-${sample.phase}`;video.pause();if(video.readyState>=2&&!video.seeking&&Math.abs(video.currentTime-sample.time)>.035)video.currentTime=sample.time;element.dataset.motionPhase=phase;return;}
@@ -31,6 +35,9 @@ export function VideoSprite({pose,cue,activity='',className='',frame=0,row=0,int
       const time=video.currentTime;
       if(current===sleepLoop){if(pending||Date.now()>=sleepUntil){load(sleepEnd);}return;}
       if(current==='walk'){
+        // Physical travel has finished. Crossfade directly to the arrival
+        // gesture rather than playing the source video's long recovery tail.
+        if(target!=='walk'){const next=pending&&pending!=='walk'?pending:target;pending=null;load(next);element.dataset.motionPhase=phase;return;}
         if(phase==='walk-enter'&&time>=walkClip.enterEnd)phase='walk-loop';
         if(phase==='walk-loop'){
           if(target!=='walk'&&time>=walkClip.loopStart+.5){phase='walk-exit';video.currentTime=walkClip.exitStart;}

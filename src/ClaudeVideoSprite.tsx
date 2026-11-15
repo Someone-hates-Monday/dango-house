@@ -13,13 +13,13 @@ const isWalkClip=(c:ClaudeClip)=>c==='walk'||c==='walkOpposite';
 const walkFacesLeft=(c:ClaudeClip)=>c==='walk';
 
 // Reactions play once then idle. Walk uses facing-matched clips; mirror only as fallback.
-export function ClaudeVideoSprite({pack,pose='idle',cue=0,interaction,stoppedAt,className=''}:{pack:ClaudeAnimationPack;pose?:Pose;cue?:number;interaction?:Interaction;stoppedAt?:number;className?:string}){
+export function ClaudeVideoSprite({pack,pose='idle',cue=0,interaction,stoppedAt,frozen=false,className=''}:{pack:ClaudeAnimationPack;pose?:Pose;cue?:number;interaction?:Interaction;stoppedAt?:number;frozen?:boolean;className?:string}){
   const video=useRef<HTMLVideoElement>(null),snapshot=useRef<HTMLCanvasElement>(null),surface=useRef<HTMLSpanElement>(null);
-  const latest=useRef({interaction,stoppedAt,pose,cue});latest.current={interaction,stoppedAt,pose,cue};
+  const latest=useRef({interaction,stoppedAt,pose,cue,frozen});latest.current={interaction,stoppedAt,pose,cue,frozen};
   const [clip,setClip]=useState<ClaudeClip>('idle'),[failed,setFailed]=useState(false);
   useEffect(()=>{
     const v=video.current!,still=snapshot.current!,el=surface.current!;
-    let current:ClaudeClip='idle',seen=0,pending:{clip:ClaudeClip;event:number}|undefined,activeEvent=0,lastStop=stoppedAt,paused=false,alive=true,raf=0,phase='idle',loading=false;
+    let current:ClaudeClip='idle',seen=0,pending:{clip:ClaudeClip;event:number}|undefined,activeEvent=0,lastStop=stoppedAt,paused=false,alive=true,raf=0,phase='idle',loading=false,travelling=false,wasFrozen=frozen,nextResume=0;
     const walkFor=(p:Pose):ClaudeClip=>{
       if(p==='walk-right')return pack.walkOpposite?'walkOpposite':pack.walk?'walk':'idle';
       if(p==='walk-left')return pack.walk?'walk':pack.walkOpposite?'walkOpposite':'idle';
@@ -39,7 +39,7 @@ export function ClaudeVideoSprite({pack,pose='idle',cue=0,interaction,stoppedAt,
     };
     const load=(next:ClaudeClip,event=0,time=0)=>{
       if(next!=='idle'&&!pack[next]){next='idle';event=0;}
-      const travel=isTravelWalk(next);
+      const travel=isTravelWalk(next);travelling=travel;
       const win=travel?walkClipWindow(next):undefined;
       if(win&&time===0)time=Math.max(0,win.loopStart-.15);
       if(v.readyState>=2){still.width=v.videoWidth;still.height=v.videoHeight;still.getContext('2d')?.drawImage(v,0,0);still.style.opacity='1';still.style.transform=v.style.transform;}
@@ -66,7 +66,10 @@ export function ClaudeVideoSprite({pack,pose='idle',cue=0,interaction,stoppedAt,
     };
     const tick=()=>{
       if(!alive)return;raf=requestAnimationFrame(tick);const p=latest.current;
-      if(p.stoppedAt&&p.stoppedAt!==lastStop){lastStop=p.stoppedAt;paused=true;pending=undefined;v.pause();el.dataset.motionPhase='paused';}
+      if(p.frozen){wasFrozen=true;paused=true;v.pause();el.dataset.motionPhase='frozen';return;}
+      if(wasFrozen){wasFrozen=false;paused=false;lastStop=p.stoppedAt;pending=undefined;load('idle');}
+      if(p.stoppedAt&&p.stoppedAt!==lastStop){lastStop=p.stoppedAt;paused=false;pending=undefined;seen=p.interaction?.startedAt??p.cue;load('idle');}
+      if(!paused&&!loading&&v.paused&&!v.ended&&Date.now()>=nextResume){nextResume=Date.now()+1000;void v.play().catch(()=>{});}
       const wantWalk=p.pose==='walk-left'||p.pose==='walk-right';
       const targetWalk=wantWalk?walkFor(p.pose):'idle';
       if(wantWalk&&targetWalk!=='idle'){
@@ -83,7 +86,11 @@ export function ClaudeVideoSprite({pack,pose='idle',cue=0,interaction,stoppedAt,
         el.dataset.motionPhase=phase;
         return;
       }
-      if(isTravelWalk(current)){
+      const direct=p.interaction;
+      if(direct&&direct.startedAt!==seen&&Date.now()-direct.startedAt<4200&&(['pat','feed','affection','chat','bookmark'].includes(direct.kind)||direct.priority==='direct')){
+        const next=claudeReactionClip(p.pose,direct);if(next!=='idle'&&pack[next]){seen=direct.startedAt;paused=false;pending=undefined;load(next,seen);el.dataset.motionPhase=phase;return;}
+      }
+      if(travelling&&isWalkClip(current)){
         queueGesture();
         if(!loading){
           const win=walkClipWindow(current),time=v.currentTime;

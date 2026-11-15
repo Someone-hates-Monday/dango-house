@@ -32,3 +32,10 @@ test('dock preferences persist and preserve free pet positions; touches carry di
  const restored=restoreState(e.state);assert.equal(restored.presentation.desktopMode,'dock');assert.equal(restored.presentation.chatForm,'chibi');assert.deepEqual(restored.pets,before);
  await e.dispatch({type:'presentation',patch:{desktopMode:'free'}});assert.deepEqual(e.state.pets,before);
 });
+
+test('feeding finishes before the same resident starts sharing food',async()=>{
+ const e=new GardenEngine();e.state.settings.autonomous=false;e.state.room.autonomous=false;
+ e.state.bonds['xia>rin']=80;await e.dispatch({type:'feed',id:'xia',food:'rice'});
+ const end=e.state.bodies.xia.until;assert.ok(end-Date.now()>10000);
+ e.tick(Date.now()+3500);assert.equal(e.state.bodies.xia.interaction?.kind,'feed');
+});

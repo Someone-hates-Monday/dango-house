@@ -459,12 +459,13 @@ export class GardenEngine {
         this.state.affection[action.id]=Math.min(100,this.state.affection[action.id]+(favorite?4:2));
         applyFavor(this.state,action.id,0);
         const now=Date.now();
-        this.perform(action.id,{action:'eat',emotion:'happy',bubble:this.state.settings.mode==='api'?'':feedLine(this.locale(),action.id,action.food,name,this.state.relationship.address),duration:8},'local',now,{kind:'feed',startedAt:now,food:action.food});
+        const feedDuration=action.id==='xia'&&action.food==='rice'?Math.max(8,(clipById('rice')?.seconds??8)+.5):8;
+        this.perform(action.id,{action:'eat',emotion:'happy',bubble:this.state.settings.mode==='api'?'':feedLine(this.locale(),action.id,action.food,name,this.state.relationship.address),duration:feedDuration},'local',now,{kind:'feed',startedAt:now,food:action.food});
         if(this.state.settings.mode==='api'){await this.reactHouse('feed',action.id,{food:action.food});return;}
         const partner=cpPartner(action.id);
         if(isSpeaking(this.state,partner)&&bondOf(this.state.bonds,action.id,partner)>=40){
           const share=shareSnackBubble(this.state.settings.pairTone??'warm',action.id,partner,name);
-          this.queueJob({id:`feed-share-${action.id}-${now}`,source:'feed-share',priority:'reaction',cast:[action.id,partner]},[{at:now+2800,actor:action.id,intent:{action:'approach',target:partner,emotion:'happy',bubble:share,duration:7},speech:share}],now);
+          this.queueJob({id:`feed-share-${action.id}-${now}`,source:'feed-share',priority:'reaction',cast:[action.id,partner]},[{at:this.ownedEndFor(action.id)+100,actor:action.id,intent:{action:'approach',target:partner,emotion:'happy',bubble:share,duration:7},speech:share}],now);
         }
         this.queueRivalryEscalation(action.id,now);
         return;
@@ -598,7 +599,7 @@ export class GardenEngine {
           if(!clip)throw new Error('Unknown Claude animation clip');
           const now=Math.max(Date.now(),(this.state.bodies.rin.interaction?.startedAt??0)+1);
           this.lastClaudeClip=clip.id;
-          this.perform('rin',{action:'think',duration:Math.max(6,clip.seconds+1),bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});
+          this.perform('rin',{action:'think',duration:Math.max(6,clip.seconds+1),bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now,priority:'direct'});
           this.state.bodies.rin.until=now+clip.seconds*1000+500;
           this.state.bodies.rin.label=clip.title;this.publish();return;
         }
@@ -610,7 +611,7 @@ export class GardenEngine {
         const now=Math.max(Date.now(),(this.state.bodies.xia.interaction?.startedAt??0)+1);
         this.lastDeepseekClip=clip.id;
         if(clip.group==='food'){this.state.affection.xia=Math.min(100,this.state.affection.xia+2);applyFavor(this.state,'xia',0);}
-        this.perform('xia',{action:'think',duration:15,bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now});
+        this.perform('xia',{action:'think',duration:15,bubble:clip.title},'local',now,{kind:'clip',clipId:clip.id,startedAt:now,priority:'direct'});
         this.state.bodies.xia.until=now+Math.max(clip.seconds*1000+500,clip.title==='睡觉-开始'?40000:0);
         this.state.bodies.xia.label=clip.title;this.publish();return;
       }

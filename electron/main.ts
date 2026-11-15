@@ -34,6 +34,7 @@ let database: DatabaseSync;
 let engine: GardenEngine;
 let saveTimer: ReturnType<typeof setTimeout>;
 const overlays = new Map<number, BrowserWindow>();
+const mouseThrough = new WeakMap<BrowserWindow,boolean>();
 const privateWindows = new Map<CharacterId,BrowserWindow>();
 let keys: Record<string, string> = {};
 let lastRevision = -1;
@@ -208,7 +209,7 @@ if (single) app.whenReady().then(async () => {
   ipcMain.on('garden:private',(event,id:CharacterId)=>{if(known(event.sender))openPrivate(id);});
   ipcMain.on('garden:hit', (event, interactive: boolean) => {
     const window = BrowserWindow.fromWebContents(event.sender);
-    if (typeof interactive === 'boolean' && window && ([...overlays.values()].includes(window)||window===houseWindow?.window)) window.setIgnoreMouseEvents(!interactive, { forward: true });
+    if (typeof interactive === 'boolean' && window && ([...overlays.values()].includes(window)||window===houseWindow?.window)&&mouseThrough.get(window)!==!interactive){mouseThrough.set(window,!interactive);window.setIgnoreMouseEvents(!interactive, { forward: true });}
   });
   ipcMain.handle('garden:key', async (event, provider: string, key: string) => {
     if ((event.sender !== mainWindow.webContents&&event.sender!==houseWindow?.window.webContents) || !providers.some(p => p.id === provider) || typeof key !== 'string' || key.length > 4096) throw new Error('凭证输入无效');
