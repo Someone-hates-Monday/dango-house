@@ -28,7 +28,7 @@ Welcome home. DeepSeek is waiting for dinner, Claude has saved the window seat, 
 
 Dango House is a Windows companion app where community-inspired AI girls share a tiny home. They chat, visit each other, ask for headpats, and get a little jealous of your attention. Choose friendship, pet-like companionship, or a more affectionate relationship.
 
-> **Source: v0.5.0-alpha.14; public Windows portable preview: [v0.4.0-alpha.5](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.4.0-alpha.5).** Screenshots use isolated offline profiles; see their version notes. Scripted scenes work locally; live AI chat needs your own API. Switch the UI among **简体中文 / English / 日本語** in settings.
+> **Source: v0.5.0-alpha.14; public Windows portable preview: [v0.5.0-alpha.14](https://github.com/Someone-hates-Monday/dango-house/releases/tag/v0.5.0-alpha.14).** Screenshots use isolated offline profiles; see their version notes. Scripted scenes work locally; live AI chat needs your own API. Switch the UI among **简体中文 / English / 日本語** in settings.
 
 Current source opens a compact heart-roof house, with roof controls, chat/private conversation below and one shared CG above. One API key can perform the cast: in API mode the house model generates bounded multi-character turns and action intentions. All 109 DeepSeek clips, Dock/free pets and the optional MCP/REST stage remain available. This is one model coordinating household events, not seven independent agents. See [implementation and acceptance](docs/MINI-HOUSE-IMPLEMENTATION-DRAFT.en.md).
 
