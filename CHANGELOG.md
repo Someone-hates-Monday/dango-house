@@ -1,5 +1,13 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.11 · 2026-11-16 · Clear conversations / 看得懂的对话
+
+- 各自气泡标明说话者与对象，听话者有提示，点击定位聊天记录。Individual bubbles identify speaker and recipient, highlight listeners and open the relevant transcript.
+- 模型承接问答、一句只对一个对象；轻松争宠独立开关，实际发言才计冷却。Continue the immediate topic, keep one addressee per beat and offer optional model-driven attention-seeking with delivery-based cooldown.
+- 修复非聊天事件冗余 focus 导致整段拒绝；公开/私聊与移动到达保留对象信息。Fix redundant focus labels rejecting non-chat plans; preserve audience metadata through arrival and private delivery.
+- 屋檐图标按钮、完整吸顶导航与真实角色头像；气泡不改变原生窗口大小。Refine roof controls, full-width sticky navigation and portrait selection without speech-driven native resizing.
+- 163 项测试与隔离桌面联调、真实 DeepSeek 接话/争宠/私聊检查通过。163 tests, isolated desktop integration and live DeepSeek conversation, rivalry and private-audience checks passed.
+
 ## 0.5.0-alpha.10 · 2026-11-16 · Connected companion scenes / 聊天驱动同伴演出
 
 - 公共聊天按语义选择同伴场景；私聊邀请工具接通真实走近、接话、Q版动作及一份共享CG，取消的邀请不延迟偷跑。Semantic public scenes and private invitation tools execute movement, peer replies, gestures and a shared CG, with cancellation guards.

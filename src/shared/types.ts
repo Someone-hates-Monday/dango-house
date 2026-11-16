@@ -16,7 +16,8 @@ export interface ReplyOrigin {
   provider?: string;
   model?: string;
 }
-export interface Message {
+export interface MessageAddress {replyTo?:CharacterId;audience?:'user'|'companions'|'group';sceneId?:string}
+export interface Message extends MessageAddress {
   id: string;
   speaker: CharacterId | 'user' | 'system';
   text: string;
@@ -112,6 +113,7 @@ export interface AppState {
     pairRomance?: boolean;
     cgAutoplay?: boolean;
     housePlayMode?: 'together'|'self-play';
+    playfulRivalry?:boolean;
     /** Optional localhost Agent Bridge for Cursor/Claude/Codex plugins; app remains the primary product. */
     agentBridge: boolean;
     /** Today’s cast size preset; inferred from presentIds (not muted). */

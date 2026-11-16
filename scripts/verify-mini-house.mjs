@@ -49,7 +49,7 @@ try{
  await house.getByRole('button',{name:'发送',exact:true}).click();
  await waitHouseState(house,s=>!s.busy);
  await house.getByRole('button',{name:'Claude',exact:true}).click();
- await house.locator('.house-speech').waitFor();
+ await house.locator('.house-speech').first().waitFor();
  await house.waitForFunction(()=>document.querySelector('.house-chat header strong')?.textContent?.includes('Claude'));
  await house.screenshot({path:path.join(out,'private.png'),omitBackground:true,scale:'css'});
  await house.getByRole('button',{name:'小屋群聊',exact:true}).click();

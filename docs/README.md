@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [各自气泡、对话对象、轻松争宠与界面修复：0.5.0-alpha.11](RESIDENT-DIALOGUE-AND-UI.zh-CN.md) · [English](RESIDENT-DIALOGUE-AND-UI.en.md)
+
 - [聊天驱动同伴演出、自己玩与对白去梗化：0.5.0-alpha.10](COMPANION-SCENE-CONTROL.zh-CN.md) · [English](COMPANION-SCENE-CONTROL.en.md)
 
 - [鼠标停留回应与问候冷却：0.5.0-alpha.9](HOVER-GREETING.zh-CN.md) · [English](HOVER-GREETING.en.md)

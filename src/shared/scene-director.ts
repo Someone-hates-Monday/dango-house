@@ -1,9 +1,9 @@
-import type { AvatarIntent, CharacterId, CgAssetId, ReplyOrigin } from './types';
+import type { AvatarIntent, CharacterId, CgAssetId, ReplyOrigin, MessageAddress } from './types';
 import type { CompanionEventKind } from './events';
 
 export type ScenePriority = 'user' | 'reaction' | 'idle';
 
-export interface SceneStep {
+export interface SceneStep extends MessageAddress {
   at: number;
   actor: CharacterId;
   intent: AvatarIntent;

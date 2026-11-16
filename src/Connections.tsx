@@ -149,6 +149,12 @@ export function Connections({ state }: { state: AppState }) {
             {locale==='en'?'Scene clips after interactions':locale==='ja'?'交流後のシーン再生':'互动后的剧情短片'} · {state.settings.cgAutoplay===false?(locale==='en'?'Off':locale==='ja'?'オフ':'关闭'):(locale==='en'?'On':locale==='ja'?'オン':'开启')}
           </button>
         </div>
+        <div className="relationship-options">
+          <button aria-pressed={state.settings.playfulRivalry!==false} className={state.settings.playfulRivalry!==false?'selected':''} onClick={()=>void send({type:'settings',patch:{playfulRivalry:state.settings.playfulRivalry===false}})}>
+            {locale==='en'?'Playful attention-seeking':locale==='ja'?'可愛いやきもち':'轻松争宠'} · {state.settings.playfulRivalry===false?(locale==='en'?'Off':locale==='ja'?'オフ':'关闭'):(locale==='en'?'On':locale==='ja'?'オン':'开启')}
+          </button>
+        </div>
+        <p className="helper">{locale==='en'?'After someone receives special attention, another resident may playfully ask to join. Warm invitations, without guilt or blame.':locale==='ja'?'誰かが可愛がられると、ほかの子も優しく仲間に入りたがります。責めずに楽しく誘います。':'偏爱一位伙伴时，其他人可以按自己的性格撒娇、邀请你或善意逗趣；不责怪你，也不把互动擅自变成百合剧情。'}</p>
         <p className="helper">{locale==='en'?'Girl–girl affection is independent of your role. Romantic scenes toward you follow Lover mode. Scenes appear naturally through interactions.':locale==='ja'?'女の子同士の親密さはあなたとの関係と別設定です。あなたへの恋愛シーンは恋人モードに従います。シーンは交流から自然に始まります。':'女孩之间的贴贴与你的身份分开设置；面向你的恋爱短片只在恋人模式下随互动出现。剧情会通过日常互动自然出现。'}</p>
         <div className="relationship-options">
           {(

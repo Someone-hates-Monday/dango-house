@@ -61,7 +61,7 @@ export function restoreState(value: unknown, now = Date.now()): AppState {
   base.messages = Array.isArray(saved.messages) ? saved.messages.filter(m => m && typeof m.text === 'string' && typeof m.id === 'string' && ['user', 'system', ...ids].includes(m.speaker)).slice(-500) : base.messages;
   base.memories = Array.isArray(saved.memories) ? saved.memories.filter(m => m && typeof m.text === 'string' && typeof m.id === 'string').slice(-100) : [];
   if (saved.settings && typeof saved.settings === 'object') {
-    for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay'] as const) if (typeof saved.settings[key] === 'boolean') base.settings[key] = saved.settings[key];
+    for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay', 'playfulRivalry'] as const) if (typeof saved.settings[key] === 'boolean') base.settings[key] = saved.settings[key];
     if (Number.isFinite(saved.settings.intimacy)) base.settings.intimacy = Math.max(0, Math.min(100, saved.settings.intimacy));
     if(saved.settings.housePlayMode==='together'||saved.settings.housePlayMode==='self-play')base.settings.housePlayMode=saved.settings.housePlayMode;
     if (typeof saved.settings.provider === 'string') base.settings.provider = saved.settings.provider;

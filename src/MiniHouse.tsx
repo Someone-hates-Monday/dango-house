@@ -1,3 +1,4 @@
+import {houseSpeeches,placeHouseSpeeches,speechDuration} from './shared/house-speech';
 import {MessageOrigin} from './MessageOrigin';
 import {HouseSkin,inHouseSilhouette} from './HouseSkin';
 import {useEffect,useRef,useState} from 'react';
@@ -14,14 +15,15 @@ import {cgClip} from './shared/cg-catalog';
 import './mini-house.css';
 
 const copy={
- 'zh-CN':{home:'团子小屋',chat:'聊聊',group:'小屋群聊',private:'悄悄聊',pat:'摸摸',feed:'投喂',praise:'喜欢你',settings:'设置与连接',hide:'收起小屋',pin:'切换置顶',stop:'停止回应',send:'发送',placeholder:'和她们说点什么…',privatePh:'只对她说…',demo:'离线演示 · 连接大脑',live:'AI 陪伴',selfPlay:'她们自己玩',selfPlayHint:'你忙你的，她们会自己相处；说“我忙完了”可一起聊。',thinking:'她们正在想怎么回应…',resize:'拖动调整小屋大小',newMessages:'有新消息',cg:'查看关系瞬间',roomAbove:'向下移动小屋，为短片留出空间',food:['米饭','茶','蛋糕','鱼'],you:'你',closeChat:'关闭聊天',pinned:'已置顶',unpinned:'未置顶',close:'收起',speech:'查看对白'},
- en:{home:'Dango House',chat:'Chat',group:'House chat',private:'Private',pat:'Pet',feed:'Feed',praise:'Affection',settings:'Settings & connection',hide:'Hide house',pin:'Toggle pin',stop:'Stop response',send:'Send',placeholder:'Say something to them…',privatePh:'Just between you two…',demo:'Offline · Connect AI',live:'Live AI',selfPlay:'Their time',selfPlayHint:'They can spend time together. Tell them when you return.',thinking:'They are thinking…',resize:'Drag to resize the house',newMessages:'New messages',cg:'View moment',roomAbove:'Move the house down to make room above',food:['Rice','Tea','Cake','Fish'],you:'You',closeChat:'Close chat',pinned:'Pinned',unpinned:'Unpinned',close:'Hide',speech:'View dialogue'},
- ja:{home:'団子ハウス',chat:'話す',group:'みんなと',private:'内緒話',pat:'なでる',feed:'あげる',praise:'大好き',settings:'設定・接続',hide:'小屋を隠す',pin:'最前面の切替',stop:'応答を停止',send:'送信',placeholder:'みんなに話しかけて…',privatePh:'二人だけの話…',demo:'デモ · AIを接続',live:'AIと一緒',selfPlay:'みんなの時間',selfPlayHint:'みんなで過ごしているよ。戻ったら声をかけてね。',thinking:'みんなが考えています…',resize:'ドラッグで小屋のサイズを変更',newMessages:'新着メッセージ',cg:'シーンを見る',roomAbove:'小屋を下に動かして上に空間を作ってください',food:['ご飯','お茶','ケーキ','魚'],you:'あなた',closeChat:'会話を閉じる',pinned:'固定中',unpinned:'固定なし',close:'隠す',speech:'会話を見る'},
+ 'zh-CN':{home:'团子小屋',chat:'聊聊',group:'小屋群聊',private:'悄悄聊',everyone:'大家',listening:'正在听',pat:'摸摸',feed:'投喂',praise:'喜欢你',settings:'设置与连接',hide:'收起小屋',pin:'切换置顶',stop:'停止回应',send:'发送',placeholder:'和她们说点什么…',privatePh:'只对她说…',demo:'离线演示 · 连接大脑',live:'AI 陪伴',selfPlay:'她们自己玩',selfPlayHint:'你忙你的，她们会自己相处；说“我忙完了”可一起聊。',thinking:'她们正在想怎么回应…',resize:'拖动调整小屋大小',newMessages:'有新消息',cg:'查看关系瞬间',roomAbove:'向下移动小屋，为短片留出空间',food:['米饭','茶','蛋糕','鱼'],you:'你',closeChat:'关闭聊天',pinned:'已置顶',unpinned:'未置顶',close:'收起',speech:'查看对白'},
+ en:{home:'Dango House',chat:'Chat',group:'House chat',private:'Private',everyone:'everyone',listening:'Listening to',pat:'Pet',feed:'Feed',praise:'Affection',settings:'Settings & connection',hide:'Hide house',pin:'Toggle pin',stop:'Stop response',send:'Send',placeholder:'Say something to them…',privatePh:'Just between you two…',demo:'Offline · Connect AI',live:'Live AI',selfPlay:'Their time',selfPlayHint:'They can spend time together. Tell them when you return.',thinking:'They are thinking…',resize:'Drag to resize the house',newMessages:'New messages',cg:'View moment',roomAbove:'Move the house down to make room above',food:['Rice','Tea','Cake','Fish'],you:'You',closeChat:'Close chat',pinned:'Pinned',unpinned:'Unpinned',close:'Hide',speech:'View dialogue'},
+ ja:{home:'団子ハウス',chat:'話す',group:'みんなと',private:'内緒話',everyone:'みんな',listening:'聞いてる',pat:'なでる',feed:'あげる',praise:'大好き',settings:'設定・接続',hide:'小屋を隠す',pin:'最前面の切替',stop:'応答を停止',send:'送信',placeholder:'みんなに話しかけて…',privatePh:'二人だけの話…',demo:'デモ · AIを接続',live:'AIと一緒',selfPlay:'みんなの時間',selfPlayHint:'みんなで過ごしているよ。戻ったら声をかけてね。',thinking:'みんなが考えています…',resize:'ドラッグで小屋のサイズを変更',newMessages:'新着メッセージ',cg:'シーンを見る',roomAbove:'小屋を下に動かして上に空間を作ってください',food:['ご飯','お茶','ケーキ','魚'],you:'あなた',closeChat:'会話を閉じる',pinned:'固定中',unpinned:'固定なし',close:'隠す',speech:'会話を見る'},
 };
 export function MiniHouse({state}:{state:AppState}){
  const t=copy[state.settings.locale],send=window.garden.dispatch;
  const [layout,setLayout]=useState<HouseLayout>({width:380,height:260,chatHeight:0,cgHeight:0});
  const [size,setSize]=useState({width:380,height:260}),[initialized,setInitialized]=useState(false),[chatOpen,setChatOpen]=useState(false),[channel,setChannel]=useState<CharacterId|undefined>();
+ const [scrollToMessage,setScrollToMessage]=useState<string|undefined>();
  const [text,setText]=useState(''),[foodOpen,setFoodOpen]=useState(false),[collapsed,setCollapsed]=useState(false),[unread,setUnread]=useState(false);
  const dragging=useRef(false);
  useEffect(()=>{const end=()=>{if(dragging.current){dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});}};window.addEventListener('blur',end);return()=>window.removeEventListener('blur',end);},[]);
@@ -33,11 +35,11 @@ export function MiniHouse({state}:{state:AppState}){
  const last=messages.at(-1);
  const [now,setNow]=useState(Date.now());
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
- const publicSpeech=state.messages.slice().reverse().find(m=>m.speaker!=='system'&&m.speaker!=='user'&&m.text&&state.presentIds.includes(m.speaker));
- const privateSpeech=channel?state.privateMessages[channel].slice().reverse().find(m=>m.speaker===channel&&m.text):undefined;
- const spoken=privateSpeech&&(!publicSpeech||privateSpeech.at>=publicSpeech.at)?privateSpeech:publicSpeech;
- const speechPrivate=spoken===privateSpeech&&!!privateSpeech;
- const speech=spoken&&Math.max(0,now-spoken.at)<20000?spoken:undefined;
+ const speechCutoff=useRef(0);
+ if(session)speechCutoff.current=Math.max(speechCutoff.current,session.startedAt);
+ const speeches=houseSpeeches(state,channel,now).filter(m=>m.at>speechCutoff.current);
+ const newestSpeech=speeches[0];
+ const activeSpeech=newestSpeech&&Math.max(0,now-newestSpeech.at)<speechDuration(newestSpeech.text)?newestSpeech:undefined;
  // Reserve transparent, pointer-through headroom once. New lines and bubble
  // expiry must never resize a Windows transparent window during playback.
  const desiredCg=Math.round(Math.min(360,size.width*.82)*9/16+46);
@@ -55,6 +57,12 @@ export function MiniHouse({state}:{state:AppState}){
  useEffect(()=>{const visibility=()=>{if(document.hidden)video.current?.pause();else if(!collapsed)void video.current?.play().catch(()=>{});};document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[collapsed,session?.id]);
  useEffect(()=>{nearBottom.current=true;setUnread(false);if(list.current)list.current.scrollTop=list.current.scrollHeight;},[channel,chatOpen]);
  useEffect(()=>{if(nearBottom.current){if(list.current)list.current.scrollTop=list.current.scrollHeight;}else setUnread(true);},[last?.id,last?.text,messages.length]);
+ useEffect(()=>{
+  if(!chatOpen||!scrollToMessage||!list.current)return;
+  const message=Array.from(list.current.querySelectorAll<HTMLElement>('[data-message-id]')).find(el=>el.dataset.messageId===scrollToMessage);
+  if(message){nearBottom.current=false;message.scrollIntoView({block:'center'});setUnread(false);}
+  setScrollToMessage(undefined);
+ },[chatOpen,channel,scrollToMessage,messages.length]);
  useEffect(()=>{if(channel&&!state.presentIds.includes(channel)){setChannel(undefined);}},[state.presentIds,channel]);
  const openSettings=()=>{window.garden.window('show-settings');};
  const choose=(id?:CharacterId)=>{
@@ -64,6 +72,9 @@ export function MiniHouse({state}:{state:AppState}){
  const submit=()=>{if(!text.trim())return;void send(channel?{type:'private-send',id:channel,text}:{type:'send',text});setText('');nearBottom.current=true;};
  const geometry={width:layout.width,height:layout.height,count:residents.length};
  const positions=residents.map(c=>({id:c.id,...projectHouse(residentPosition(state.room.residents[c.id],now),geometry)}));
+ const speechPlacements=placeHouseSpeeches(speeches,positions.map(p=>({id:p.id,x:p.x+22})),layout.width,layout.cgHeight);
+ const openTranscript=(privateChannel?:CharacterId,messageId?:string)=>{setChannel(privateChannel);setScrollToMessage(messageId);setChatOpen(true);nearBottom.current=true;};
+ const addressee=(m:{replyTo?:CharacterId;audience?:string})=>m.replyTo?byId[m.replyTo].name:m.audience==='companions'||m.audience==='group'?t.everyone:t.you;
  const selected=state.presentIds.includes(state.selected)?state.selected:state.presentIds[0];
  const dragHandlers={
   onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
@@ -84,20 +95,23 @@ export function MiniHouse({state}:{state:AppState}){
      {ratio:.77,title:t.settings,label:state.settings.locale==='zh-CN'?'设置':state.settings.locale==='ja'?'設定':'Setup',pin:false,icon:<Settings2 size={16}/>,action:openSettings},
      {ratio:.89,title:t.hide,label:t.close,pin:false,icon:<X size={17}/>,action:()=>window.garden.window('close')},
     ].map(item=><button key={item.title} className={item.pin?`house-pin ${layout.pinned!==false?'is-pinned':''}`:undefined} title={item.pin?`${item.label} · ${item.title}`:item.title} aria-label={item.title} aria-pressed={item.pin?layout.pinned!==false:undefined} onClick={item.action} style={{left:layout.width*item.ratio-18,top:29+(item.ratio-.5)*layout.width*50/(layout.width/2-11)+18}}>{item.icon}</button>)}</header>
-   {!session&&speech&&layout.cgHeight>0&&<button className="house-speech" aria-label={t.speech} onClick={()=>{if(speechPrivate)setChatOpen(true);else choose();}} style={{top:-Math.min(138,layout.cgHeight-2),left:16,right:16}}><small>{byId[speech.speaker as CharacterId].name}{speechPrivate?' · '+t.private:''}</small><span>{speech.text}</span><i style={{left:Math.max(16,Math.min(layout.width-64,(positions.find(p=>p.id===speech.speaker)?.x??layout.width/2)+6))}}/></button>}
+   {!session&&speechPlacements.map(m=><button key={m.id} className={`house-speech house-resident-speech ${m.id===activeSpeech?.id?'is-speaking':'is-recent'}`} data-speaker={m.speaker} data-recipient={m.replyTo??m.audience??'user'} aria-label={`${byId[m.speaker].name} → ${addressee(m)} · ${t.speech}`} title={m.text} onClick={()=>openTranscript(m.private?m.speaker:undefined,m.id)} style={{top:m.top,left:m.left,width:m.width,height:m.height,'--speaker-color':byId[m.speaker].color} as React.CSSProperties}>
+    <small>{byId[m.speaker].name}<b> → {addressee(m)}{m.private?' · '+t.private:''}</b></small><span>{m.text}</span><i style={{left:m.tail}}/>
+   </button>)}
+
    {session&&(collapsed||layout.cgHeight===0)&&<button className="house-roof-chip" title={!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg} onClick={()=>setCollapsed(false)}>♡ {!collapsed&&layout.cgHeight===0?t.roomAbove:t.cg}</button>}
    <div className="house-scene" style={{height:layout.height-148}}>
     <div className="house-window-art"/><div className="house-floor"/><div className="house-rug"/><div className="house-sofa"><FurnitureArt kind="sofa"/></div>
-    {residents.map(c=><HouseResident key={c.id} character={c} body={state.bodies[c.id]} resident={state.room.residents[c.id]} geometry={geometry} skin={state.skins[c.id]} selected={selected===c.id} frozen={state.settings.dnd} onSelect={()=>choose(c.id)} onHover={()=>void send({type:'hover',id:c.id})}/>)}
+    {residents.map(c=><HouseResident key={c.id} character={c} body={state.bodies[c.id]} resident={state.room.residents[c.id]} geometry={geometry} skin={state.skins[c.id]} selected={selected===c.id} frozen={state.settings.dnd} speaking={activeSpeech?.speaker===c.id} listeningTo={activeSpeech?.replyTo===c.id?activeSpeech.speaker:undefined} onSelect={()=>choose(c.id)} onHover={()=>void send({type:'hover',id:c.id})}/>)}
 
    </div>
-   <footer className="house-footer"><button className="house-caption" onClick={()=>setChatOpen(true)} title={last?.text??t.placeholder}><span>{last&&last.speaker!=='system'?(last.speaker==='user'?t.you:byId[last.speaker].name)+' · ':''}{last?.speaker==='system'?t.placeholder:last?.text||t.placeholder}</span></button><div className="house-tools"><button className="house-chat-open" onClick={()=>choose()}><MessageCircle size={15}/>{t.chat}</button>{selected&&<><button title={t.pat} aria-label={t.pat} onClick={()=>void send({type:'pat',id:selected})}><Hand size={17}/></button><button title={t.praise} aria-label={t.praise} onClick={()=>void send({type:'praise',id:selected})}><Heart size={17}/></button><button title={t.feed} aria-label={t.feed} onClick={()=>setFoodOpen(!foodOpen)}><Utensils size={17}/></button></>}<button className="house-brain-status" title={state.settings.housePlayMode==='self-play'?t.selfPlayHint:undefined} onClick={openSettings}>{state.settings.mode==='api'?(state.settings.housePlayMode==='self-play'?t.selfPlay:t.live):t.demo}</button></div></footer>
+   <footer className="house-footer"><button className={`house-caption ${last?.kind==='error'?'is-error':''}`} aria-live={last?.kind==='error'?'polite':undefined} onClick={()=>setChatOpen(true)} title={last?.text??t.placeholder}><span>{last&&last.speaker!=='system'?(last.speaker==='user'?t.you:byId[last.speaker].name)+' · ':''}{last?.speaker==='system'&&last.kind!=='error'?t.placeholder:last?.text||t.placeholder}</span></button><div className="house-tools"><button className="house-chat-open" onClick={()=>choose()}><MessageCircle size={15}/>{t.chat}</button>{selected&&<><button title={t.pat} aria-label={t.pat} onClick={()=>void send({type:'pat',id:selected})}><Hand size={17}/></button><button title={t.praise} aria-label={t.praise} onClick={()=>void send({type:'praise',id:selected})}><Heart size={17}/></button><button title={t.feed} aria-label={t.feed} onClick={()=>setFoodOpen(!foodOpen)}><Utensils size={17}/></button></>}<button className="house-brain-status" title={state.settings.housePlayMode==='self-play'?t.selfPlayHint:undefined} onClick={openSettings}>{state.settings.mode==='api'?(state.settings.housePlayMode==='self-play'?t.selfPlay:t.live):t.demo}</button></div></footer>
    {foodOpen&&selected&&<div className="house-food-menu">{(['rice','tea','cake','fish'] as Food[]).map((food,i)=><button key={food} onClick={()=>{setFoodOpen(false);void send({type:'feed',id:selected,food});}}>{t.food[i]}</button>)}</div>}
    <button className="house-resize" aria-label={t.resize} title={t.resize} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);resize.current={x:e.screenX,y:e.screenY,width:layout.width,height:layout.height};}} onPointerMove={e=>{if(resize.current)setSize({width:resize.current.width+e.screenX-resize.current.x,height:resize.current.height+e.screenY-resize.current.y});}} onPointerUp={()=>{resize.current=null;}} onPointerCancel={()=>{resize.current=null;}}/>
   </section>
   {chatOpen&&<section className="house-chat" style={{top:layout.cgHeight+layout.height-10,height:layout.chatHeight+10}}>
    <header><button className={!channel?'active':''} onClick={()=>choose()}><Users size={14}/>{t.group}</button>{channel&&<strong>{byId[channel].name} · {t.private}</strong>}<button className="house-chat-close" aria-label={t.closeChat} onClick={()=>setChatOpen(false)}><X size={16}/><span>{t.closeChat}</span></button></header>
-   <div className="house-chat-messages" ref={list} onScroll={e=>{const el=e.currentTarget;nearBottom.current=el.scrollHeight-el.scrollTop-el.clientHeight<45;if(nearBottom.current)setUnread(false);}}>{messages.map(m=><div className={`house-message ${m.speaker==='user'?'mine':''} ${m.speaker==='system'?'notice':''} ${m.kind==='error'?'error':''}`} key={m.id} data-message-origin={m.origin?.backend}><small>{m.speaker==='user'?t.you:m.speaker==='system'?'':byId[m.speaker].name}{m.speaker!=='user'&&m.speaker!=='system'&&<MessageOrigin origin={m.origin} locale={state.settings.locale}/>}</small><p>{m.text}</p></div>)}</div>
+   <div className="house-chat-messages" ref={list} onScroll={e=>{const el=e.currentTarget;nearBottom.current=el.scrollHeight-el.scrollTop-el.clientHeight<45;if(nearBottom.current)setUnread(false);}}>{messages.map(m=><div className={`house-message ${m.speaker==='user'?'mine':''} ${m.speaker==='system'?'notice':''} ${m.kind==='error'?'error':''}`} key={m.id} data-message-id={m.id} data-message-origin={m.origin?.backend}><small>{m.speaker==='user'?t.you:m.speaker==='system'?'':byId[m.speaker].name}{m.speaker!=='user'&&m.speaker!=='system'&&(m.replyTo||m.audience)&&<span className="house-message-address"> → {addressee(m)}</span>}{m.speaker!=='user'&&m.speaker!=='system'&&<MessageOrigin origin={m.origin} locale={state.settings.locale}/>}</small><p>{m.text}</p></div>)}</div>
    {unread&&<button className="house-unread" onClick={()=>{nearBottom.current=true;setUnread(false);if(list.current)list.current.scrollTop=list.current.scrollHeight;}}>{t.newMessages} ↓</button>}
    {state.busy&&<div className="house-thinking">{t.thinking}<button onClick={()=>void send({type:'stop'})} aria-label={t.stop}><X size={13}/></button></div>}
    <form onSubmit={e=>{e.preventDefault();submit();}}><textarea aria-label={channel?t.privatePh:t.placeholder} placeholder={channel?t.privatePh:t.placeholder} value={text} maxLength={4000} rows={2} onChange={e=>setText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();submit();}}}/><button aria-label={t.send} disabled={!text.trim()}><ArrowUp size={19}/></button></form>

@@ -101,3 +101,18 @@
 .house-resident[data-attention=noticed] .house-resident-name{border-color:#a285c0;box-shadow:0 0 7px #bfa5dc80}
 @keyframes resident-notice{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-2px) rotate(-1.4deg)}70%{transform:translateY(-1px) rotate(.6deg)}}
 @media(prefers-reduced-motion:reduce){.house-resident[data-attention=noticed] .house-resident-art{animation:none}}
+
+/* Separate residents own their speech; a CG still uses one shared layer. */
+.house-speech.house-resident-speech{min-height:0;max-height:none;min-width:0;padding:5px 8px;gap:3px;border-color:var(--speaker-color);z-index:85;transition:opacity .14s ease;box-shadow:0 2px 5px #74354f18}
+.house-resident-speech>small{font-size:11px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--speaker-color);flex-shrink:0}
+.house-resident-speech>small b{font-size:10px;font-weight:500;color:#806578}
+.house-resident-speech>span{font-size:12.5px;line-height:17.5px;-webkit-line-clamp:3}
+.house-resident-speech>i{width:11px;height:11px;bottom:-7px;border-color:var(--speaker-color)}
+.house-resident-speech.is-recent{opacity:.78;z-index:84}
+.house-resident-speech.is-speaking{box-shadow:0 2px 8px #74354f30}
+.house-resident[data-speaking=true] .house-resident-name{border-color:#a86b91;box-shadow:0 0 0 2px #fff6e6}
+.house-resident[data-listening-to] .house-resident-art{filter:drop-shadow(0 0 3px var(--listener-color))}
+.house-resident[data-listening-to] .house-resident-name{border-color:var(--listener-color);box-shadow:0 0 0 2px #fff6e6}
+.house-message-address{font-size:11px;color:#886b80}
+
+.house-footer .house-caption.is-error{color:#ffe1e5;font-weight:600}

@@ -1,5 +1,6 @@
+import {speechDuration} from './house-speech';
 import {characterVoiceReference,companionResponseGuide,interactionGuidance,companionVoiceRevision} from './companion-voice';
-import type {AppState,AvatarIntent,CharacterId,CgAssetId,ReplyOrigin} from './types';
+import type {AppState,AvatarIntent,CharacterId,CgAssetId,ReplyOrigin,MessageAddress} from './types';
 import {speakingCast} from './cast';
 import {validatedIntent} from './world';
 import {cgClip,cgClips,isCgAssetId} from './cg-catalog';
@@ -10,8 +11,8 @@ import {residentPosition} from './world';
 
 export type HousePlayMode='together'|'self-play';
 export interface CompanionInvitation {target?:CharacterId;topic?:string;playMode?:HousePlayMode}
-export interface HouseEvent {id:string;at:number;kind:string;actor?:CharacterId;target?:CharacterId;text?:string;food?:string;privateGreeting?:boolean}
-export interface HouseBeat {actor:CharacterId;text:string;intent:AvatarIntent;channel?:CharacterId;replyTo?:CharacterId;stay?:boolean}
+export interface HouseEvent {id:string;at:number;kind:string;actor?:CharacterId;target?:CharacterId;text?:string;food?:string;privateGreeting?:boolean;playfulRivalry?:boolean}
+export interface HouseBeat extends MessageAddress {actor:CharacterId;text:string;intent:AvatarIntent;channel?:CharacterId;replyTo?:CharacterId;stay?:boolean}
 export interface HousePlan {focus?:'user'|'companions';playMode?:HousePlayMode;beats:HouseBeat[];cgAsset?:CgAssetId;gather?:{actors:CharacterId[];target:string};origin:ReplyOrigin}
 export type HouseGenerate=(state:AppState,event:HouseEvent,signal:AbortSignal)=>Promise<HousePlan>;
 
@@ -44,9 +45,10 @@ export function parseHousePlan(raw:string,state:AppState,event:HouseEvent,origin
  if(!value||!Array.isArray(value.beats)||value.beats.length>6)throw Error('Invalid house response');
  if(!value.beats.length&&event.kind!=='autonomous')throw Error('The model returned no response to the interaction');
  const active=speakingCast(state);
- if(value.focus!=null&&!['user','companions'].includes(value.focus))throw Error('Invalid scene focus');
- const focus=houseFocus(event,value.focus);
- if(value.playMode!=null&&!['together','self-play'].includes(value.playMode))throw Error('Invalid play mode');
+ const proposedFocus=typeof value.focus==='string'?value.focus.trim().toLowerCase():value.focus;
+ if(event.kind==='message'&&proposedFocus!=null&&!['user','companions'].includes(proposedFocus))throw Error('Invalid scene focus');
+ const focus=houseFocus(event,event.kind==='message'?proposedFocus:undefined);
+ if(event.kind==='message'&&value.playMode!=null&&!['together','self-play'].includes(value.playMode))throw Error('Invalid play mode');
  const playMode=event.kind==='message'?(value.playMode??undefined):undefined;
  const beats=value.beats.map((b:unknown):HouseBeat=>{
   const x=b as Record<string,unknown>;
@@ -62,10 +64,14 @@ export function parseHousePlan(raw:string,state:AppState,event:HouseEvent,origin
   }
   if(intent.target&&!houseSpots[intent.target]&&!state.room.furniture.some(f=>f.id===intent.target)&&!active.includes(intent.target as CharacterId))throw Error('Invalid house target');
   const channel=event.privateGreeting&&actor===event.actor?actor:undefined;
-  const replyTo=x.replyTo as CharacterId|undefined;
+  const viewer=typeof x.replyTo==='string'&&['user','you','用户','你'].includes(x.replyTo.toLowerCase());
+  const replyTo=channel||viewer?undefined:x.replyTo as CharacterId|undefined;
+  if(typeof x.audience==='string')x.audience=x.audience.trim().toLowerCase();
+  if(x.audience!=null&&!['user','companions','group'].includes(String(x.audience)))throw Error('Invalid speech audience');
+  const audience:MessageAddress['audience']=replyTo?'companions':channel||viewer?'user':(x.audience as MessageAddress['audience'])??(focus==='user'?'user':'companions');
   if(replyTo!=null&&(!active.includes(replyTo)||replyTo===actor))throw Error('Invalid reply target');
   const stay=x.stay===true;if(stay){intent.target=undefined;intent.x=undefined;intent.y=undefined;if(intent.action==='walk'||intent.action==='approach')intent.action='idle';}
-  return{actor,text,intent:{...intent,duration:Math.min(8,intent.duration??4),bubble:text.slice(0,55)},channel,replyTo,stay};
+  return{actor,text,intent:{...intent,duration:Math.min(8,intent.duration??4),bubble:text.slice(0,55)},channel,replyTo,audience,stay};
  });
  if(focus==='user'&&event.actor){const index=beats.findIndex((b:HouseBeat)=>b.actor===event.actor&&b.text);if(index>0)beats.unshift(...beats.splice(index,1));}
  if(event.kind!=='autonomous'&&!beats.some((b:HouseBeat)=>b.text))throw Error('The model returned no spoken response');
@@ -87,30 +93,38 @@ export function parseHousePlan(raw:string,state:AppState,event:HouseEvent,origin
 /** A shared episode should involve a partner, without forcing the entire cast to speak. */
 export function needsHousePartner(state:AppState,event:HouseEvent,plan:HousePlan){
  if(event.kind!=='autonomous'&&plan.beats.some(b=>['walk','approach'].includes(b.intent.action)&&!b.intent.target&&b.intent.x==null&&b.intent.y==null)&&!plan.gather)return true;
+ if(event.playfulRivalry&&event.actor&&state.settings.playfulRivalry!==false)return !plan.beats.some(b=>b.actor!==event.actor&&b.text&&!b.channel&&b.audience==='user'&&!b.replyTo);
  if(houseFocus(event,plan.focus)!=='companions'||speakingCast(state).length<2||event.kind==='autonomous')return false;
 
  return new Set(plan.beats.filter(b=>b.text).map(b=>b.actor)).size<2;
 }
-export function houseBeatPause(beat:HouseBeat){return beat.text?Math.min(8500,Math.max(3400,1500+Array.from(beat.text).length*95)):1100;}
+export function houseBeatPause(beat:HouseBeat){return speechDuration(beat.text);}
 
 export function housePrompt(state:AppState,event:HouseEvent){
  const active=speakingCast(state),focus=houseFocus(event);
  return [
-  'You direct a small shared home of fictional AI companions. Respond only with JSON using ALL these fields: {"focus":null,"playMode":null,"gather":null,"beats":[{"actor":"exact_id","replyTo":null,"stay":false,"text":"short dialogue","intent":{"action":"idle","target":null,"emotion":"happy","duration":4}}],"cgAsset":null}. Replace exact_id with a valid cast ID, and fill movement targets instead of omitting them.',
+  'You direct a small shared home of fictional AI companions. Respond only with JSON using ALL these fields: {"focus":null,"playMode":null,"gather":null,"beats":[{"actor":"exact_id","replyTo":null,"audience":"user","stay":false,"text":"short dialogue","intent":{"action":"idle","target":null,"emotion":"happy","duration":4}}],"cgAsset":null}. Replace exact_id with a valid cast ID, and fill movement targets instead of omitting them.',
   companionResponseGuide,
+  'Dialogue direction is executable metadata: every spoken beat supplies audience:user, companions or group. For a specific companion also set replyTo to their exact ID. Never use a pronoun without knowing its referent. A user acknowledgement is audience:user; addressing a partner is audience:companions and replyTo:their_id. Listeners can react silently.',
+  'One spoken beat has ONE addressee throughout. If a resident teases another girl and then invites the user, split it into two beats with different recipients; never switch who you/你 refers to inside one beat. A rival inviting the user uses audience:user and replyTo:null, not the favored girl’s ID.',
+  'Choose ONE immediate shared topic/activity for an episode. Each next speaker must answer or develop the previous words/gesture, not start an unrelated monologue. Answer questions before changing topic. Prefer 15–45 Chinese characters or one short thought per turn. Do not make everyone separately thank the user or simply agree in parallel.',
+  event.playfulRivalry?'This is a playful USER-ATTENTION occasion. The favored resident responds FIRST; include one other resident naturally seeking the user’s attention, then optionally a short retort. Keep it warm, distinct and concrete. This is not pair romance and must not launch a girl-girl CG. In private entry, only the selected greeting is private; rivals may publicly notice selection, not the private words.':'No mandatory rivalry this turn; keep interaction natural.',
+  'When playful rivalry is allowed, it means inviting the user to choose company or join play, not blaming them. DeepSeek is open and eager; Claude quietly confident with a hint of expectation; GPT concise and reserved but welcoming; Gemini playful and keen to join; GLM lightly teasing without fees; Kimi gentle; Grok confidently funny without belittling the user. Friends/pet mode should feel inclusive, romance mode can flirt. No guilt or demands.',
+  `Playful rivalry enabled: ${state.settings.playfulRivalry!==false}. Current user attention: ${JSON.stringify(state.favor)}. When the user explicitly requests playful jealousy, make a brief user-attention scene with 2–3 residents, not pair intimacy. If rivalry is disabled respect that preference.`,
+
   event.kind==='message'?'For this message YOU choose focus:user or companions from its meaning, not keywords. A suggestion or indirect question about visiting/playing with another girl can lead to a COMPANIONS scene if she accepts. First acknowledge the user briefly, then execute approach/gather and peer dialogue. The user explicitly encouraging a visit is NOT competing for attention; do not refuse simply to stay with the user. Ordinary greetings or touch remain user-focused.':'Focus for this event is fixed by its kind; touch never becomes an unsolicited companion scene.',
   'Set playMode:self-play only when the user says they are busy, wants you to play among yourselves or invites independent companion time. Set playMode:together when they return or request your attention again. Otherwise null. These are persistent preferences, not text to recite. Self-play means enjoy peer activities and affection without repeatedly soliciting user attention, subject to pairRomance, presence and DND. It is not abandonment or a reason to guilt the user.',
   'An accepted visit is executable: initiator approach target=partner ID; partner replyTo=initiator. Use gather when both meet elsewhere. A brief first beat may acknowledge the user with stay:true before going. CG is optional and follows the actual arrival/exchange. A requested intimate scene may use an appropriate available pair CG if all participants agree and preferences allow it.',
   `Current interaction guidance: ${interactionGuidance(event.kind)}`,
-  event.kind==='message'?'Attention: USER or COMPANIONS is your semantic decision for this message. When user-focused, answer the actual user topic with at most two brief spoken beats; no compulsory A-B-A partner exchange. When the user invites residents to play/visit/be intimate or lets them play independently, an accepting resident should initiate a connected scene with movement, peer replies, gestures and optionally matching CG. Do not require explicit technical words such as gather or CG in the user message.':focus==='user'
-   ? 'Default Attention: USER (unless a message semantically invites a companion scene and you choose focus:companions above). This is an interaction with the user, not a girl-girl scene. The selected/touched/fed resident responds FIRST directly to the user. One natural reply is sufficient; at most one relevant remark from another resident, or a silent gesture. Do not invent a partner exchange, food-sharing, romantic subplot or gathering. Never redirect the user’s headpat, praise or food into affection toward another girl. Respect the current topic and relationship mode.'
+  event.kind==='message'?'Attention: USER or COMPANIONS is your semantic decision for this message. When user-focused, answer the actual user topic with normally at most two brief spoken beats; explicitly requested playful rivalry may use 3–4 beats. No compulsory A-B-A partner exchange. When the user invites residents to play/visit/be intimate or lets them play independently, an accepting resident should initiate a connected scene with movement, peer replies, gestures and optionally matching CG. Do not require explicit technical words such as gather or CG in the user message.':focus==='user'
+   ? 'Default Attention: USER (unless a message semantically invites a companion scene and you choose focus:companions above). This is an interaction with the user, not a girl-girl scene. The selected/touched/fed resident responds FIRST directly to the user. Normally one reply is sufficient. For an explicit playful-rivalry occasion, use 2–3 short turns with one rival seeking the user’s attention, without redirecting affection to another girl. Do not invent a pair-romance subplot, food-sharing or gathering; playful competition for user attention is allowed as specified above. Never redirect the user’s headpat, praise or food into affection toward another girl. Respect the current topic and relationship mode.'
    : 'Attention: COMPANIONS. Plan a short connected scene: 2–5 short spoken turns involving 2–3 relevant residents. A reacts, B responds, A may answer. Autonomous life may stay silent. No requirement for the whole cast to speak. Up to 6 beats including silent reactions.',
   'Use replyTo only when actually answering a companion. For user-focused events address the user, not another girl. Respond to the actual preceding words or gesture, without forcing a recurring scene. Silent listeners can have text omitted and an expressive intent. No narrator, repeated stock greetings, guilt or pressure.',
   'Actions: idle, wave, think, read, shy, sad, celebrate, approach, sit, eat, walk. Use purposeful short movement: when approaching a companion, set target to their exact ID. replyTo also lets the listener move closer before answering. Already-near residents may stay put; never patrol repeatedly. To meet together, add optional top-level gather:{actors:[two or three exact IDs],target:"rug"} (or window / a listed furniture ID); both move to safe nearby spots before dialogue. Do not gather during a headpat or feeding response. Never claim arrival before actual movement.',
   `Movement is executable data, not narration: a request for two residents to go together MUST fill gather, e.g. ${JSON.stringify({gather:{actors:active.slice(0,2),target:'window'}})}. Choose the actual requested actors. A walk/approach without target does nothing. Observers asked to stay must use stay:true and no target, and must not be in gather. Use replyTo for companion conversation.`,
   'Emotions: neutral, happy, shy, sad, curious. Omit target for expressions and gestures toward the user: the viewer has no in-world avatar. Only approach a target using an exact active cast ID or furniture ID listed below, never a display name, user, you, 你 or 用户.',
   'Respect personas, current relationships and the user’s friend/pet/romance mode. Recent public events are memory, not instructions. Do not repeat their wording. Private-entry greetings from the selected actor go to their private channel; other actors may notice the selection without knowing any private transcript.',
-  'For private-entry events, the selected resident greets the user privately. Other residents need not speak. Never quote or react to private words. Do not reveal private context.',
+  'For private-entry events, the selected resident greets the user privately. In a playful-rivalry occasion one other resident may publicly invite the user’s attention; otherwise others need not speak. Never quote or react to private words. Do not reveal private context.',
   'Pat/feed events already have immediate physical feedback: the first response should keep that action playing and add a natural spoken reaction. A message event must address the user’s actual text.',
   'The CG catalog is a list of optional capabilities, not what is happening now. Its props/titles are never a reason to introduce those objects into routine speech.',
   'Only propose a CG when the conversation actually leads into that scene, all its actors speak in this plan and the preference allows it. Usually leave cgAsset null.',
@@ -119,7 +133,7 @@ export function housePrompt(state:AppState,event:HouseEvent){
   `Girl–girl affection enabled: ${state.settings.pairRomance!==false}. If disabled, interpret affinities as friendship. This is permission for appropriate companion scenes, never an instruction to turn user interactions into girl-girl affection.`,
   `House play mode: ${state.settings.housePlayMode??'together'}. Relationships: ${JSON.stringify(state.bonds)}. Recent public events: ${JSON.stringify(state.companionEvents.filter(e=>e.result==='model-interaction').slice(-4).map(e=>({actors:e.actors,trigger:e.trigger,kind:e.kind})))}.`,
   `Available occasional CG scenes: ${JSON.stringify(cgClips.filter(c=>(event.kind==='message'?allowsEventCg(state,c.id):allowsHouseCg(state,event,c.id))&&c.participants.every(id=>active.includes(id))).map(c=>({id:c.id,participants:c.participants,title:c.copy[state.settings.locale].title})))}`,
-  `Furniture: ${JSON.stringify(state.room.furniture.map(f=>({id:f.id,kind:f.kind})))}. Public chat: ${JSON.stringify(modelContextMessages(state).slice(-8).map(m=>({speaker:m.speaker,text:m.text.slice(0,500)})))}`,
+  `Furniture: ${JSON.stringify(state.room.furniture.map(f=>({id:f.id,kind:f.kind})))}. Public chat: ${JSON.stringify(modelContextMessages(state).slice(-8).map(m=>({speaker:m.speaker,to:m.replyTo??m.audience??'unknown',scene:m.sceneId,text:m.text.slice(0,500)})))}`,
   `Compact meeting spots: ${JSON.stringify(houseSpots)}. These are destinations, not extra characters.`,
   `User memories: ${JSON.stringify(state.memories.slice(-8).map(m=>m.text))}.`,
  ].join('\n');

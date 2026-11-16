@@ -9,7 +9,7 @@ import type {Interaction} from '../src/shared/motion';
 import { byId, providers } from '../src/shared/characters';
 import { socialScenes, relationshipKey } from '../src/shared/social';
 import { chooseSpeakers, demoReply, initialState, praiseLines, ids } from '../src/shared/director';
-import type { Action, AppState, CharacterId, CgAssetId, Message, AvatarIntent, Emotion,RoomPoint } from '../src/shared/types';
+import type { Action, AppState, CharacterId, CgAssetId, Message, MessageAddress, AvatarIntent, Emotion,RoomPoint } from '../src/shared/types';
 import { boundedPoint, defaultFurniture, inferredIntent, poseForAction, restingBody, residentPosition, targetDescription, validatedIntent } from '../src/shared/world';
 import { emptyAgentUi } from '../src/shared/agent';
 import { isAppLocale, translate } from '../src/shared/i18n';
@@ -53,10 +53,12 @@ export class GardenEngine {
   private privateOpened: {id:CharacterId;at:number}|null=null;
   private hovered: Partial<Record<CharacterId,number>>={};
   private lastGreeting=0;
+  private lastRivalryAt=0;
+  private activeRivalry?:{jobId:string;favored:CharacterId};
   private nextDeepseek=Date.now()+120000;
   private lastDeepseekClip="";
   private lastClaudeClip="";
-  private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction;speech?:{text:string;channel?:CharacterId;origin?:Message['origin'];jobId:string}}>();
+  private pendingArrive=new Map<CharacterId,{bubble:string;interaction?:Interaction;speech?:MessageAddress&{text:string;channel?:CharacterId;origin?:Message['origin'];jobId:string}}>();
   private houseGeometry:HouseGeometry={width:360,height:300,count:3};
   private houseCastKey='';
   setHouseGeometry(width:number,height:number){
@@ -105,7 +107,8 @@ export class GardenEngine {
     if(kind!=='message'&&now-(this.houseLast.get(key)??0)<1500)return;
     this.houseLast.set(key,now);this.stop();const round=this.epoch;
     const controller=new AbortController();this.abort=controller;
-    const event:HouseEvent={...details,id:crypto.randomUUID(),kind,actor,at:now};this.pendingHouseKind=kind;
+    const rivalry=!!actor&&this.state.settings.playfulRivalry!==false&&speakingCast(this.state).length>1&&now-this.lastRivalryAt>=45000&&(['praise','private-open'].includes(kind)||kind==='pat'&&this.state.favor.streak>=2||kind==='feed'&&this.state.favor.streak>=3);
+    const event:HouseEvent={...details,id:crypto.randomUUID(),kind,actor,at:now,playfulRivalry:rivalry};this.pendingHouseKind=kind;
     this.state.busy=true;this.state.activity=this.locale()==='en'?'The house is thinking…':this.locale()==='ja'?'みんなが考えています…':'她们在想怎么回应…';this.publish();
     try{
       if(!this.houseGenerate)throw Error('小屋互动生成器尚未连接');
@@ -122,11 +125,17 @@ export class GardenEngine {
       let offset=plan.gather?250:0,previousPublic:CharacterId|undefined;
       const steps:SceneStep[]=plan.gather?plan.gather.actors.map(id=>({at,actor:id,intent:{action:'approach',target:plan.gather!.target,duration:1},origin:plan.origin})):[];
       const approached=new Set<CharacterId>();
-      for(const b of plan.beats){const intent={...b.intent},peer=b.replyTo??previousPublic;
-        if(houseFocus(event,plan.focus)==='companions'&&this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
-        steps.push({at:at+offset,actor:b.actor,intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,preserveReaction:b.actor===actor});offset+=houseBeatPause(b);if(!b.channel&&b.text)previousPublic=b.actor;
+      for(const b of plan.beats){
+        const intent={...b.intent},audience=b.channel?'user':b.audience??(houseFocus(event,plan.focus)==='companions'?'companions':'user');
+        const target=ids.find(id=>id===intent.target&&id!==b.actor);
+        const replyTo=b.replyTo??(audience==='companions'?(target??(previousPublic!==b.actor?previousPublic:undefined)):undefined);
+        const peer=replyTo??previousPublic;
+        if(audience==='companions'&&houseFocus(event,plan.focus)==='companions'&&this.state.presentation.surface==='house'&&this.state.connections[this.state.settings.provider]?.tools!==false&&!plan.gather&&!b.stay&&!b.channel&&b.text&&peer&&peer!==b.actor&&!intent.target&&approached.size===0){intent.target=peer;approached.add(b.actor);}
+        steps.push({at:at+offset,actor:b.actor,intent,speech:b.text||undefined,channel:b.channel,origin:plan.origin,replyTo,audience,sceneId:'house-'+event.id,preserveReaction:b.actor===actor});offset+=houseBeatPause(b);if(!b.channel&&b.text)previousPublic=b.actor;
       }
-      const job=this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
+      const hasRival=event.playfulRivalry&&!!actor&&plan.beats.some(b=>b.actor!==actor&&b.text&&!b.channel);
+      const job=this.queueJob({id:'house-'+event.id,source:'house:'+kind,priority:kind==='autonomous'?'idle':'user',cast,cgAsset:plan.cgAsset,reward:{kind:hasRival?'rival-react':'other',actors:cast,trigger:kind,result:'model-interaction',recall:publicLines.slice(0,160)||(plan.beats.some(b=>b.channel&&b.text)?'与用户进行了一次私下问候':'伙伴安静地相处了一会儿')}},steps,at);
+      if(job&&hasRival&&actor)this.activeRivalry={jobId:'house-'+event.id,favored:actor};
       this.tick(at);return !!job;
     }catch(error){if(kind==='hover')this.houseLast.delete(key);if(round===this.epoch&&!controller.signal.aborted){const detail=error instanceof Error?error.message.slice(0,180):'';this.add('system',(this.locale()==='en'?'The AI response failed. Try again.':this.locale()==='ja'?'AIの応答に失敗しました。もう一度お試しください。':'这次 AI 回应未完成，请重试。')+(detail?' '+detail:''),'error');}}
     finally{if(round===this.epoch){this.abort=undefined;this.pendingHouseKind=undefined;this.state.busy=false;this.publish();}}
@@ -134,11 +143,12 @@ export class GardenEngine {
   private locale() { return this.state.settings.locale; }
   private t(key: string, vars?: Record<string, string | number>) { return translate(this.locale(), key, vars); }
   publish() { this.state.revision++; this.notify(this.state); }
-  add(speaker: Message['speaker'], text: string, kind?: Message['kind'], origin?: Message['origin']) {
-    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind, origin:origin?.backend==='model'?{...origin,voiceRevision:companionVoiceRevision}:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined) };
+  add(speaker: Message['speaker'], text: string, kind?: Message['kind'], origin?: Message['origin'],address:MessageAddress={}) {
+    if(this.activeRivalry&&address.sceneId===this.activeRivalry.jobId&&speaker!==this.activeRivalry.favored&&speaker!=='user'&&speaker!=='system'){this.lastRivalryAt=Date.now();this.activeRivalry=undefined;}
+    const message = { id: crypto.randomUUID(), speaker, text, at: Date.now(), kind,replyTo:address.replyTo,audience:address.audience,sceneId:address.sceneId, origin:origin?.backend==='model'?{...origin,voiceRevision:companionVoiceRevision}:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined) };
     this.state.messages.push(message); this.state.messages = this.state.messages.slice(-500); this.publish(); return message;
   }
-  private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string,origin?:Message['origin']){const message={id:crypto.randomUUID(),speaker,text,at:Date.now(),origin:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined)};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
+  private addPrivate(id:CharacterId,speaker:Message['speaker'],text:string,origin?:Message['origin'],address:MessageAddress={}){const message={id:crypto.randomUUID(),speaker,text,kind:speaker==='system'?'error' as const:undefined,at:Date.now(),replyTo:undefined,sceneId:address.sceneId,audience:'user' as const,origin:origin?.backend==='model'?{...origin,voiceRevision:companionVoiceRevision}:origin??(speaker!=='user'&&speaker!=='system'?{backend:'local' as const}:undefined)};this.state.privateMessages[id].push(message);this.state.privateMessages[id]=this.state.privateMessages[id].slice(-200);this.publish();return message;}
   perform(id:CharacterId,value:unknown,source:'local'|'model'='local',now=Date.now(),interaction?:Interaction) {
     if(!ids.includes(id))throw new Error(this.t('sys.unknownCharacter'));
     if(!isPresent(this.state,id))throw new Error(this.t('cast.needInvite',{name:byId[id].name}));
@@ -321,7 +331,7 @@ export class GardenEngine {
   }
   private freezeRoom(now=Date.now()) {
     this.cancelScenes('freeze');
-    this.pendingArrive.clear();
+    this.pendingArrive.clear();this.activeRivalry=undefined;
     for(const id of ids){const p=residentPosition(this.state.room.residents[id],now);this.state.room.residents[id]={...this.state.room.residents[id],...p,from:p,path:undefined,startedAt:0,arrivesAt:0};const d=this.state.desktopMoves[id];if(d&&this.state.pets[id]){const t=Math.max(0,Math.min(1,(now-d.startedAt)/(d.arrivesAt-d.startedAt)));this.state.pets[id]={...this.state.pets[id]!,x:d.from.x+(d.to.x-d.from.x)*t,y:d.from.y+(d.to.y-d.from.y)*t};}delete this.state.desktopMoves[id];this.state.bodies[id]={...restingBody(),stoppedAt:now};}this.publish();
   }
   private playSocial(id:string,now=Date.now()) {
@@ -348,6 +358,7 @@ export class GardenEngine {
     this.nextSocial = now + steps.length * 4200 + 180000;
   }
   private queueRivalryEscalation(favored: CharacterId, now = Date.now()) {
+    if(this.state.settings.playfulRivalry===false)return;
     if (this.state.settings.dnd || this.state.focus || !isSpeaking(this.state, favored)) return;
     if (!shouldEscalateRivalry(this.state)) return;
     const cast = rivalryEscalationCast(this.state, favored);
@@ -389,7 +400,7 @@ export class GardenEngine {
         await this.wait(controller.signal);
         if (round !== this.epoch) break;
         if (useApi && this.generate) {
-          const message = channel?this.addPrivate(channel,line.speaker,'',{backend:'model'}):this.add(line.speaker, '',undefined,{backend:'model'});
+          const message = channel?this.addPrivate(channel,line.speaker,'',{backend:'model'}):this.add(line.speaker, '',undefined,{backend:'model'},{audience:'user'});
           try {
             let acted=false;
             const context=channel?{...this.state,messages:this.state.privateMessages[channel]}:this.state;
@@ -428,7 +439,7 @@ export class GardenEngine {
         } else {
           this.perform(line.speaker,{...inferredIntent(line.text),bubble:line.text.slice(0,45)});
           const origin={backend:'local' as const,provider:'demo',model:'offline'};
-          if(channel)this.addPrivate(channel,line.speaker,line.text,origin);else this.add(line.speaker, line.text, undefined, origin);
+          if(channel)this.addPrivate(channel,line.speaker,line.text,origin);else this.add(line.speaker, line.text, undefined, origin,{audience:'user'});
         }
         this.state.mood[line.speaker] = this.state.focus ? 'focus' : 'idle';this.state.affection[line.speaker]=Math.min(100,this.state.affection[line.speaker]+1); this.publish();
       }
@@ -537,7 +548,7 @@ export class GardenEngine {
         applyFavor(this.state,action.id,0);
         this.perform(action.id,{action:'celebrate',emotion:'happy',bubble:greeting.slice(0,52),duration:9},'local',now,{kind:'chat',startedAt:now});
         this.addPrivate(action.id,action.id,greeting);
-        const plan=planChoseHer(this.state,action.id,now);
+        const plan=this.state.settings.playfulRivalry===false?undefined:planChoseHer(this.state,action.id,now);
         if(plan){
           const steps=plan.beats.map(b=>({at:now+b.atOffset,actor:b.actor,intent:b.intent,speech:b.speech}));
           this.queueJob({
@@ -561,7 +572,7 @@ export class GardenEngine {
         visit.settled=true;
         this.privateVisits.set(action.id,visit);
         if(this.state.settings.mode==='api'){this.privateOpened=null;await this.reactHouse('private-return',action.id);return;}
-        const rivals=choseHerRivals(this.state,action.id);
+        const rivals=this.state.settings.playfulRivalry===false?[]:choseHerRivals(this.state,action.id);
         const line=privateReturnLine(action.id,rivals,this.state.companionEvents,this.state.settings.pairTone??'warm');
         this.perform(action.id,{action:'wave',emotion:'happy',bubble:line.slice(0,52),duration:8},'local',now);
         this.add(action.id,line);
@@ -692,7 +703,7 @@ export class GardenEngine {
         applyFavor(this.state, action.id, 0);
         this.add('user', praiseUserLine(this.locale(), byId[action.id].name));
         if(this.state.settings.mode==='api'){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});await this.reactHouse('praise',action.id);return;}
-        {const round=this.epoch;await this.sequence(praiseLines(action.id, this.state.settings.intimacy, this.locale()));
+        {const round=this.epoch;await this.sequence(praiseLines(action.id,this.state.settings.intimacy,this.locale()).filter(l=>this.state.settings.playfulRivalry!==false||l.speaker===action.id));
         // sequence starts and finishes one round; a newer request cancels this reaction.
         if(this.epoch===round+2){const now=Date.now();this.perform(action.id,{action:'shy',emotion:'happy',duration:7},'local',now,{kind:'affection',startedAt:now});this.queueRivalryEscalation(action.id,now);const asset=affectionCgFor(action.id);if(asset&&this.eventCgReady(asset))this.beginCgMeetThenPlay(asset,'room',true,7000);}}return;
       }
@@ -751,7 +762,7 @@ export class GardenEngine {
       case 'settings': {
         const p = action.patch;
         if (!p || typeof p !== 'object') return;
-        for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay'] as const) if (typeof p[key] === 'boolean') this.state.settings[key] = p[key];
+        for (const key of ['dnd', 'autonomous', 'petsVisible', 'agentBridge', 'pairRomance', 'cgAutoplay', 'playfulRivalry'] as const) if (typeof p[key] === 'boolean') this.state.settings[key] = p[key];
         if (Number.isFinite(p.intimacy)) this.state.settings.intimacy = Math.max(0, Math.min(100, p.intimacy!));
         if (typeof p.model === 'string') this.state.settings.model = p.model.trim().slice(0, 120);
         if (providers.some(v => v.id === p.provider)) this.state.settings.provider = p.provider!;
@@ -858,7 +869,7 @@ export class GardenEngine {
         changed=true;
       }
     }
-    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.path=undefined;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.speech&&pending.speech.jobId===this.director.activeJobId()&&isSpeaking(this.state,id)){const line=pending.speech;if(line.channel)this.addPrivate(line.channel,id,line.text,line.origin);else this.add(id,line.text,undefined,line.origin);}if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
+    for(const id of ids){const r=this.state.room.residents[id];if(r.arrivesAt&&now>=r.arrivesAt){r.arrivesAt=0;r.startedAt=0;r.path=undefined;r.from={x:r.x,y:r.y};this.state.bodies[id].pose=r.after;const pending=this.pendingArrive.get(id);if(pending){this.pendingArrive.delete(id);if(pending.speech&&pending.speech.jobId===this.director.activeJobId()&&isSpeaking(this.state,id)){const line=pending.speech;if(line.channel)this.addPrivate(line.channel,id,line.text,line.origin,line);else this.add(id,line.text,undefined,line.origin,line);}if(pending.bubble)this.state.bodies[id].bubble=pending.bubble;if(pending.interaction)this.state.bodies[id].interaction={...pending.interaction,startedAt:Math.max(pending.interaction.startedAt,now)};}changed=true;}if(this.state.bodies[id].until&&now>this.state.bodies[id].until){this.state.bodies[id]=restingBody();changed=true;}}
     this.director.dropMissing(presentCast(this.state));
     let {steps:due,completed}=this.director.due(now);
     let waveDelay=0;
@@ -872,7 +883,7 @@ export class GardenEngine {
         else this.perform(item.actor,item.intent,item.origin?.backend==='model'?'model':'local',now);
         const arriving=this.state.presentation.surface==='house'&&this.state.room.residents[item.actor].arrivesAt>now;
         if(arriving)waveDelay=Math.max(waveDelay,this.state.room.residents[item.actor].arrivesAt-now);
-        if(item.speech){if(arriving){const pending=this.pendingArrive.get(item.actor)??{bubble:item.speech.slice(0,55)};pending.speech={text:item.speech,channel:item.channel,origin:item.origin,jobId:this.director.activeJobId()??''};this.pendingArrive.set(item.actor,pending);}else if(item.channel)this.addPrivate(item.channel,item.actor,item.speech,item.origin);else this.add(item.actor,item.speech,undefined,item.origin);}
+        if(item.speech){if(arriving){const pending=this.pendingArrive.get(item.actor)??{bubble:item.speech.slice(0,55)};pending.speech={text:item.speech,channel:item.channel,origin:item.origin,replyTo:item.replyTo,audience:item.audience,sceneId:item.sceneId,jobId:this.director.activeJobId()??''};this.pendingArrive.set(item.actor,pending);}else if(item.channel)this.addPrivate(item.channel,item.actor,item.speech,item.origin,item);else this.add(item.actor,item.speech,undefined,item.origin,item);}
         this.director.noteOwnedEnd(this.ownedEndFor(item.actor));
       }catch{this.director.failEssential();due=[];break;}
     }
