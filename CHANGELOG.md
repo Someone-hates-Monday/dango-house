@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.13 · 2026-11-16 · Dialogue-driven CG / 对话驱动 CG
+
+- 私聊增加 CG 工具、回复结束后排队和可见拦截原因；取消不补播。Add private CG requests, deferred execution, visible blocked reasons and cancellation guards.
+- 群聊与自主同伴交流根据实际对白选择片段，漏选时有界语义补选；保留对象与素材边界。Select matching CG from actual public/peer dialogue with bounded semantic recovery and audience restrictions.
+- 169 项测试及隔离主进程/播放器联调；语义补选可能增加一次模型调用。169 tests and isolated main-process/player integration; semantic recovery may add a model call.
+
 ## 0.5.0-alpha.12 · 2026-11-16 · Affection requests / 亲近邀请
 
 - 明确亲近邀请优先考虑匹配 CG，保留相处模式、冷却和场景完成条件，不冒充缺少的拥抱素材。Prefer compatible CG for accepted affection requests without inventing unavailable footage or bypassing preferences and cooldown.

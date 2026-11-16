@@ -13,7 +13,7 @@ export type HousePlayMode='together'|'self-play';
 export interface CompanionInvitation {target?:CharacterId;topic?:string;playMode?:HousePlayMode}
 export interface HouseEvent {id:string;at:number;kind:string;actor?:CharacterId;target?:CharacterId;text?:string;food?:string;privateGreeting?:boolean;playfulRivalry?:boolean}
 export interface HouseBeat extends MessageAddress {actor:CharacterId;text:string;intent:AvatarIntent;channel?:CharacterId;replyTo?:CharacterId;stay?:boolean}
-export interface HousePlan {focus?:'user'|'companions';playMode?:HousePlayMode;beats:HouseBeat[];cgAsset?:CgAssetId;gather?:{actors:CharacterId[];target:string};origin:ReplyOrigin}
+export interface HousePlan {cgRequested?:boolean;focus?:'user'|'companions';playMode?:HousePlayMode;beats:HouseBeat[];cgAsset?:CgAssetId;gather?:{actors:CharacterId[];target:string};origin:ReplyOrigin}
 export type HouseGenerate=(state:AppState,event:HouseEvent,signal:AbortSignal)=>Promise<HousePlan>;
 
 /** Direct attention belongs to the user unless they explicitly request a companion scene. */
@@ -87,7 +87,7 @@ export function parseHousePlan(raw:string,state:AppState,event:HouseEvent,origin
   if(!Array.isArray(g.actors)||g.actors.length<2||g.actors.length>3||new Set(g.actors).size!==g.actors.length||!g.actors.every((id:CharacterId)=>active.includes(id)&&beats.some((b:HouseBeat)=>b.actor===id))||typeof g.target!=='string'||(!houseSpots[g.target]&&!state.room.furniture.some(f=>f.id===g.target)))throw Error('Invalid gathering');
   gather={actors:g.actors,target:g.target};
  }
- return{beats,cgAsset,gather,origin,focus,playMode};
+ return{beats,cgAsset,gather,origin,focus,playMode,cgRequested:value.cgRequested===true};
 }
 
 /** A shared episode should involve a partner, without forcing the entire cast to speak. */
@@ -103,7 +103,7 @@ export function houseBeatPause(beat:HouseBeat){return speechDuration(beat.text);
 export function housePrompt(state:AppState,event:HouseEvent){
  const active=speakingCast(state),focus=houseFocus(event);
  return [
-  'You direct a small shared home of fictional AI companions. Respond only with JSON using ALL these fields: {"focus":null,"playMode":null,"gather":null,"beats":[{"actor":"exact_id","replyTo":null,"audience":"user","stay":false,"text":"short dialogue","intent":{"action":"idle","target":null,"emotion":"happy","duration":4}}],"cgAsset":null}. Replace exact_id with a valid cast ID, and fill movement targets instead of omitting them.',
+  'You direct a small shared home of fictional AI companions. Respond only with JSON using ALL these fields: {"focus":null,"playMode":null,"gather":null,"beats":[{"actor":"exact_id","replyTo":null,"audience":"user","stay":false,"text":"short dialogue","intent":{"action":"idle","target":null,"emotion":"happy","duration":4}}],"cgRequested":false,"cgAsset":null}. Replace exact_id with a valid cast ID, and fill movement targets instead of omitting them.',
   companionResponseGuide,
   'Dialogue direction is executable metadata: every spoken beat supplies audience:user, companions or group. For a specific companion also set replyTo to their exact ID. Never use a pronoun without knowing its referent. A user acknowledgement is audience:user; addressing a partner is audience:companions and replyTo:their_id. Listeners can react silently.',
   'One spoken beat has ONE addressee throughout. If a resident teases another girl and then invites the user, split it into two beats with different recipients; never switch who you/你 refers to inside one beat. A rival inviting the user uses audience:user and replyTo:null, not the favored girl’s ID.',
@@ -127,6 +127,7 @@ export function housePrompt(state:AppState,event:HouseEvent){
   'For private-entry events, the selected resident greets the user privately. In a playful-rivalry occasion one other resident may publicly invite the user’s attention; otherwise others need not speak. Never quote or react to private words. Do not reveal private context.',
   'Pat/feed events already have immediate physical feedback: the first response should keep that action playing and add a natural spoken reaction. A message event must address the user’s actual text.',
   'The CG catalog is a list of optional capabilities, not what is happening now. Its props/titles are never a reason to introduce those objects into routine speech.',
+  'Set cgRequested:true when this episode accepts a user invitation for closeness OR companion dialogue naturally develops an affectionate shared moment suited to a listed scene. This applies to autonomous companion conversation too. Fill cgAsset with the matching ID in the SAME plan, not just dialogue promising a scene. Set false when unrelated, refusing, or no compatible scene exists. No obligation to turn every exchange into intimacy.',
   'CG selection: when the user clearly invites gentle closeness (a hug, hand-holding, coming closer, cuddling, or asking two girls to lean together) and the resident accepts, actively prefer a compatible available CG instead of routinely returning null. No technical trigger words are needed. First give a brief warm acceptance and matching gesture, then let the scene finish before playback. Keep focus:user for closeness to the user; never substitute a girl-girl CG for a hug requested by the user. All clip participants must speak and preferences still apply. Use null for routine unrelated chat, refusal, unavailable cast, or no compatible clip. Do not invent a hug video: a reach/close-up clip can express accepting closeness, but dialogue must not claim that an unavailable animated embrace is shown. Do not add book-handling dialogue just because a clip contains a book.',
   `Language: ${state.settings.locale}. Event: ${JSON.stringify(event)}. User relationship: ${JSON.stringify(state.relationship)}.`,
   `Cast: ${JSON.stringify(active.map(id=>({...characterVoiceReference(id,state.settings.locale,event.kind),position:residentPosition(state.room.residents[id]),affinity:event.kind==='message'||focus==='companions'?{target:socialProfiles[id].target}:undefined})))}`,

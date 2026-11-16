@@ -29,7 +29,7 @@ import { pushCompanionEvent, clearCompanionEvents, type CompanionEventKind } fro
 import { planChoseHer, planStory, choseHerRivals, privateReturnLine } from '../src/shared/companion-stories';
 import { shouldAttemptStoryLlm, storyLlmPrompt } from '../src/shared/story-llm';
 type GenerateResult = { text: string; provider: string; model: string };
-type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act?: (intent:AvatarIntent)=>string,invite?:(request:CompanionInvitation)=>string) => Promise<string | GenerateResult>;
+type Generate = (state: AppState, id: CharacterId, text: string, signal: AbortSignal, update: (text: string) => void, act?: (intent:AvatarIntent)=>string,invite?:(request:CompanionInvitation)=>string,cg?:(asset:string)=>string) => Promise<string | GenerateResult>;
 export class GardenEngine {
   state: AppState;
   agent?: AgentRuntime;
@@ -117,8 +117,9 @@ export class GardenEngine {
       const proposed=await this.houseGenerate(this.state,event,signal);
       if(proposed.beats.some(b=>castBefore.has(b.actor)&&!isSpeaking(this.state,b.actor)))return;
       if(round!==this.epoch||signal.aborted||(kind==='autonomous'&&!this.houseVisible)||this.state.settings.mode!=='api'||this.state.settings.dnd||(this.state.focus&&!kind.startsWith('focus')))return;
-      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset,gather:proposed.gather,focus:proposed.focus,playMode:proposed.playMode}),this.state,event,proposed.origin);
+      const plan=parseHousePlan(JSON.stringify({beats:proposed.beats,cgAsset:proposed.cgAsset,cgRequested:proposed.cgRequested,gather:proposed.gather,focus:proposed.focus,playMode:proposed.playMode}),this.state,event,proposed.origin);
       if(!plan.beats.length)return;
+      if(plan.cgRequested&&!plan.cgAsset)this.add('system','CG 未排入：当前没有符合本轮对象与情境的可用片段。','notice');
       if(plan.playMode)this.state.settings.housePlayMode=plan.playMode;
       const at=Date.now();const cast=[...new Set(plan.beats.map(b=>b.actor))];
       const publicLines=plan.beats.filter(b=>!b.channel&&b.text).map(b=>byId[b.actor].name+':'+b.text).join(' ');
@@ -267,9 +268,19 @@ export class GardenEngine {
       return;
     }
     const asset = job.cgAsset??cgAssetForCompletedJob(job);
+    if(asset){const reason=this.cgBlockReason(asset);if(reason){if(job.source.startsWith('house:')||job.source==='private-cg')this.add('system',reason,'notice');return;}}
     if (asset&&this.eventCgReady(asset)&&this.startCgSession(asset,this.state.presentation.surface==='desktop'?'desktop':'room',false,true))this.lastEventCgAt=Date.now();
   }
-  private eventCgReady(asset:CgAssetId){return allowsEventCg(this.state,asset)&&this.cgCastPresent(asset)&&Date.now()-this.lastEventCgAt>=120000&&!this.state.cgSession;}
+  private cgBlockReason(asset:CgAssetId):string|undefined{
+    if(this.state.settings.dnd||this.state.focus)return 'CG 暂不可用：当前处于免打扰或专注模式。';
+    if(this.state.settings.cgAutoplay===false)return 'CG 未播放：请开启“互动后的剧情短片”。';
+    if(!allowsEventCg(this.state,asset))return 'CG 未播放：当前相处方式或女孩贴贴设置不允许该场景。';
+    if(!this.cgCastPresent(asset))return 'CG 未播放：参与角色没有全部在场。';
+    if(this.state.presentation.surface==='desktop'&&!this.state.settings.petsVisible)return 'CG 未播放：桌宠已隐藏。';
+    if(this.state.cgSession)return 'CG 正在播放，请等当前片段结束。';
+    const remaining=Math.ceil((120000-(Date.now()-this.lastEventCgAt))/1000);if(remaining>0)return 'CG 冷却中，还需约 '+remaining+' 秒。';
+  }
+  private eventCgReady(asset:CgAssetId){return !this.cgBlockReason(asset);}
   private cancelPrivateVisit(id: CharacterId) {
     const visit = this.privateVisits.get(id);
     if (!visit || visit.settled) return;
@@ -390,7 +401,7 @@ export class GardenEngine {
     this.stop();
     if(useApi&&!this.generate){const text=this.t('sys.needApi');if(channel)this.addPrivate(channel,'system',text);else this.add('system',text,'error');return;}
     const round = this.epoch; const controller = new AbortController(); this.abort = controller;
-    let invitation:CompanionInvitation|undefined,replyComplete=false;
+    let invitation:CompanionInvitation|undefined,requestedCg:CgAssetId|undefined,cgFeedback:string|undefined,replyComplete=false;
     this.state.busy = true; this.publish();
     try {
       for (const line of lines) {
@@ -411,7 +422,7 @@ export class GardenEngine {
             const invite=(request:CompanionInvitation)=>{
               if(round!==this.epoch||controller.signal.aborted)throw Error(this.t('sys.roundCancelled'));
               if(!channel||!request||typeof request!=='object')throw Error('Invalid private invitation');
-              if(invitation)throw Error('Only one companion invitation is allowed per turn');
+              if(invitation||requestedCg)throw Error('Only one scene request is allowed per turn');
               if(request.playMode!=null&&!['together','self-play'].includes(request.playMode))throw Error('Invalid play mode');
               if(request.target!=null&&(!ids.includes(request.target)||request.target===line.speaker||!isSpeaking(this.state,request.target)))throw Error('Choose a different present companion');
               if(!request.target&&request.playMode!=='together')throw Error('A companion target is required');
@@ -420,9 +431,16 @@ export class GardenEngine {
               invitation={target:request.target,topic:request.topic,playMode:request.playMode};acted=true;
               return '邀请已排队。先完成给用户的简短回应；随后才真实走近并交流，不要声称已到达。';
             };
+            const requestCg=(asset:string)=>{
+              if(round!==this.epoch||controller.signal.aborted)throw Error(this.t('sys.roundCancelled'));
+              if(requestedCg||invitation)throw Error('This turn already has a queued scene');
+              if(!isCgAssetId(asset)||!cgClip(asset).participants.includes(line.speaker)||cgClip(asset).participants.length!==1)throw Error('No compatible solo CG for this resident');
+              const reason=this.cgBlockReason(asset);if(reason){cgFeedback=reason;return JSON.stringify({status:'blocked',reason});}
+              requestedCg=asset;return JSON.stringify({status:'queued',message:'先完成回复，随后播放。尚未播放，不要提前声称成功。'});
+            };
             const raw=await this.generate(context,line.speaker,input,controller.signal,text=>{
               if(round===this.epoch){message.text=text;this.publish();}
-            },act,channel?invite:undefined);
+            },act,channel?invite:undefined,requestCg);
             const result = typeof raw === 'string' ? { text: raw, provider: this.state.settings.provider, model: this.state.settings.model } : raw;
             if (round === this.epoch) {
               message.text = result.text;
@@ -446,6 +464,12 @@ export class GardenEngine {
     } finally {
       const owned=round===this.epoch&&!controller.signal.aborted;
       if(round===this.epoch)this.stop();
+      if(owned&&replyComplete&&cgFeedback){if(channel)this.addPrivate(channel,'system',cgFeedback);else this.add('system',cgFeedback,'notice');}
+      if(owned&&replyComplete&&requestedCg){
+        const reason=this.cgBlockReason(requestedCg);
+        if(reason){if(channel)this.addPrivate(channel,'system',reason);else this.add('system',reason,'notice');}
+        else {const speaker=lines[0].speaker,now=Date.now();this.perform(speaker,{action:'shy',emotion:'happy',duration:2},'model',now);const job=this.queueJob({id:'private-cg-'+crypto.randomUUID(),source:'private-cg',priority:'user',cast:[speaker],cgAsset:requestedCg},[{at:now+2000,actor:speaker,intent:{action:'shy',emotion:'happy',duration:1}}],now);if(!job){const text='CG 未排入：当前场景仍在进行。';if(channel)this.addPrivate(channel,'system',text);else this.add('system',text,'notice');}this.publish();}
+      }
       if(owned&&replyComplete&&invitation&&channel&&isSpeaking(this.state,channel)){
         if(invitation.playMode)this.state.settings.housePlayMode=invitation.playMode;
         this.publish();

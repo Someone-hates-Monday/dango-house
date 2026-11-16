@@ -8,6 +8,7 @@ export const companionTool={
  description:'当你决定接受用户建议、去找另一位在场伙伴玩或亲近时，安排一次真实拜访：先完成当前私聊回复，然后小屋执行走近、伙伴接话、Q版动作与合适的共享CG。只提交可公开的邀请话题，不携带私聊内容。用户说自己忙、让你们自己玩时，可设置self-play；用户回来可设置together。不要为了继续独占用户而无故拒绝用户的建议。',
  parameters:{type:'object',properties:{target:{type:'string',description:'想邀请的在场伙伴的精确ID，不是自己。设置together而不拜访时可省略'},topic:{type:'string',description:'公开的简单邀请目的，例如一起休息、聊聊或靠近待会儿，不超过120字，不是私聊摘要'},playMode:{type:'string',enum:['self-play','together'],description:'仅在用户明确表示想让你们自己玩、或回来一起时设置'}},additionalProperties:false},
 };
+export const cgTool={name:'request_cg',description:'接受用户的亲近邀请后，选择上下文中匹配的现有CG。先完成对白，再播放；回执说明排队或被设置、冷却等拦截。只选自己参与且面向用户的片段，不代替邀请伙伴，不捏造拥抱素材。',parameters:{type:'object',properties:{asset:{type:'string',description:'上下文CG目录的精确ID'}},required:['asset'],additionalProperties:false}};
 export function endpointFor(value:string|undefined,fallback:string,claude=false){
   const raw=value?.trim()||fallback;let url:URL;try{url=new URL(raw);}catch{throw new Error('API 地址不是有效网址。');}
   if(url.username||url.password||url.hash||url.search)throw new Error('API 地址不能包含账号、查询参数或片段。');
