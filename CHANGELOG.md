@@ -1,5 +1,10 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.12 · 2026-11-16 · Affection requests / 亲近邀请
+
+- 明确亲近邀请优先考虑匹配 CG，保留相处模式、冷却和场景完成条件，不冒充缺少的拥抱素材。Prefer compatible CG for accepted affection requests without inventing unavailable footage or bypassing preferences and cooldown.
+- 动作只写在开头括号里，随后写对话；统一私聊提示并隔离旧的反复道具对白。Use an optional action prefix before speech, align private prompts and migrate away from repetitive prop-focused context.
+
 ## 0.5.0-alpha.11 · 2026-11-16 · Clear conversations / 看得懂的对话
 
 - 各自气泡标明说话者与对象，听话者有提示，点击定位聊天记录。Individual bubbles identify speaker and recipient, highlight listeners and open the relevant transcript.

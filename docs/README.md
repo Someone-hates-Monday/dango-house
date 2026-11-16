@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [亲近邀请与动作对白格式：0.5.0-alpha.12](AFFECTION-REQUESTS.zh-CN.md) · [English](AFFECTION-REQUESTS.en.md)
+
 - [各自气泡、对话对象、轻松争宠与界面修复：0.5.0-alpha.11](RESIDENT-DIALOGUE-AND-UI.zh-CN.md) · [English](RESIDENT-DIALOGUE-AND-UI.en.md)
 
 - [聊天驱动同伴演出、自己玩与对白去梗化：0.5.0-alpha.10](COMPANION-SCENE-CONTROL.zh-CN.md) · [English](COMPANION-SCENE-CONTROL.en.md)

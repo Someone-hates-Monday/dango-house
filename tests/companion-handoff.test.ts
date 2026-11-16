@@ -67,7 +67,7 @@ test('obsolete voice prose is not replayed, while visible history and explicit m
  s.memories=[{id:'fact',at:1,text:'EXPLICIT_USER_MEMORY'}];
  assert.deepEqual(modelContextMessages(s).map(m=>m.text),['CURRENT_TOPIC']);
  assert.ok(housePrompt(s,{id:'test',at:1,kind:'message'}).includes('EXPLICIT_USER_MEMORY'));
- s.messages.push({id:'new-model',at:4,speaker:'rin',text:'NEW_REPLY',origin:{backend:'model',voiceRevision:2}});
+ s.messages.push({id:'new-model',at:4,speaker:'rin',text:'NEW_REPLY',origin:{backend:'model',voiceRevision:3}});
  assert.deepEqual(modelContextMessages(s).map(m=>m.text),['CURRENT_TOPIC','NEW_REPLY']);
  assert.equal(s.messages[1].text,'OLD_PROP_OBSESSION','the user transcript is never deleted');
 });
