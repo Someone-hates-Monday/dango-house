@@ -381,7 +381,7 @@ export function Connections({ state }: { state: AppState }) {
                   checked={on}
                   onChange={e => void send({ type: 'cast-present', id: c.id as CharacterId, present: e.target.checked })}
                 />
-                <span className="cast-present-swatch" style={{ background: c.pale }} />
+                <span className="cast-present-avatar" data-character={c.id} style={{background:c.pale}}><img src={`./portraits/${c.file}-alpha-v1.png`} alt="" draggable={false}/></span>
                 <span>
                   <strong>{c.name}</strong>
                   <small>{on ? t('settings.castOnStage') : t('settings.castOffStage')}</small>

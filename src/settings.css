@@ -67,3 +67,15 @@
 @media(max-width:1100px){.connections-page{padding:28px 24px}.connections-page .field-pair{grid-template-columns:minmax(0,1fr)}.connections-page .language-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 .global-settings .sidebar-bottom .settings-nav{display:none}
+
+/* The sticky bar owns the complete scrollport edge, including page gutters. */
+.connections-page{--settings-gutter:40px;padding:0 var(--settings-gutter) 35px;scroll-padding-top:86px}
+.connections-page>.eyebrow{display:block;padding-top:32px}
+.connections-page .settings-groups{top:0;align-self:stretch;margin:16px calc(-1 * var(--settings-gutter)) 0;padding:12px var(--settings-gutter);background:#fff9fc;z-index:30;box-shadow:0 1px 0 #e8d4e1}
+.connections-page .cast-present-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.cast-present-avatar{position:relative;display:block;width:44px;height:44px;flex:0 0 44px;overflow:hidden;border-radius:12px;border:1px solid #dbc6d9}
+.cast-present-avatar img{position:absolute;width:200%;max-width:none;height:auto;left:-50%;top:0}
+.cast-present-avatar[data-character=shiori] img{top:-4px}
+.cast-present-avatar[data-character=grok] img{width:240%;left:-90%;top:-18px}
+.cast-present-card.off .cast-present-avatar{opacity:.8}
+@media(max-width:1100px){.connections-page{--settings-gutter:24px}}
