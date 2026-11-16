@@ -6,6 +6,8 @@ Pick one language per document (do not stack zh/en/ja in one page). Root README 
 
 ## 当前入口 / Current guides
 
+- [小屋拉伸与点击恢复：0.5.0-alpha.14](HOUSE-RESIZE-FIX.zh-CN.md) · [English](HOUSE-RESIZE-FIX.en.md)
+
 - [对话驱动 CG：私聊、群聊与同伴交流：0.5.0-alpha.13](DIALOGUE-CG-CONTROL.zh-CN.md) · [English](DIALOGUE-CG-CONTROL.en.md)
 
 - [亲近邀请与动作对白格式：0.5.0-alpha.12](AFFECTION-REQUESTS.zh-CN.md) · [English](AFFECTION-REQUESTS.en.md)

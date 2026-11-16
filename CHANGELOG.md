@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 0.5.0-alpha.14 · 2026-11-16 · Resize recovery / 拉伸恢复
+
+- 切断尺寸回传反馈，合并拉伸请求并串行发送布局 IPC。Break layout feedback and coalesce resize requests with one layout IPC in flight.
+- 补齐释放、失焦、取消、捕获丢失时的拉伸/拖动清理。Recover input after release, blur, cancellation and lost pointer capture.
+- 极端拉伸后检查尺寸稳定、按钮可点击及 GPT 动画推进。Verify settled bounds, clickable controls and advancing GPT video after extreme resizing.
+
 ## 0.5.0-alpha.13 · 2026-11-16 · Dialogue-driven CG / 对话驱动 CG
 
 - 私聊增加 CG 工具、回复结束后排队和可见拦截原因；取消不补播。Add private CG requests, deferred execution, visible blocked reasons and cancellation guards.

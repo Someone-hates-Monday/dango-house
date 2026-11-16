@@ -26,7 +26,7 @@ export function MiniHouse({state}:{state:AppState}){
  const [scrollToMessage,setScrollToMessage]=useState<string|undefined>();
  const [text,setText]=useState(''),[foodOpen,setFoodOpen]=useState(false),[collapsed,setCollapsed]=useState(false),[unread,setUnread]=useState(false);
  const dragging=useRef(false);
- useEffect(()=>{const end=()=>{if(dragging.current){dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});}};window.addEventListener('blur',end);return()=>window.removeEventListener('blur',end);},[]);
+ useEffect(()=>{const end=()=>{resize.current=null;window.garden.hitTest(false);if(dragging.current){dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});}};window.addEventListener('blur',end);return()=>window.removeEventListener('blur',end);},[]);
  const list=useRef<HTMLDivElement>(null),nearBottom=useRef(true),resize=useRef<{x:number;y:number;width:number;height:number}|null>(null),video=useRef<HTMLVideoElement>(null),playedAt=useRef(0),lastCg=useRef<string|undefined>(undefined);
  const session=state.presentation.surface==='house'&&state.cgSession?.host==='room'?state.cgSession:undefined;
  const clip=session?cgClip(session.asset):undefined;
@@ -45,14 +45,20 @@ export function MiniHouse({state}:{state:AppState}){
  const desiredCg=Math.round(Math.min(360,size.width*.82)*9/16+46);
  useEffect(()=>{
   document.documentElement.classList.add('house-document');
-  const off=window.garden.onHouseLayout(value=>{setLayout(value);setSize(old=>old.width===value.width&&old.height===value.height?old:{width:value.width,height:value.height});});
+  const off=window.garden.onHouseLayout(value=>{setLayout(value);});
   void window.garden.houseLayout().then(value=>{setLayout(value);setSize({width:value.width,height:value.height});setInitialized(true);});
-  const move=(e:PointerEvent)=>{if(dragging.current){window.garden.hitTest(true);return;}const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip,.house-canopy')||painted);};
-  const leave=()=>{if(!dragging.current)window.garden.hitTest(false);};
+  const move=(e:PointerEvent)=>{if(dragging.current||resize.current){window.garden.hitTest(true);return;}const target=e.target as Element;const frame=document.querySelector('.mini-frame');const r=frame?.getBoundingClientRect();const painted=!!r&&inHouseSilhouette(e.clientX-r.left,e.clientY-r.top,r.width,r.height);window.garden.hitTest(!!target.closest('.house-chat,.house-cg,.house-speech,.house-header button,.house-resize,.house-roof-chip,.house-canopy')||painted);};
+  const leave=()=>{if(!dragging.current&&!resize.current)window.garden.hitTest(false);};
   document.addEventListener('pointermove',move);document.addEventListener('pointerleave',leave);
   return()=>{off();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',leave);};
  },[]);
- useEffect(()=>{if(initialized)void window.garden.houseLayout({...size,chatOpen,panelHeight:280,cgHeight:desiredCg}).then(setLayout);},[initialized,size.width,size.height,chatOpen,desiredCg,residents.length]);
+ const layoutPending=useRef<Parameters<typeof window.garden.houseLayout>[0]>(undefined);
+ useEffect(()=>{if(initialized)layoutPending.current={...size,chatOpen,panelHeight:280,cgHeight:desiredCg};},[initialized,size.width,size.height,chatOpen,desiredCg,residents.length]);
+ useEffect(()=>{let inFlight=false,alive=true;const timer=setInterval(()=>{
+  if(inFlight||!layoutPending.current)return;
+  const request=layoutPending.current;layoutPending.current=undefined;inFlight=true;
+  void window.garden.houseLayout(request).catch(()=>{}).finally(()=>{if(alive)inFlight=false;});
+ },40);return()=>{alive=false;clearInterval(timer);layoutPending.current=undefined;};},[]);
  useEffect(()=>{if(session?.id&&lastCg.current!==session.id){lastCg.current=session.id;setCollapsed(false);playedAt.current=0;}},[session?.id]);
  useEffect(()=>{const visibility=()=>{if(document.hidden)video.current?.pause();else if(!collapsed)void video.current?.play().catch(()=>{});};document.addEventListener('visibilitychange',visibility);return()=>document.removeEventListener('visibilitychange',visibility);},[collapsed,session?.id]);
  useEffect(()=>{nearBottom.current=true;setUnread(false);if(list.current)list.current.scrollTop=list.current.scrollHeight;},[channel,chatOpen]);
@@ -80,6 +86,7 @@ export function MiniHouse({state}:{state:AppState}){
   onPointerDown:(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0)return;dragging.current=true;e.currentTarget.setPointerCapture(e.pointerId);window.garden.hitTest(true);window.garden.houseDrag('start',{x:e.screenX,y:e.screenY});},
   onPointerMove:(e:React.PointerEvent<HTMLElement>)=>{if(dragging.current)window.garden.houseDrag('move',{x:e.screenX,y:e.screenY});},
   onPointerUp:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
+  onLostPointerCapture:()=>{dragging.current=false;window.garden.houseDrag('end',{x:0,y:0});},
   onPointerCancel:(e:React.PointerEvent<HTMLElement>)=>{dragging.current=false;window.garden.houseDrag('end',{x:e.screenX,y:e.screenY});},
  };
  const collapseCg=()=>{playedAt.current=video.current?.currentTime??playedAt.current;setCollapsed(true);};
@@ -107,7 +114,7 @@ export function MiniHouse({state}:{state:AppState}){
    </div>
    <footer className="house-footer"><button className={`house-caption ${last?.kind==='error'?'is-error':''}`} aria-live={last?.kind==='error'?'polite':undefined} onClick={()=>setChatOpen(true)} title={last?.text??t.placeholder}><span>{last&&last.speaker!=='system'?(last.speaker==='user'?t.you:byId[last.speaker].name)+' · ':''}{last?.speaker==='system'&&last.kind!=='error'?t.placeholder:last?.text||t.placeholder}</span></button><div className="house-tools"><button className="house-chat-open" onClick={()=>choose()}><MessageCircle size={15}/>{t.chat}</button>{selected&&<><button title={t.pat} aria-label={t.pat} onClick={()=>void send({type:'pat',id:selected})}><Hand size={17}/></button><button title={t.praise} aria-label={t.praise} onClick={()=>void send({type:'praise',id:selected})}><Heart size={17}/></button><button title={t.feed} aria-label={t.feed} onClick={()=>setFoodOpen(!foodOpen)}><Utensils size={17}/></button></>}<button className="house-brain-status" title={state.settings.housePlayMode==='self-play'?t.selfPlayHint:undefined} onClick={openSettings}>{state.settings.mode==='api'?(state.settings.housePlayMode==='self-play'?t.selfPlay:t.live):t.demo}</button></div></footer>
    {foodOpen&&selected&&<div className="house-food-menu">{(['rice','tea','cake','fish'] as Food[]).map((food,i)=><button key={food} onClick={()=>{setFoodOpen(false);void send({type:'feed',id:selected,food});}}>{t.food[i]}</button>)}</div>}
-   <button className="house-resize" aria-label={t.resize} title={t.resize} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);resize.current={x:e.screenX,y:e.screenY,width:layout.width,height:layout.height};}} onPointerMove={e=>{if(resize.current)setSize({width:resize.current.width+e.screenX-resize.current.x,height:resize.current.height+e.screenY-resize.current.y});}} onPointerUp={()=>{resize.current=null;}} onPointerCancel={()=>{resize.current=null;}}/>
+   <button className="house-resize" aria-label={t.resize} title={t.resize} onPointerDown={e=>{if(e.button!==0)return;window.garden.hitTest(true);e.currentTarget.setPointerCapture(e.pointerId);resize.current={x:e.screenX,y:e.screenY,width:layout.width,height:layout.height};}} onPointerMove={e=>{if(!e.buttons){resize.current=null;return;}if(resize.current)setSize({width:resize.current.width+e.screenX-resize.current.x,height:resize.current.height+e.screenY-resize.current.y});}} onPointerUp={e=>{resize.current=null;if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}} onLostPointerCapture={()=>{resize.current=null;}} onPointerCancel={()=>{resize.current=null;}}/>
   </section>
   {chatOpen&&<section className="house-chat" style={{top:layout.cgHeight+layout.height-10,height:layout.chatHeight+10}}>
    <header><button className={!channel?'active':''} onClick={()=>choose()}><Users size={14}/>{t.group}</button>{channel&&<strong>{byId[channel].name} · {t.private}</strong>}<button className="house-chat-close" aria-label={t.closeChat} onClick={()=>setChatOpen(false)}><X size={16}/><span>{t.closeChat}</span></button></header>
